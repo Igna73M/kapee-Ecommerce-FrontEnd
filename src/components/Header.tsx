@@ -34,20 +34,23 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
     <>
       {/* Language & Currency Bar */}
       <div className='bg-primary py-2 px-4 text-sm'>
-        <div className='max-w-7xl mx-auto flex justify-between items-center'>
-          <div className='flex items-center gap-4 text-black'>
-            <select className='bg-transparent border-none text-black outline-none'>
-              <option>ENGLISH</option>
-              <option>SPANISH</option>
-              <option>FRENCH</option>
-              // Wishlist count const wishlistCount = Array.isArray(wishlist) ?
-              wishlist.length : 0;
-            </select>
-            <select className='bg-transparent border-none text-black outline-none'>
-              <option>$ DOLLAR (US)</option>
-              <option>€ EURO</option>
-              <option>£ POUND (UK)</option>
-            </select>
+        <div className='max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2'>
+          <div className='flex items-center gap-4 text-black w-full md:w-auto justify-between'>
+            <div className='flex gap-2'>
+              <select className='bg-transparent border-none text-black outline-none'>
+                <option>ENGLISH</option>
+                <option>SPANISH</option>
+                <option>FRENCH</option>
+              </select>
+              <select className='bg-transparent border-none text-black outline-none'>
+                <option>$ DOLLAR (US)</option>
+                <option>€ EURO</option>
+                <option>£ POUND (UK)</option>
+              </select>
+            </div>
+            <button className='md:hidden block p-2' aria-label='Open menu'>
+              <Menu className='h-5 w-5' />
+            </button>
           </div>
           <div className='hidden md:flex items-center gap-4 text-black'>
             <span>WELCOME TO OUR STORE!</span>
@@ -61,15 +64,18 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
       {/* Main Header */}
       <header className='bg-background py-4 px-4'>
         <div className='max-w-7xl mx-auto'>
-          <div className='flex items-center justify-between'>
+          <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
             {/* Logo */}
-            <Link to='/' className='text-3xl font-bold text-foreground'>
+            <Link
+              to='/'
+              className='text-3xl font-bold text-foreground mb-2 sm:mb-0'
+            >
               kapee.
             </Link>
 
             {/* Search Bar */}
-            <div className='hidden md:flex items-center flex-1 max-w-2xl mx-8'>
-              <div className='relative flex-1 flex border rounded-lg overflow-hidden'>
+            <div className='w-full sm:w-auto flex-1 flex items-center justify-center sm:justify-start order-3 sm:order-none mt-2 sm:mt-0'>
+              <div className='hidden md:flex relative flex-1 flex border rounded-lg overflow-hidden max-w-2xl'>
                 <Input
                   type='text'
                   placeholder='Search for products, categories, brands, sku...'
@@ -111,7 +117,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
             </div>
 
             {/* User Actions */}
-            <div className='flex items-center gap-6'>
+            <div className='flex items-center gap-4 sm:gap-6 w-full sm:w-auto justify-end'>
               <div className='hidden md:flex items-center gap-2 text-sm'>
                 <User className='h-4 w-4' />
                 <div>
@@ -158,23 +164,20 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   </div>
                 </div>
               </div>
-
-              <Button variant='ghost' size='icon' className='md:hidden'>
-                <Menu className='h-5 w-5' />
-              </Button>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className='mt-6 border-t pt-4'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-8'>
+            <div className='flex flex-col md:flex-row items-center justify-between gap-4'>
+              <div className='flex flex-wrap items-center gap-4 md:gap-8 justify-center md:justify-start w-full'>
                 <Button
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 relative'
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 md:px-6 md:py-3 relative text-xs md:text-base'
                   onClick={() => setShowCategorySidebar((prev) => !prev)}
                 >
                   <Menu className='h-4 w-4 mr-2' />
-                  SHOP BY CATEGORIES
+                  <span className='hidden sm:inline'>SHOP BY CATEGORIES</span>
+                  <span className='inline sm:hidden'>CATEGORIES</span>
                   <CategorySidebar
                     open={showCategorySidebar}
                     onClose={() => setShowCategorySidebar(false)}
@@ -183,30 +186,30 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
 
                 <Link
                   to='/'
-                  className='font-medium hover:text-primary smooth-transition'
+                  className='font-medium hover:text-primary smooth-transition text-xs md:text-base'
                 >
                   HOME
                 </Link>
                 <Link
                   to='/shop'
-                  className='font-medium hover:text-primary smooth-transition'
+                  className='font-medium hover:text-primary smooth-transition text-xs md:text-base'
                 >
                   SHOP
                 </Link>
-                <span className='font-medium hover:text-primary smooth-transition cursor-pointer'>
+                <span className='font-medium hover:text-primary smooth-transition cursor-pointer text-xs md:text-base'>
                   PAGES
                 </span>
                 <Link
                   to='/blog'
-                  className='font-medium hover:text-primary smooth-transition'
+                  className='font-medium hover:text-primary smooth-transition text-xs md:text-base'
                 >
                   BLOG
                 </Link>
-                <span className='font-medium hover:text-primary smooth-transition cursor-pointer'>
+                <span className='font-medium hover:text-primary smooth-transition cursor-pointer text-xs md:text-base'>
                   ELEMENTS
                 </span>
               </div>
-              <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-6'>
+              <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-6 text-xs md:text-base'>
                 BUY NOW
               </Button>
             </div>

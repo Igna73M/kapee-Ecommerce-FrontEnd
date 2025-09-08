@@ -16,6 +16,7 @@ interface HeaderProps {
 
 const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
   const [showCategorySidebar, setShowCategorySidebar] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
   // Calculate cart item count and total value
   const cartCount = Array.isArray(cart)
@@ -37,19 +38,37 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
         <div className='max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2'>
           <div className='flex items-center gap-4 text-black w-full md:w-auto justify-between'>
             <div className='flex gap-2'>
-              <select className='bg-transparent border-none text-black outline-none'>
-                <option>ENGLISH</option>
-                <option>SPANISH</option>
-                <option>FRENCH</option>
+              <select
+                id='language-select'
+                className='bg-transparent border-none text-black outline-none'
+                aria-label='Select language'
+                defaultValue='ENGLISH'
+              >
+                <option value='ENGLISH'>ENGLISH</option>
+                <option value='SPANISH'>SPANISH</option>
+                <option value='FRENCH'>FRENCH</option>
               </select>
-              <select className='bg-transparent border-none text-black outline-none'>
-                <option>$ DOLLAR (US)</option>
-                <option>€ EURO</option>
-                <option>£ POUND (UK)</option>
+              <select
+                id='currency-select'
+                className='bg-transparent border-none text-black outline-none'
+                aria-label='Select currency'
+                defaultValue='USD'
+              >
+                <option value='USD'>$ DOLLAR (US)</option>
+                <option value='EUR'>€ EURO</option>
+                <option value='GBP'>£ POUND (UK)</option>
               </select>
             </div>
-            <button className='md:hidden block p-2' aria-label='Open menu'>
-              <Menu className='h-5 w-5' />
+            <button
+              className='md:hidden block p-2'
+              aria-label={showMobileNav ? "Close menu" : "Open menu"}
+              onClick={() => setShowMobileNav((prev) => !prev)}
+            >
+              <Menu
+                className={`h-5 w-5 transition-transform ${
+                  showMobileNav ? "rotate-90" : ""
+                }`}
+              />
             </button>
           </div>
           <div className='hidden md:flex items-center gap-4 text-black'>
@@ -64,24 +83,23 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
       {/* Main Header */}
       <header className='bg-background py-4 px-4'>
         <div className='max-w-7xl mx-auto'>
-          <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+          <div className='flex flex-col md:flex-row items-center md:items-stretch justify-between gap-4 w-full'>
             {/* Logo */}
-            <Link
-              to='/'
-              className='text-3xl font-bold text-foreground mb-2 sm:mb-0'
-            >
-              kapee.
-            </Link>
+            <div className='flex-shrink-0 flex items-center w-full md:w-auto justify-center md:justify-start mb-2 md:mb-0'>
+              <Link to='/' className='text-3xl font-bold text-foreground'>
+                kapee.
+              </Link>
+            </div>
 
             {/* Search Bar */}
-            <div className='w-full sm:w-auto flex-1 flex items-center justify-center sm:justify-start order-3 sm:order-none mt-2 sm:mt-0'>
-              <div className='hidden md:flex relative flex-1 flex border rounded-lg overflow-hidden max-w-2xl'>
+            <div className='w-full md:flex-1 flex items-center justify-center md:justify-center order-3 md:order-none mt-2 md:mt-0'>
+              <div className='flex flex-1 border rounded-lg w-full min-w-0'>
                 <Input
                   type='text'
                   placeholder='Search for products, categories, brands, sku...'
-                  className='border-0 rounded-none py-3 px-4 focus:ring-0'
+                  className='border-0 rounded-none py-3 px-4 focus:ring-0 w-full min-w-0'
                 />
-                <select className='bg-muted px-4 border-l text-sm outline-none'>
+                <select className='bg-muted px-4 border-l text-sm outline-none min-w-[110px]'>
                   <option>All Categories</option>
                   <option value='shirt'>Shirt</option>
                   <option value='electronics'>Electronics</option>
@@ -117,7 +135,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
             </div>
 
             {/* User Actions */}
-            <div className='flex items-center gap-4 sm:gap-6 w-full sm:w-auto justify-end'>
+            <div className='flex items-center gap-4 md:gap-6 w-full md:w-auto justify-center md:justify-end mt-2 md:mt-0'>
               <div className='hidden md:flex items-center gap-2 text-sm'>
                 <User className='h-4 w-4' />
                 <div>
@@ -169,7 +187,8 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
 
           {/* Navigation */}
           <nav className='mt-6 border-t pt-4'>
-            <div className='flex flex-col md:flex-row items-center justify-between gap-4'>
+            {/* Desktop nav */}
+            <div className='hidden md:flex flex-row items-center justify-between gap-4'>
               <div className='flex flex-wrap items-center gap-4 md:gap-8 justify-center md:justify-start w-full'>
                 <Button
                   className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 md:px-6 md:py-3 relative text-xs md:text-base'
@@ -183,7 +202,6 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                     onClose={() => setShowCategorySidebar(false)}
                   />
                 </Button>
-
                 <Link
                   to='/'
                   className='font-medium hover:text-primary smooth-transition text-xs md:text-base'
@@ -213,6 +231,52 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 BUY NOW
               </Button>
             </div>
+            {/* Mobile nav */}
+            {showMobileNav && (
+              <div className='flex flex-col md:hidden gap-4 mt-4 animate-fade-in'>
+                <Button
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 relative text-xs'
+                  onClick={() => setShowCategorySidebar((prev) => !prev)}
+                >
+                  <Menu className='h-4 w-4 mr-2' />
+                  CATEGORIES
+                  <CategorySidebar
+                    open={showCategorySidebar}
+                    onClose={() => setShowCategorySidebar(false)}
+                  />
+                </Button>
+                <Link
+                  to='/'
+                  className='font-medium hover:text-primary smooth-transition text-xs'
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  HOME
+                </Link>
+                <Link
+                  to='/shop'
+                  className='font-medium hover:text-primary smooth-transition text-xs'
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  SHOP
+                </Link>
+                <span className='font-medium hover:text-primary smooth-transition cursor-pointer text-xs'>
+                  PAGES
+                </span>
+                <Link
+                  to='/blog'
+                  className='font-medium hover:text-primary smooth-transition text-xs'
+                  onClick={() => setShowMobileNav(false)}
+                >
+                  BLOG
+                </Link>
+                <span className='font-medium hover:text-primary smooth-transition cursor-pointer text-xs'>
+                  ELEMENTS
+                </span>
+                <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 text-xs'>
+                  BUY NOW
+                </Button>
+              </div>
+            )}
           </nav>
         </div>
       </header>

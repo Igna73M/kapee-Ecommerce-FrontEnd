@@ -120,14 +120,21 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 </div>
               </div>
 
-              <Button variant='ghost' size='icon' className='relative'>
-                <Heart className='h-5 w-5' />
-                {wishlistCount > 0 && (
-                  <Badge className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary text-primary-foreground text-xs'>
-                    {wishlistCount}
-                  </Badge>
-                )}
-              </Button>
+              <Link to='/wishlist'>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='relative'
+                  aria-label='View wishlist'
+                >
+                  <Heart className='h-5 w-5' />
+                  {wishlistCount > 0 && (
+                    <Badge className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary text-primary-foreground text-xs'>
+                      {wishlistCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
 
               <div className='flex items-center gap-2'>
                 <Button

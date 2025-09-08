@@ -11,6 +11,9 @@ import { useState } from "react";
 import { Product } from "@/types/product";
 import Shop from "./pages/Shop";
 import Index from "./pages/Index";
+import Wishlist from "./pages/Wishlist";
+import WishlistPage from "./pages/Wishlist";
+import { products } from "./data/products";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +110,17 @@ const App = () => {
               }
             />
             <Route path='/blog' element={<Blog />} />
+            <Route
+              path='/wishlist'
+              element={
+                <WishlistPage
+                  wishlist={products.filter((p) => wishlist.includes(p.id))}
+                  onProductClick={() => {}}
+                  addToCart={addToCart}
+                  toggleWishlist={toggleWishlist}
+                />
+              }
+            />
             <Route path='*' element={<NotFound />} />
           </Routes>
         </BrowserRouter>

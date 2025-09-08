@@ -90,40 +90,6 @@ const HotDealCard = ({
           {product.name}
         </h3>
 
-        {/* Features/Highlights */}
-        {product.features && product.features.length > 0 && (
-          <div className='text-sm text-muted-foreground'>
-            <div className='font-medium mb-1'>Highlights:</div>
-            <ul className='space-y-1'>
-              {product.features.slice(0, 3).map((feature, index) => (
-                <li key={index} className='text-xs flex items-start'>
-                  <span className='w-1 h-1 bg-muted-foreground rounded-full mr-2 mt-2 flex-shrink-0'></span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Rating */}
-        {product.rating && (
-          <div className='flex items-center gap-1'>
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-4 w-4 ${
-                  i < Math.floor(product.rating!)
-                    ? "fill-primary text-primary"
-                    : "text-muted-foreground"
-                }`}
-              />
-            ))}
-            <span className='text-sm text-muted-foreground ml-1'>
-              ({product.rating})
-            </span>
-          </div>
-        )}
-
         {/* Price */}
         <div className='flex items-center gap-2'>
           <span className='text-xl font-bold text-foreground'>
@@ -142,8 +108,8 @@ const HotDealCard = ({
             )}
         </div>
 
-        {/* Action Buttons */}
-        <div className='flex gap-2'>
+        {/* Action Buttons (show only on hover) */}
+        <div className='flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200'>
           <Button
             variant='outline'
             size='icon'

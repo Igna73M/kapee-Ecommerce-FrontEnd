@@ -1,4 +1,4 @@
-# Press Layout Clone
+# Kapee-Ecommerce
 
 A modern, responsive e-commerce website built with React, TypeScript, Vite, and Tailwind CSS. This project is a feature-rich clone of a professional press/electronics store layout, designed for learning, customization, and real-world use.
 
@@ -72,4 +72,5 @@ A modern, responsive e-commerce website built with React, TypeScript, Vite, and 
 ## License
 
 This project is for educational and demonstration purposes. Feel free to use, modify, and share.
+
 # kapee-Ecommerce

@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Product } from "@/types/product";
 import CategorySidebar from "../components/CategorySidebar";
+import Login from "@/components/Login";
 
 interface HeaderProps {
   cart: { product: Product; quantity: number }[];
@@ -17,6 +18,7 @@ interface HeaderProps {
 const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
   const [showCategorySidebar, setShowCategorySidebar] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   // Calculate cart item count and total value
   const cartCount = Array.isArray(cart)
@@ -136,7 +138,10 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
 
             {/* User Actions */}
             <div className='flex items-center gap-4 md:gap-6 w-full md:w-auto justify-center md:justify-end mt-2 md:mt-0'>
-              <div className='hidden md:flex items-center gap-2 text-sm'>
+              <div
+                className='hidden md:flex items-center gap-2 text-sm cursor-pointer'
+                onClick={() => setShowLogin(true)}
+              >
                 <User className='h-4 w-4' />
                 <div>
                   <div className='text-xs text-muted-foreground'>HELLO</div>
@@ -280,6 +285,20 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
           </nav>
         </div>
       </header>
+      {/* Mobile SIGN IN button (optional, if you want it in mobile nav) */}
+      {showMobileNav && (
+        <div className='flex flex-col md:hidden gap-4 mt-4 animate-fade-in'>
+          <Button
+            variant='outline'
+            className='text-xs'
+            onClick={() => setShowLogin(true)}
+          >
+            SIGN IN
+          </Button>
+        </div>
+      )}
+      {/* Login Popup */}
+      <Login open={showLogin} onClose={() => setShowLogin(false)} />
     </>
   );
 };

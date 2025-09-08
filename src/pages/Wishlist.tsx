@@ -1,20 +1,19 @@
-import React from "react";
 import ProductCard from "../components/ProductCard";
 import { Product } from "../types/product";
 
-interface WishlistPageProps {
+type WishlistPageProps = {
   wishlist: Product[];
   onProductClick: (product: Product) => void;
   addToCart?: (product: Product, quantity?: number) => void;
   toggleWishlist?: (productId: string) => void;
-}
+};
 
-const WishlistPage: React.FC<WishlistPageProps> = ({
+function WishlistPage({
   wishlist,
   onProductClick,
   addToCart,
   toggleWishlist,
-}) => {
+}: WishlistPageProps) {
   return (
     <div className='max-w-7xl mx-auto px-4 py-8'>
       <h1 className='text-2xl font-bold mb-6'>My Wishlist</h1>
@@ -38,6 +37,6 @@ const WishlistPage: React.FC<WishlistPageProps> = ({
       )}
     </div>
   );
-};
+}
 
 export default WishlistPage;

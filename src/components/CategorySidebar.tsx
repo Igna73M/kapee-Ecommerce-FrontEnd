@@ -4,7 +4,7 @@ import { useState } from "react";
 // Import categorized data
 import { mensClothingList } from "@/data/categorizedData";
 import { womensClothingList } from "@/data/categorizedData";
-import { accessorsList } from "@/data/categorizedData";
+import { accessoriesList } from "@/data/categorizedData";
 import { shoesList } from "@/data/categorizedData";
 import { jewelleryList } from "@/data/categorizedData";
 import { bagsList } from "@/data/categorizedData";
@@ -34,7 +34,7 @@ interface CategorySidebarProps {
 const categoryMenuMap: Record<string, { id: number; name: string }[]> = {
   "Men's Clothing": mensClothingList,
   "Women's Clothing": womensClothingList,
-  Accessories: accessorsList,
+  Accessories: accessoriesList,
   Shoes: shoesList,
   Jewellery: jewelleryList,
   "Bags & Backpacks": bagsList,

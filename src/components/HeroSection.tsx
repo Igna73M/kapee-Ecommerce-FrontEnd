@@ -1,69 +1,51 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
-import heroSmartphone from "@/assets/hero-smartphone.png";
-import headphones from "@/assets/headphones.png";
-import watch from "@/assets/watch-charger.png";
-import wirelessSpeaker from "@/assets/wireless-speaker.png";
-
-const heroSlides = [
-  {
-    id: 1,
-    title: "BEST SMARTPHONE",
-    subtitle: "WIRELESS",
-    highlight: "CHARGING STAND",
-    discount: "Up To 70% Off",
-    image: heroSmartphone,
-    buttonText: "BUY NOW",
-  },
-  {
-    id: 2,
-    title: "BEST HEADPHONES",
-    subtitle: "WIRELESS",
-    highlight: "NOISE CANCELLING",
-    discount: "Up To 65% Off",
-    image: headphones,
-    buttonText: "BUY NOW",
-  },
-  {
-    id: 3,
-    title: "BEST WATCH",
-    subtitle: "SMART WATCH",
-    highlight: "FAST CHARGING",
-    discount: "Up To 50% Off",
-    image: watch,
-    buttonText: "BUY NOW",
-  },
-  {
-    id: 4,
-    title: "BEST WIRELESS SPEAKER",
-    subtitle: "PORTABLE",
-    highlight: "LONG BATTERY LIFE",
-    discount: "Up To 60% Off",
-    image: wirelessSpeaker,
-    buttonText: "BUY NOW",
-  },
-];
+import { useState, useEffect, useRef } from "react";
+import { heroSlides } from "@/data/heroSlides";
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setAnimating(false);
+    }, 350); // match animation duration
   };
 
   const prevSlide = () => {
-    setCurrentSlide(
-      (prev) => (prev - 1 + heroSlides.length) % heroSlides.length
-    );
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrentSlide(
+        (prev) => (prev - 1 + heroSlides.length) % heroSlides.length
+      );
+      setAnimating(false);
+    }, 350);
   };
+
+  // Auto-slide with medium interval (e.g., 4 seconds)
+  useEffect(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      nextSlide();
+    }, 4000);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [currentSlide]);
 
   const slide = heroSlides[currentSlide];
 
   return (
     <div className='relative bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg overflow-hidden'>
-      <div className='flex items-center min-h-[400px] p-8 md:p-12'>
-        <div className='flex-1 space-y-6'>
+      <div className='flex items-center min-h-[400px] p-8 md:p-12 transition-transform duration-700 ease-in-out'>
+        {/* Slide Content with pop-in animation */}
+        <div
+          className={`flex-1 space-y-6 ${animating ? "" : "animate-pop-in"}`}
+        >
           <div className='space-y-2'>
             <div className='text-primary text-sm font-semibold tracking-wider'>
               {slide.title}
@@ -82,7 +64,10 @@ const HeroSection = () => {
           </Button>
         </div>
 
-        <div className='flex-1 relative'>
+        <div
+          className={`flex-1 relative ${animating ? "" : "animate-pop-in"}`}
+          style={{ animationDelay: animating ? "0ms" : "100ms" }}
+        >
           <img
             src={slide.image}
             alt={slide.title}
@@ -100,7 +85,6 @@ const HeroSection = () => {
       >
         <ChevronLeft className='h-6 w-6' />
       </Button>
-
       <Button
         variant='ghost'
         size='icon'

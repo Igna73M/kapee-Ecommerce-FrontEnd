@@ -33,7 +33,7 @@ const Cart = ({
 
   const handleViewCart = () => {
     onClose();
-    navigate("/cart");
+    navigate("/cart", { state: { cart } });
   };
 
   const handleCheckout = () => {

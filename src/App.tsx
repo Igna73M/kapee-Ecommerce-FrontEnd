@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound";
 import Cart from "@/components/Cart";
 import Header from "@/components/Header";
 import Checkout from "./pages/Checkout";
+import CartPage from "./pages/CartPage";
 
 import { useState } from "react";
 import { Product } from "@/types/product";
@@ -84,6 +85,16 @@ const App = () => {
             />
           )}
           <Routes>
+            <Route
+              path='/cart'
+              element={
+                <CartPage
+                  cart={cart}
+                  removeFromCart={removeFromCart}
+                  updateCartQuantity={updateCartQuantity}
+                />
+              }
+            />
             <Route
               path='/'
               element={

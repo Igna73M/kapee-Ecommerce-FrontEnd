@@ -38,7 +38,7 @@ const Cart = ({
 
   const handleCheckout = () => {
     onClose();
-    navigate("/checkout");
+    navigate("/checkout", { state: { cart } });
   };
 
   const handleDecrease = (item: CartItem) => {

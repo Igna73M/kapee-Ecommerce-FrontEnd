@@ -6,6 +6,7 @@ import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 import Cart from "@/components/Cart";
 import Header from "@/components/Header";
+import Checkout from "./pages/Checkout";
 
 import { useState } from "react";
 import { Product } from "@/types/product";
@@ -111,6 +112,7 @@ const App = () => {
                 />
               }
             />
+            <Route path='/checkout' element={<Checkout cart={cart} />} />
             <Route path='/blog' element={<Blog />} />
             <Route
               path='/wishlist'

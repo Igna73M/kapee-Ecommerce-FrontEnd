@@ -1,10 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { heroSlides } from "@/data/heroSlides";
+import { useNavigate } from "react-router-dom";
+import { products } from "@/data/products";
+import { Product } from "@/types/product";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  addToCart: (product: Product, quantity?: number) => void;
+  openCart: () => void;
+}
+
+const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
+  // Helper to find the product for the current slide
+  const getProductForSlide = useCallback(() => {
+    const slide = heroSlides[currentSlide];
+    return products.find((p) => p.image === slide.image);
+  }, [currentSlide]);
   const [animating, setAnimating] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -59,7 +73,19 @@ const HeroSection = () => {
             </div>
           </div>
 
-          <Button variant='hero' size='xl' className='mt-8'>
+          <Button
+            variant='hero'
+            size='xl'
+            className='mt-8'
+            onClick={() => {
+              const product = getProductForSlide();
+              if (product) {
+                addToCart(product, 1);
+                openCart();
+              }
+              navigate("/checkout");
+            }}
+          >
             {slide.buttonText}
           </Button>
         </div>

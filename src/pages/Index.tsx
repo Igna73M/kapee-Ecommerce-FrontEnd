@@ -66,7 +66,7 @@ const Index = ({
           {/* Main Content */}
           <div className='lg:col-span-3 space-y-8'>
             {/* Hero Section */}
-            <HeroSection />
+            <HeroSection addToCart={addToCart} openCart={openCart} />
 
             {/* Banner Section */}
             <BannerSection />

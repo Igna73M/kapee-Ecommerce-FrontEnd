@@ -232,9 +232,11 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   ELEMENTS
                 </span>
               </div>
-              <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-6 text-xs md:text-base'>
-                BUY NOW
-              </Button>
+              <Link to='/checkout'>
+                <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-6 text-xs md:text-base'>
+                  BUY NOW
+                </Button>
+              </Link>
             </div>
             {/* Mobile nav */}
             {showMobileNav && (

@@ -131,7 +131,10 @@ const App = () => {
                 <WishlistPage
                   wishlist={products.filter((p) => wishlist.includes(p.id))}
                   onProductClick={() => {}}
-                  addToCart={addToCart}
+                  addToCart={(product, quantity) => {
+                    addToCart(product, quantity);
+                    openCart();
+                  }}
                   toggleWishlist={toggleWishlist}
                 />
               }

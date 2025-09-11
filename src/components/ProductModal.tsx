@@ -16,6 +16,9 @@ interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   addToCart?: (product: Product, quantity?: number) => void;
+  openCart?: () => void;
+  wishlist?: string[];
+  toggleWishlist?: (productId: string) => void;
 }
 
 const ProductModal = ({
@@ -23,6 +26,9 @@ const ProductModal = ({
   isOpen,
   onClose,
   addToCart,
+  openCart,
+  wishlist = [],
+  toggleWishlist,
 }: ProductModalProps) => {
   const [quantity, setQuantity] = useState(1);
   const { toast } = useToast();
@@ -153,6 +159,8 @@ const ProductModal = ({
                 onClick={() => {
                   if (addToCart && product) {
                     addToCart(product, quantity);
+                    onClose();
+                    if (openCart) openCart();
                   }
                 }}
                 disabled={!addToCart}
@@ -160,17 +168,32 @@ const ProductModal = ({
                 Add to Cart - ${(product.price * quantity).toFixed(2)}
               </Button>
               <Button
-                variant='outline'
+                variant={wishlist.includes(product.id) ? "default" : "outline"}
                 size='lg'
                 onClick={() => {
-                  toast({
-                    title: "Added to Wishlist",
-                    description: `${product.name} has been added to your wishlist!`,
-                  });
+                  if (toggleWishlist && product) {
+                    toggleWishlist(product.id);
+                    toast({
+                      title: wishlist.includes(product.id)
+                        ? "Removed from Wishlist"
+                        : "Added to Wishlist",
+                      description: `${product.name} has been ${
+                        wishlist.includes(product.id)
+                          ? "removed from"
+                          : "added to"
+                      } your wishlist!`,
+                    });
+                  }
                 }}
               >
-                <Heart className='h-4 w-4 mr-2' />
-                Wishlist
+                <Heart
+                  className={`h-4 w-4 mr-2 ${
+                    wishlist.includes(product.id)
+                      ? "text-red-500 fill-red-500"
+                      : ""
+                  }`}
+                />
+                {wishlist.includes(product.id) ? "Wishlisted" : "Wishlist"}
               </Button>
             </div>
 

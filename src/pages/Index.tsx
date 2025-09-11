@@ -151,6 +151,9 @@ const Index = ({
           addToCart(product, quantity);
           openCart();
         }}
+        openCart={openCart}
+        wishlist={wishlist}
+        toggleWishlist={toggleWishlist}
       />
     </div>
   );

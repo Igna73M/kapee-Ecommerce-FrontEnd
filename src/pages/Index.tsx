@@ -25,6 +25,7 @@ interface IndexProps {
   updateCartQuantity: (productId: string, quantity: number) => void;
   wishlist: string[];
   toggleWishlist: (productId: string) => void;
+  openCart: () => void;
 }
 
 const Index = ({
@@ -34,6 +35,7 @@ const Index = ({
   updateCartQuantity,
   wishlist,
   toggleWishlist,
+  openCart,
 }: IndexProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,7 +95,10 @@ const Index = ({
                   <FeaturedHotDeal
                     product={hotDeals[0]}
                     onProductClick={handleProductClick}
-                    addToCart={addToCart}
+                    addToCart={(product, quantity) => {
+                      addToCart(product, quantity);
+                      openCart();
+                    }}
                   />
                 </div>
 
@@ -104,7 +109,10 @@ const Index = ({
                       key={product.id}
                       product={product}
                       onProductClick={handleProductClick}
-                      addToCart={addToCart}
+                      addToCart={(p, q) => {
+                        addToCart(p, q);
+                        openCart();
+                      }}
                       wishlist={wishlist}
                       toggleWishlist={toggleWishlist}
                     />
@@ -139,7 +147,10 @@ const Index = ({
         product={selectedProduct}
         isOpen={isModalOpen}
         onClose={closeModal}
-        addToCart={addToCart}
+        addToCart={(product, quantity) => {
+          addToCart(product, quantity);
+          openCart();
+        }}
       />
     </div>
   );

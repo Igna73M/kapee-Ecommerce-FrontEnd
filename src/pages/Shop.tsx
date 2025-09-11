@@ -16,6 +16,7 @@ interface ShopProps {
   updateCartQuantity: (productId: string, quantity: number) => void;
   wishlist: string[];
   toggleWishlist: (productId: string) => void;
+  openCart: () => void;
 }
 
 const Shop = ({
@@ -25,6 +26,7 @@ const Shop = ({
   updateCartQuantity,
   wishlist,
   toggleWishlist,
+  openCart,
 }: ShopProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,7 +80,10 @@ const Shop = ({
                   key={product.id}
                   product={product}
                   onProductClick={handleProductClick}
-                  addToCart={addToCart}
+                  addToCart={(p, q) => {
+                    addToCart(p, q);
+                    openCart();
+                  }}
                   wishlist={wishlist}
                   toggleWishlist={toggleWishlist}
                 />
@@ -95,7 +100,10 @@ const Shop = ({
         product={selectedProduct}
         isOpen={isModalOpen}
         onClose={closeModal}
-        addToCart={addToCart}
+        addToCart={(product, quantity) => {
+          addToCart(product, quantity);
+          openCart();
+        }}
       />
     </div>
   );

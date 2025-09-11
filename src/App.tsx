@@ -93,6 +93,7 @@ const App = () => {
                   updateCartQuantity={updateCartQuantity}
                   wishlist={wishlist}
                   toggleWishlist={toggleWishlist}
+                  openCart={openCart}
                 />
               }
             />
@@ -106,6 +107,7 @@ const App = () => {
                   updateCartQuantity={updateCartQuantity}
                   wishlist={wishlist}
                   toggleWishlist={toggleWishlist}
+                  openCart={openCart}
                 />
               }
             />

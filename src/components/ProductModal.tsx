@@ -153,7 +153,6 @@ const ProductModal = ({
                 onClick={() => {
                   if (addToCart && product) {
                     addToCart(product, quantity);
-                    onClose();
                   }
                 }}
                 disabled={!addToCart}

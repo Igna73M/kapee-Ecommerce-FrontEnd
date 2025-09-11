@@ -69,7 +69,11 @@ const Index = ({
             <HeroSection addToCart={addToCart} openCart={openCart} />
 
             {/* Banner Section */}
-            <BannerSection />
+            <BannerSection
+              addToCart={addToCart}
+              openCart={openCart}
+              products={products}
+            />
 
             {/* Hot Deals Section */}
             <section>

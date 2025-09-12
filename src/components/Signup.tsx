@@ -1,29 +1,31 @@
 import { useState, useEffect } from "react";
-import Signup from "./Signup";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 
-interface LoginProps {
+interface SignupProps {
   open: boolean;
   onClose: () => void;
+  onSwitchToLogin: () => void;
 }
 
-export default function Login({ open, onClose }: LoginProps) {
+export default function Signup({
+  open,
+  onClose,
+  onSwitchToLogin,
+}: SignupProps) {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [show, setShow] = useState(open);
   const [animate, setAnimate] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
 
   useEffect(() => {
     if (open) {
       setShow(true);
-      setTimeout(() => setAnimate(true), 10); // trigger animation
+      setTimeout(() => setAnimate(true), 10);
     } else if (show) {
       setAnimate(false);
-      // Wait for animation to finish before unmounting
       const timeout = setTimeout(() => setShow(false), 250);
       return () => clearTimeout(timeout);
     }
@@ -31,21 +33,9 @@ export default function Login({ open, onClose }: LoginProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
+    // Handle signup logic here
   };
 
-  if (showSignup) {
-    return (
-      <Signup
-        open={showSignup}
-        onClose={() => {
-          setShowSignup(false);
-          onClose();
-        }}
-        onSwitchToLogin={() => setShowSignup(false)}
-      />
-    );
-  }
   if (!show) return null;
   return (
     <div
@@ -59,16 +49,17 @@ export default function Login({ open, onClose }: LoginProps) {
         }`}
       >
         <div className='p-6 md:p-8 bg-yellow-400 w-full md:w-1/2 flex-shrink-0'>
-          <h2 className='text-2xl md:text-3xl font-bold mb-2'>Login</h2>
+          <h2 className='text-2xl md:text-3xl font-bold mb-2'>Sign Up</h2>
           <div className='text-sm md:text-base text-black w-full pt-4 md:pt-6'>
-            Get access to your Orders, Wishlist and Recommendations.
+            Create an account to access your Orders, Wishlist and
+            Recommendations.
           </div>
         </div>
         <div className='relative bg-white p-6 md:p-8 w-full'>
           <button
             onClick={onClose}
             className='fixed md:absolute top-0 right-2 z-50 text-black hover:text-gray-600 text-2xl font-bold focus:outline-none bg-transparent border-0 p-0'
-            aria-label='Close login dialog'
+            aria-label='Close signup dialog'
           >
             ×
           </button>
@@ -78,7 +69,16 @@ export default function Login({ open, onClose }: LoginProps) {
                 type='text'
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder='Enter Username/Email address'
+                placeholder='Username'
+                required
+              />
+            </div>
+            <div>
+              <Input
+                type='email'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder='Email address'
                 required
               />
             </div>
@@ -87,39 +87,33 @@ export default function Login({ open, onClose }: LoginProps) {
                 type='password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder='Enter Password'
+                placeholder='Password'
                 required
               />
             </div>
-            <div className='flex items-center justify-between'>
-              <label className='flex items-center gap-2 text-sm text-primary font-bold'>
-                <Checkbox
-                  checked={remember}
-                  onCheckedChange={(v) => setRemember(!!v)}
-                />
-                Remember me
-              </label>
-              <button
-                type='button'
-                className='text-xs text-primary hover:underline bg-transparent border-0 p-0 font-bold'
-              >
-                Lost your password?
-              </button>
+            <div>
+              <Input
+                type='password'
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder='Confirm Password'
+                required
+              />
             </div>
             <Button
               type='submit'
               className='w-full mt-2 bg-black text-yellow-400 hover:bg-gray-800 hover:text-white'
             >
-              Log in
+              Sign Up
             </Button>
             <div className='text-center pt-2'>
-              <span className='text-sm'>Don't have an account? </span>
+              <span className='text-sm'>Already have an account? </span>
               <button
                 type='button'
                 className='text-primary font-bold hover:underline bg-transparent border-0 p-0 text-sm'
-                onClick={() => setShowSignup(true)}
+                onClick={onSwitchToLogin}
               >
-                Sign up
+                Log in
               </button>
             </div>
           </form>

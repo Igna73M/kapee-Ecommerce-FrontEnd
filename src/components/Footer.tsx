@@ -6,8 +6,6 @@ import {
   Youtube,
   Rss,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 const Footer = () => {
   return (
@@ -168,42 +166,63 @@ const Footer = () => {
               </p>
 
               <div className='flex gap-2'>
-                <Input
+                <input
                   type='email'
                   placeholder='Your email address'
-                  className='flex-1'
+                  className='flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
                 />
-                <Button className='bg-foreground text-background hover:bg-foreground/90'>
+                <button
+                  className='bg-foreground text-background hover:bg-foreground/90 px-4 py-2 rounded font-semibold transition-colors duration-150'
+                  type='button'
+                >
                   SIGN UP
-                </Button>
+                </button>
               </div>
 
               {/* Social Media Icons */}
               <div className='flex gap-2 mt-6'>
-                <Button size='icon' className='bg-blue-600 hover:bg-blue-700'>
+                <button
+                  className='bg-blue-600 hover:bg-blue-700 rounded-full p-2'
+                  type='button'
+                >
                   <Facebook className='h-4 w-8' />
-                </Button>
-                <Button size='icon' className='bg-black hover:bg-gray-800'>
+                </button>
+                <button
+                  className='bg-black hover:bg-gray-800 rounded-full p-2'
+                  type='button'
+                >
                   <Twitter className='h-4 w-8' />
-                </Button>
-                <Button size='icon' className='bg-blue-700 hover:bg-blue-800'>
+                </button>
+                <button
+                  className='bg-blue-700 hover:bg-blue-800 rounded-full p-2'
+                  type='button'
+                >
                   <Linkedin className='h-4 w-8' />
-                </Button>
-                <Button size='icon' className='bg-pink-500 hover:bg-pink-600'>
+                </button>
+                <button
+                  className='bg-pink-500 hover:bg-pink-600 rounded-full p-2'
+                  type='button'
+                >
                   <Instagram className='h-4 w-8' />
-                </Button>
-                <Button size='icon' className='bg-pink-600 hover:bg-pink-700'>
+                </button>
+                <button
+                  className='bg-pink-600 hover:bg-pink-700 rounded-full p-2'
+                  type='button'
+                >
                   <span className='text-xs font-bold'>D</span>
-                </Button>
-                <Button
-                  size='icon'
-                  className='bg-orange-500 hover:bg-orange-600'
+                </button>
+                <button
+                  className='bg-orange-500 hover:bg-orange-600 rounded-full p-2'
+                  type='button'
                 >
                   <Rss className='h-4 w-8' />
-                </Button>
-                <Button size='icon' className='bg-red-600 hover:bg-red-700'>
+                </button>
+                <button
+                  className='bg-red-600 hover:bg-red-700 rounded-full p-2'
+                  type='button'
+                >
                   <Youtube className='h-4 w-8' />
-                </Button>
+                </button>
               </div>
             </div>
           </div>

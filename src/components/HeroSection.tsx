@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { heroSlides } from "@/data/heroSlides";
@@ -73,10 +72,8 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
             </div>
           </div>
 
-          <Button
-            variant='hero'
-            size='xl'
-            className='mt-8'
+          <button
+            className='mt-8 bg-primary text-primary-foreground px-8 py-3 rounded text-lg font-bold shadow hover:bg-primary/90 transition-colors duration-150'
             onClick={() => {
               const product = getProductForSlide();
               if (product) {
@@ -85,9 +82,10 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
               }
               navigate("/checkout");
             }}
+            type='button'
           >
             {slide.buttonText}
-          </Button>
+          </button>
         </div>
 
         <div
@@ -103,22 +101,22 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
       </div>
 
       {/* Navigation Arrows */}
-      <Button
-        variant='ghost'
-        size='icon'
-        className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white'
+      <button
+        className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow transition-colors duration-150'
         onClick={prevSlide}
+        type='button'
+        aria-label='Previous Slide'
       >
         <ChevronLeft className='h-6 w-6' />
-      </Button>
-      <Button
-        variant='ghost'
-        size='icon'
-        className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white'
+      </button>
+      <button
+        className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow transition-colors duration-150'
         onClick={nextSlide}
+        type='button'
+        aria-label='Next Slide'
       >
         <ChevronRight className='h-6 w-6' />
-      </Button>
+      </button>
 
       {/* Slide Indicators */}
       <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 '>

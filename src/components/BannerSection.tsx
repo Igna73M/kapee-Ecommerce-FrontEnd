@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { banners } from "@/data/banners";
 
 import { useNavigate } from "react-router-dom";
@@ -40,21 +39,19 @@ const BannerSection = ({
                   </div>
                 </div>
 
-                <Button
-                  variant='shop'
-                  size='sm'
+                <button
+                  className='bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90 text-sm font-semibold transition-colors duration-150 mt-4'
                   onClick={() => {
                     if (product) {
-                      addToCart(product, 1);
+                      addToCart(product);
                       openCart();
                     }
-                    navigate("/checkout");
                   }}
+                  type='button'
                 >
                   {banner.buttonText}
-                </Button>
+                </button>
               </div>
-
               <div className='flex-1'>
                 <img
                   src={banner.image}

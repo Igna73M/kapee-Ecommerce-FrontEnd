@@ -11,7 +11,6 @@ import { bagsList } from "@/data/categorizedData";
 import { watchesList } from "@/data/categorizedData";
 
 // Menu UI
-import PopUpMenu from "./ui/pop-up-menu";
 
 // Categories from the screenshot
 const sidebarCategories = [
@@ -66,7 +65,16 @@ const CategorySidebar = ({ open, onClose }: CategorySidebarProps) => {
             <ChevronRight className='h-4 w-4 text-gray-400 group-hover:text-primary' />
             {hoveredCategory === category.name &&
               categoryMenuMap[category.name] && (
-                <PopUpMenu items={categoryMenuMap[category.name]} />
+                <ul className='absolute left-full top-0 ml-2 bg-white border rounded shadow-lg z-50 min-w-[150px]'>
+                  {categoryMenuMap[category.name].map((item) => (
+                    <li
+                      key={item.id}
+                      className='px-4 py-2 hover:bg-primary/10 cursor-pointer text-sm text-gray-700'
+                    >
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
               )}
           </div>
         ))}

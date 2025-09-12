@@ -1,7 +1,4 @@
 import { Heart, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { products } from "@/data/products";
 import { Product } from "@/types/product";
 
@@ -37,16 +34,14 @@ const BestSellingSection = ({
       <div className='bg-card rounded-lg border-2 border-yellow-400 hover:shadow-lg transition-all duration-300 group relative overflow-hidden h-full'>
         {/* Discount Badge */}
         {discountPercentage > 0 && (
-          <Badge className='absolute top-3 left-3 z-10 bg-green-500 text-white'>
+          <span className='absolute top-3 left-3 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded'>
             {discountPercentage}% OFF
-          </Badge>
+          </span>
         )}
 
         {/* Wishlist Button */}
-        <Button
-          variant='ghost'
-          size='icon'
-          className='absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background'
+        <button
+          className='absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background rounded-full p-2'
           onClick={(e) => {
             e.stopPropagation();
             if (toggleWishlist) toggleWishlist(product.id);
@@ -56,13 +51,14 @@ const BestSellingSection = ({
               ? "Remove from wishlist"
               : "Add to wishlist"
           }
+          type='button'
         >
           <Heart
             className={`h-4 w-4 ${
               wishlist.includes(product.id) ? "text-red-500 fill-red-500" : ""
             }`}
           />
-        </Button>
+        </button>
 
         {/* Product Image */}
         <div
@@ -123,7 +119,12 @@ const BestSellingSection = ({
                 </span>
               </span>
             </div>
-            <Progress value={progressValue} className='h-2' />
+            <div className='w-full bg-gray-200 rounded h-2 overflow-hidden'>
+              <div
+                className='bg-yellow-400 h-2 rounded'
+                style={{ width: `${progressValue}%` }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -134,7 +135,12 @@ const BestSellingSection = ({
     <section className='space-y-6'>
       <div className='flex items-center justify-between'>
         <h2 className='text-3xl font-bold'>BEST SELLING PRODUCTS</h2>
-        <Button variant='outline'>View All</Button>
+        <button
+          className='border border-gray-300 rounded px-4 py-2 bg-white hover:bg-gray-100 text-sm font-semibold transition-colors duration-150'
+          type='button'
+        >
+          View All
+        </button>
       </div>
 
       <div className='grid grid-cols-2 lg:grid-cols-3 gap-4'>

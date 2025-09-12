@@ -1,7 +1,5 @@
 import { Heart, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Product } from "@/types/product";
+import { Product } from "../types/product";
 
 interface FeaturedHotDealProps {
   product: Product;
@@ -24,29 +22,32 @@ const FeaturedHotDeal = ({
     <div className='bg-card rounded-lg border hover:shadow-md transition-all duration-300 group relative overflow-hidden'>
       {/* Discount Badge */}
       {discountPercentage > 0 && (
-        <Badge className='absolute top-2 left-2 z-10 bg-green-500 text-white text-xs'>
+        <span className='absolute top-2 left-2 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded'>
           {discountPercentage}% Off
-        </Badge>
+        </span>
       )}
 
       {/* Featured Badge */}
       {product.discount && product.discount > 30 && (
-        <Badge className='absolute top-2 right-2 z-10 bg-blue-500 text-white text-xs'>
+        <span className='absolute top-2 right-2 z-10 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded'>
           Featured
-        </Badge>
+        </span>
       )}
 
       {/* Wishlist Button */}
-      <Button
-        variant='ghost'
-        size='icon'
-        className='absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background w-8 h-8'
+      <button
+        className='absolute bottom-2 right-2 z-10 bg-white/80 hover:bg-red-100 rounded-full p-2 transition-colors duration-150 shadow opacity-0 group-hover:opacity-100'
         onClick={(e) => {
           e.stopPropagation();
+          if (addToCart) {
+            addToCart(product);
+          }
         }}
+        aria-label='Add to wishlist'
       >
-        <Heart className='h-3 w-3' />
-      </Button>
+        <Heart className='h-4 w-4 text-gray-400' />
+      </button>
+      <Heart className='h-3 w-3' />
 
       {/* Product Image */}
       <div
@@ -107,13 +108,13 @@ const FeaturedHotDeal = ({
         </div>
 
         {/* Add to Cart Button */}
-        <Button
-          className='w-full text-sm py-2'
+        <button
+          className='w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded font-semibold transition-colors duration-150 disabled:opacity-50 text-sm'
           onClick={() => addToCart && addToCart(product, 1)}
           disabled={!addToCart}
         >
           Add to cart
-        </Button>
+        </button>
       </div>
     </div>
   );

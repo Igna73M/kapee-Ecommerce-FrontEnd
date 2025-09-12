@@ -1,8 +1,5 @@
 import { Heart, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Product } from "@/types/product";
-import { toast } from "@/components/ui/use-toast";
+import { Product } from "../types/product";
 
 interface ProductCardProps {
   product: Product;
@@ -29,47 +26,41 @@ const ProductCard = ({
     <div className='bg-white rounded-lg border hover:shadow-lg transition-all duration-300 group relative overflow-hidden'>
       {/* Discount Badge */}
       {discountPercentage > 0 && (
-        <Badge className='absolute top-3 left-3 z-10 bg-green-500 text-white'>
+        <span className='absolute top-3 left-3 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded'>
           {discountPercentage}% Off
-        </Badge>
+        </span>
       )}
 
       {/* Featured Badge - Check if it's a featured product (could be marked different ways) */}
       {product.discount && product.discount > 30 && (
-        <Badge className='absolute top-3 right-3 z-10 bg-blue-500 text-white'>
+        <span className='absolute top-3 right-3 z-10 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded'>
           Featured
-        </Badge>
+        </span>
       )}
 
       {/* Wishlist Button */}
-      <Button
-        variant='ghost'
-        size='icon'
-        className='absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white'
+      <button
+        className='absolute top-3 right-3 z-10 bg-white/80 hover:bg-red-100 rounded-full p-2 transition-colors duration-150 shadow'
         onClick={(e) => {
           e.stopPropagation();
-          if (toggleWishlist) toggleWishlist(product.id);
-          toast({
-            title: wishlist.includes(product.id)
-              ? "Removed from Wishlist"
-              : "Added to Wishlist",
-            description: `${product.name} ${
-              wishlist.includes(product.id) ? "removed from" : "added to"
-            } your wishlist.`,
-          });
+          if (toggleWishlist) {
+            toggleWishlist(product.id);
+          }
         }}
         aria-label={
-          wishlist.includes(product.id)
+          wishlist?.includes(product.id)
             ? "Remove from wishlist"
             : "Add to wishlist"
         }
       >
         <Heart
-          className={`h-4 w-4 ${
-            wishlist.includes(product.id) ? "text-red-500 fill-red-500" : ""
+          className={`h-5 w-5 ${
+            wishlist?.includes(product.id)
+              ? "text-red-500 fill-red-500"
+              : "text-gray-400"
           }`}
         />
-      </Button>
+      </button>
 
       {/* Product Image */}
       <div
@@ -151,13 +142,13 @@ const ProductCard = ({
         </div>
 
         {/* Add to Cart Button */}
-        <Button
-          className='w-full bg-primary text-primary-foreground hover:bg-primary/90'
+        <button
+          className='w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded font-semibold transition-colors duration-150 disabled:opacity-50'
           onClick={() => addToCart && addToCart(product, 1)}
           disabled={!addToCart}
         >
           Add to cart
-        </Button>
+        </button>
       </div>
     </div>
   );

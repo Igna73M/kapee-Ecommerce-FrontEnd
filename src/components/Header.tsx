@@ -1,7 +1,4 @@
 import { Search, ShoppingCart, User, Heart, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 
 import { useState } from "react";
@@ -96,7 +93,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
             {/* Search Bar */}
             <div className='w-full md:flex-1 flex items-center justify-center md:justify-center order-3 md:order-none mt-2 md:mt-0'>
               <div className='flex flex-1 border rounded-lg w-full min-w-0'>
-                <Input
+                <input
                   type='text'
                   placeholder='Search for products, categories, brands, sku...'
                   className='border-0 rounded-none py-3 px-4 focus:ring-0 w-full min-w-0'
@@ -127,12 +124,12 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   <option value='services'>Services</option>
                   <option value='others'>Others</option>
                 </select>
-                <Button
-                  variant='default'
+                <button
                   className='rounded-none px-6 bg-foreground text-background hover:bg-foreground/90'
+                  type='button'
                 >
                   <Search className='h-4 w-4 text-yellow-400' />
-                </Button>
+                </button>
               </div>
             </div>
 
@@ -150,36 +147,34 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
               </div>
 
               <Link to='/wishlist'>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='relative'
+                <button
+                  className='relative bg-transparent border-0 p-0'
                   aria-label='View wishlist'
+                  type='button'
                 >
                   <Heart className='h-5 w-5' />
                   {wishlistCount > 0 && (
-                    <Badge className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary text-primary-foreground text-xs'>
+                    <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary text-primary-foreground text-xs'>
                       {wishlistCount}
-                    </Badge>
+                    </span>
                   )}
-                </Button>
+                </button>
               </Link>
 
               <div className='flex items-center gap-2'>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className='relative'
+                <button
+                  className='relative bg-transparent border-0 p-0'
                   onClick={onCartClick}
                   aria-label='View cart'
+                  type='button'
                 >
                   <ShoppingCart className='h-5 w-5' />
                   {cartCount > 0 && (
-                    <Badge className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary text-primary-foreground text-xs'>
+                    <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary text-primary-foreground text-xs'>
                       {cartCount}
-                    </Badge>
+                    </span>
                   )}
-                </Button>
+                </button>
                 <div className='hidden md:block text-sm'>
                   <div className='text-xs text-muted-foreground'>Cart</div>
                   <div className='font-semibold'>
@@ -195,9 +190,10 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
             {/* Desktop nav */}
             <div className='hidden md:flex flex-row items-center justify-between gap-4'>
               <div className='flex flex-wrap items-center gap-4 md:gap-8 justify-center md:justify-start w-full'>
-                <Button
+                <button
                   className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 md:px-6 md:py-3 relative text-xs md:text-base'
                   onClick={() => setShowCategorySidebar((prev) => !prev)}
+                  type='button'
                 >
                   <Menu className='h-4 w-4 mr-2' />
                   <span className='hidden sm:inline'>SHOP BY CATEGORIES</span>
@@ -206,7 +202,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                     open={showCategorySidebar}
                     onClose={() => setShowCategorySidebar(false)}
                   />
-                </Button>
+                </button>
                 <Link
                   to='/'
                   className='font-medium hover:text-primary smooth-transition text-xs md:text-base'
@@ -233,17 +229,21 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 </span>
               </div>
               <Link to='/checkout'>
-                <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-6 text-xs md:text-base'>
+                <button
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-6 text-xs md:text-base'
+                  type='button'
+                >
                   BUY NOW
-                </Button>
+                </button>
               </Link>
             </div>
             {/* Mobile nav */}
             {showMobileNav && (
               <div className='flex flex-col md:hidden gap-4 mt-4 animate-fade-in'>
-                <Button
+                <button
                   className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 relative text-xs'
                   onClick={() => setShowCategorySidebar((prev) => !prev)}
+                  type='button'
                 >
                   <Menu className='h-4 w-4 mr-2' />
                   CATEGORIES
@@ -251,7 +251,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                     open={showCategorySidebar}
                     onClose={() => setShowCategorySidebar(false)}
                   />
-                </Button>
+                </button>
                 <Link
                   to='/'
                   className='font-medium hover:text-primary smooth-transition text-xs'
@@ -279,9 +279,12 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 <span className='font-medium hover:text-primary smooth-transition cursor-pointer text-xs'>
                   ELEMENTS
                 </span>
-                <Button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 text-xs'>
+                <button
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 text-xs'
+                  type='button'
+                >
                   BUY NOW
-                </Button>
+                </button>
               </div>
             )}
           </nav>
@@ -290,13 +293,13 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
       {/* Mobile SIGN IN button (optional, if you want it in mobile nav) */}
       {showMobileNav && (
         <div className='flex flex-col md:hidden gap-4 mt-4 animate-fade-in'>
-          <Button
-            variant='outline'
-            className='text-xs'
+          <button
+            className='text-xs border border-gray-300 rounded px-3 py-1 bg-white hover:bg-gray-100'
             onClick={() => setShowLogin(true)}
+            type='button'
           >
             SIGN IN
-          </Button>
+          </button>
         </div>
       )}
       {/* Login Popup */}

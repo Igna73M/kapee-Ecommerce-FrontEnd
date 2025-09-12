@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import Signup from "./Signup";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
+import axios from "axios";
+import { useForm } from "react-hook-form";
 
 interface LoginProps {
   open: boolean;
@@ -16,6 +16,7 @@ export default function Login({ open, onClose }: LoginProps) {
   const [show, setShow] = useState(open);
   const [animate, setAnimate] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+  const { register, handleSubmit, reset } = useForm<FormData>();
 
   useEffect(() => {
     if (open) {
@@ -28,11 +29,6 @@ export default function Login({ open, onClose }: LoginProps) {
       return () => clearTimeout(timeout);
     }
   }, [open, show]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle login logic here
-  };
 
   if (showSignup) {
     return (
@@ -47,6 +43,36 @@ export default function Login({ open, onClose }: LoginProps) {
     );
   }
   if (!show) return null;
+
+  interface FormData {
+    email: string;
+    password: string;
+  }
+  const onLogin = async (data: FormData) => {
+    try {
+      const { email, password } = data;
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
+
+      const res = await axios.post(
+        "http://localhost:5000/api_v1/user/login",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // Notify.success("Login Successful")
+      reset();
+      console.log(res);
+    } catch (error) {
+      console.error("Login failed", error);
+      // Notify.failure("Login failed");
+    }
+  };
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
@@ -72,30 +98,38 @@ export default function Login({ open, onClose }: LoginProps) {
           >
             ×
           </button>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+
+          {/* Form section */}
+          <form className='space-y-4' onSubmit={handleSubmit(onLogin)}>
             <div>
-              <Input
-                type='text'
-                value={username}
+              <input
+                id='email'
+                type='email'
+                placeholder='Email address'
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder='Enter Username/Email address'
                 required
+                {...register("email", { required: true })}
+                className='mb-2 border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
               />
             </div>
             <div>
-              <Input
+              <input
+                id='password'
                 type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 placeholder='Enter Password'
+                onChange={(e) => setPassword(e.target.value)}
                 required
+                {...register("password", { required: true })}
+                className='mb-2 border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
               />
             </div>
             <div className='flex items-center justify-between'>
               <label className='flex items-center gap-2 text-sm text-primary font-bold'>
-                <Checkbox
-                  checked={remember}
-                  onCheckedChange={(v) => setRemember(!!v)}
+                <input
+                  id='remember'
+                  type='checkbox'
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className='mr-2'
                 />
                 Remember me
               </label>
@@ -106,12 +140,12 @@ export default function Login({ open, onClose }: LoginProps) {
                 Lost your password?
               </button>
             </div>
-            <Button
+            <button
               type='submit'
               className='w-full mt-2 bg-black text-yellow-400 hover:bg-gray-800 hover:text-white'
             >
               Log in
-            </Button>
+            </button>
             <div className='text-center pt-2'>
               <span className='text-sm'>Don't have an account? </span>
               <button

@@ -1,4 +1,3 @@
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -72,77 +71,75 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <Header cart={cart} wishlist={wishlist} onCartClick={openCart} />
-          {/* Cart UI */}
-          {isCartOpen && (
-            <Cart
-              cart={cart}
-              removeFromCart={removeFromCart}
-              updateCartQuantity={updateCartQuantity}
-              onClose={closeCart}
-            />
-          )}
-          <Routes>
-            <Route
-              path='/cart'
-              element={
-                <CartPage
-                  cart={cart}
-                  removeFromCart={removeFromCart}
-                  updateCartQuantity={updateCartQuantity}
-                />
-              }
-            />
-            <Route
-              path='/'
-              element={
-                <Index
-                  addToCart={addToCart}
-                  cart={cart}
-                  removeFromCart={removeFromCart}
-                  updateCartQuantity={updateCartQuantity}
-                  wishlist={wishlist}
-                  toggleWishlist={toggleWishlist}
-                  openCart={openCart}
-                />
-              }
-            />
-            <Route
-              path='/shop'
-              element={
-                <Shop
-                  addToCart={addToCart}
-                  cart={cart}
-                  removeFromCart={removeFromCart}
-                  updateCartQuantity={updateCartQuantity}
-                  wishlist={wishlist}
-                  toggleWishlist={toggleWishlist}
-                  openCart={openCart}
-                />
-              }
-            />
-            <Route path='/checkout' element={<Checkout cart={cart} />} />
-            <Route path='/blog' element={<Blog />} />
-            <Route
-              path='/wishlist'
-              element={
-                <WishlistPage
-                  wishlist={products.filter((p) => wishlist.includes(p.id))}
-                  onProductClick={() => {}}
-                  addToCart={(product, quantity) => {
-                    addToCart(product, quantity);
-                    openCart();
-                  }}
-                  toggleWishlist={toggleWishlist}
-                />
-              }
-            />
-            <Route path='*' element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <BrowserRouter>
+        <Header cart={cart} wishlist={wishlist} onCartClick={openCart} />
+        {/* Cart UI */}
+        {isCartOpen && (
+          <Cart
+            cart={cart}
+            removeFromCart={removeFromCart}
+            updateCartQuantity={updateCartQuantity}
+            onClose={closeCart}
+          />
+        )}
+        <Routes>
+          <Route
+            path='/cart'
+            element={
+              <CartPage
+                cart={cart}
+                removeFromCart={removeFromCart}
+                updateCartQuantity={updateCartQuantity}
+              />
+            }
+          />
+          <Route
+            path='/'
+            element={
+              <Index
+                addToCart={addToCart}
+                cart={cart}
+                removeFromCart={removeFromCart}
+                updateCartQuantity={updateCartQuantity}
+                wishlist={wishlist}
+                toggleWishlist={toggleWishlist}
+                openCart={openCart}
+              />
+            }
+          />
+          <Route
+            path='/shop'
+            element={
+              <Shop
+                addToCart={addToCart}
+                cart={cart}
+                removeFromCart={removeFromCart}
+                updateCartQuantity={updateCartQuantity}
+                wishlist={wishlist}
+                toggleWishlist={toggleWishlist}
+                openCart={openCart}
+              />
+            }
+          />
+          <Route path='/checkout' element={<Checkout cart={cart} />} />
+          <Route path='/blog' element={<Blog />} />
+          <Route
+            path='/wishlist'
+            element={
+              <WishlistPage
+                wishlist={products.filter((p) => wishlist.includes(p.id))}
+                onProductClick={() => {}}
+                addToCart={(product, quantity) => {
+                  addToCart(product, quantity);
+                  openCart();
+                }}
+                toggleWishlist={toggleWishlist}
+              />
+            }
+          />
+          <Route path='*' element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };

@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const TopBanner = () => {
@@ -14,23 +13,18 @@ const TopBanner = () => {
           <span className='text-sm font-medium'>
             SUMMER SALE, Get 40% Off for all products.
           </span>
-          <Button
-            variant='outline'
-            size='sm'
-            className='bg-primary text-primary-foreground border-primary hover:bg-primary/90'
-          >
+          <button className='bg-primary text-primary-foreground border border-primary hover:bg-primary/90 px-4 py-1 rounded text-sm font-medium transition-colors duration-150'>
             Click Here
-          </Button>
+          </button>
         </div>
       </div>
-      <Button
-        variant='ghost'
-        size='icon'
-        className='absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-background hover:bg-background/20'
+      <button
+        className='absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-background hover:bg-background/20 flex items-center justify-center rounded-full transition-colors duration-150'
         onClick={() => setIsVisible(false)}
+        aria-label='Close banner'
       >
         <X className='h-4 w-4' />
-      </Button>
+      </button>
     </div>
   );
 };

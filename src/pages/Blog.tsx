@@ -2,7 +2,6 @@ import TopBanner from "@/components/TopBanner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import { Card, CardContent } from "@/components/ui/card";
 import { blogPosts } from "@/data/blogPosts";
 
 const Blog = () => {
@@ -21,24 +20,25 @@ const Blog = () => {
 
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
           {blogPosts.map((post) => (
-            <Card key={post.id} className='card-shadow group cursor-pointer'>
-              <CardContent className='p-0'>
-                <div className='aspect-video overflow-hidden'>
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className='w-full h-full object-cover group-hover:scale-105 smooth-transition'
-                  />
+            <div
+              key={post.id}
+              className='card-shadow group cursor-pointer bg-white rounded-lg overflow-hidden border'
+            >
+              <div className='aspect-video overflow-hidden'>
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className='w-full h-full object-cover group-hover:scale-105 smooth-transition'
+                />
+              </div>
+              <div className='p-6'>
+                <div className='text-sm text-muted-foreground mb-2'>
+                  {post.date}
                 </div>
-                <div className='p-6'>
-                  <div className='text-sm text-muted-foreground mb-2'>
-                    {post.date}
-                  </div>
-                  <h3 className='text-xl font-bold mb-3'>{post.title}</h3>
-                  <p className='text-muted-foreground'>{post.excerpt}</p>
-                </div>
-              </CardContent>
-            </Card>
+                <h3 className='text-xl font-bold mb-3'>{post.title}</h3>
+                <p className='text-muted-foreground'>{post.excerpt}</p>
+              </div>
+            </div>
           ))}
         </div>
       </main>

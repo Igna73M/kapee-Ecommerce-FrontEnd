@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import { register } from "module";
+
+// const RegistrationForm = () => {
+
+// };
 interface SignupProps {
   open: boolean;
   onClose: () => void;
@@ -17,8 +22,10 @@ export default function Signup({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [show, setShow] = useState(open);
   const [animate, setAnimate] = useState(false);
+  const { register, handleSubmit } = useForm<FormData>();
 
   useEffect(() => {
     if (open) {
@@ -31,12 +38,40 @@ export default function Signup({
     }
   }, [open, show]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle signup logic here
+  if (!show) return null;
+
+  interface FormData {
+    username: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }
+
+  const onRegister = async (data: FormData) => {
+    try {
+      const { username, email, password, confirmPassword } = data;
+      const formData = new FormData();
+
+      formData.append("username", username);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("confirmPassword", confirmPassword);
+
+      const response = await axios.post(
+        "http://localhost:5000/api_v1/user/register",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log("Registration Failed", error);
+    }
   };
 
-  if (!show) return null;
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
@@ -63,49 +98,55 @@ export default function Signup({
           >
             ×
           </button>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+
+          {/* Form section */}
+          <form className='space-y-4' onSubmit={handleSubmit(onRegister)}>
             <div>
-              <Input
+              <input
                 type='text'
-                value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder='Username'
                 required
+                {...register("username", {
+                  required: true,
+                  maxLength: 20,
+                  minLength: 3,
+                })}
               />
             </div>
             <div>
-              <Input
+              <input
                 type='email'
-                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder='Email address'
                 required
+                {...register("email", { required: true })}
               />
             </div>
             <div>
-              <Input
+              <input
                 type='password'
-                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='Password'
                 required
+                {...register("password", { required: true })}
               />
             </div>
             <div>
-              <Input
+              <input
                 type='password'
-                value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder='Confirm Password'
                 required
+                {...register("confirmPassword", { required: true })}
               />
             </div>
-            <Button
+            <button
               type='submit'
               className='w-full mt-2 bg-black text-yellow-400 hover:bg-gray-800 hover:text-white'
             >
               Sign Up
-            </Button>
+            </button>
             <div className='text-center pt-2'>
               <span className='text-sm'>Already have an account? </span>
               <button

@@ -1,8 +1,5 @@
-import { Heart, Star, Shuffle, Eye, ShoppingCart, ZoomIn } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Product } from "@/types/product";
+import { Heart, Star, Shuffle, ShoppingCart, ZoomIn } from "lucide-react";
+import { Product } from "../types/product";
 
 interface HotDealCardProps {
   product: Product;
@@ -29,53 +26,41 @@ const HotDealCard = ({
     <div className='bg-card rounded-lg border hover:shadow-lg transition-all duration-300 group relative overflow-hidden'>
       {/* Discount Badge */}
       {discountPercentage > 0 && (
-        <Badge className='absolute top-3 left-3 z-10 bg-green-500 text-white'>
+        <span className='absolute top-3 left-3 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded'>
           {discountPercentage}% Off
-        </Badge>
+        </span>
       )}
 
       {/* Featured Badge */}
       {product.discount && product.discount > 30 && (
-        <Badge className='absolute top-3 right-3 z-10 bg-blue-500 text-white'>
+        <span className='absolute top-3 right-3 z-10 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded'>
           Featured
-        </Badge>
+        </span>
       )}
 
       {/* Wishlist Button */}
-      <Button
-        variant='ghost'
-        size='icon'
-        className='absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 hover:bg-background'
+      <button
+        className='absolute bottom-3 right-3 z-10 bg-white/80 hover:bg-red-100 rounded-full p-2 transition-colors duration-150 shadow'
         onClick={(e) => {
           e.stopPropagation();
-          if (toggleWishlist) toggleWishlist(product.id);
+          if (toggleWishlist) {
+            toggleWishlist(product.id);
+          }
         }}
         aria-label={
-          wishlist.includes(product.id)
+          wishlist?.includes(product.id)
             ? "Remove from wishlist"
             : "Add to wishlist"
         }
       >
         <Heart
-          className={`h-4 w-4 ${
-            wishlist.includes(product.id) ? "text-red-500 fill-red-500" : ""
+          className={`h-5 w-5 ${
+            wishlist?.includes(product.id)
+              ? "text-red-500 fill-red-500"
+              : "text-gray-400"
           }`}
         />
-      </Button>
-
-      {/* Product Image */}
-      <div
-        className='aspect-square overflow-hidden bg-muted cursor-pointer'
-        onClick={() => onProductClick(product)}
-      >
-        <img
-          src={product.image}
-          alt={product.name}
-          className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
-        />
-      </div>
-
-      {/* Product Info */}
+      </button>
       <div className='p-4 space-y-3'>
         {/* Category */}
         <div className='text-xs text-primary font-medium uppercase tracking-wide'>
@@ -108,30 +93,14 @@ const HotDealCard = ({
             )}
         </div>
 
-        {/* Action Buttons (show only on hover) */}
-        <div className='flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200'>
-          <Button
-            variant='outline'
-            size='icon'
-            className='bg-yellow-400 border-yellow-400 text-black hover:bg-yellow-500 hover:border-yellow-500'
-          >
-            <Shuffle className='h-4 w-4' />
-          </Button>
-          <Button
-            className='flex-1 bg-yellow-400 text-black hover:bg-yellow-500'
-            onClick={() => addToCart && addToCart(product, 1)}
-            disabled={!addToCart}
-          >
-            <ShoppingCart className='h-4 w-4 mr-2' />
-          </Button>
-          <Button
-            variant='outline'
-            size='icon'
-            className='bg-yellow-400 border-yellow-400 text-black hover:bg-yellow-500 hover:border-yellow-500'
-          >
-            <ZoomIn />
-          </Button>
-        </div>
+        {/* Add to Cart Button */}
+        <button
+          className='w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded font-semibold transition-colors duration-150 disabled:opacity-50 mt-2'
+          onClick={() => addToCart && addToCart(product, 1)}
+          disabled={!addToCart}
+        >
+          <ShoppingCart className='h-4 w-4 mr-2 inline' /> Add to cart
+        </button>
       </div>
     </div>
   );

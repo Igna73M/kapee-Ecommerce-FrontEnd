@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
@@ -15,10 +15,19 @@ import Index from "./pages/Index";
 import Wishlist from "./pages/Wishlist";
 import WishlistPage from "./pages/Wishlist";
 import { products } from "./data/products";
+import DashboardLayout from "./pages/dashboard/DashboardLayout";
+import Dashboard from "./pages/dashboard/Dashboard";
+import DashProduct from "./pages/dashboard/DashProduct";
+import DashCustomers from "./pages/dashboard/DashCustomers";
+import DashProfile from "./pages/dashboard/DashProfile";
+import DashSettings from "./pages/dashboard/DashSettings";
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  // Get current location for conditional header rendering
+  const location =
+    typeof window !== "undefined" ? window.location : { pathname: "/" };
   // Cart state: array of {product, quantity}
   const [cart, setCart] = useState<{ product: Product; quantity: number }[]>(
     []
@@ -73,7 +82,6 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Header cart={cart} wishlist={wishlist} onCartClick={openCart} />
-        {/* Cart UI */}
         {isCartOpen && (
           <Cart
             cart={cart}
@@ -137,6 +145,14 @@ const App = () => {
               />
             }
           />
+          <Route path='/dashboard' element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path='/dashboard/product' element={<DashProduct />} />
+            <Route path='/dashboard/customers' element={<DashCustomers />} />
+            <Route path='/dashboard/profile' element={<DashProfile />} />
+            <Route path='/dashboard/settings' element={<DashSettings />} />
+          </Route>
+          {/* 404 Page error */}
           <Route path='*' element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,10 +1,12 @@
 import { Search, ShoppingCart, User, Heart, Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { Link, useLocation } from "react-router-dom";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import CategorySidebar from "../components/CategorySidebar";
 import Login from "@/components/Login";
+import { Notify } from "notiflix";
 
 interface HeaderProps {
   cart: { product: Product; quantity: number }[];
@@ -13,9 +15,25 @@ interface HeaderProps {
 }
 
 const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
+  const location = useLocation();
   const [showCategorySidebar, setShowCategorySidebar] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Helper to get cookie value
+  function getCookie(name: string) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+    return null;
+  }
+
+  // On mount, check for username in cookies
+  useEffect(() => {
+    setUsername(getCookie("username"));
+  }, []);
 
   // Calculate cart item count and total value
   const cartCount = Array.isArray(cart)
@@ -30,6 +48,10 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
 
   // Calculate wishlist count
   const wishlistCount = Array.isArray(wishlist) ? wishlist.length : 0;
+  // Only show header if not on dashboard or return routes
+  if (location.pathname.startsWith("/dashboard")) {
+    return null;
+  }
   return (
     <>
       {/* Language & Currency Bar */}
@@ -135,15 +157,59 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
 
             {/* User Actions */}
             <div className='flex items-center gap-4 md:gap-6 w-full md:w-auto justify-center md:justify-end mt-2 md:mt-0'>
-              <div
-                className='hidden md:flex items-center gap-2 text-sm cursor-pointer'
-                onClick={() => setShowLogin(true)}
-              >
+              <div className='hidden md:flex items-center gap-2 text-sm relative'>
                 <User className='h-4 w-4' />
                 <div>
-                  <div className='text-xs text-muted-foreground'>HELLO</div>
-                  <div className='font-semibold'>SIGN IN</div>
+                  <div className='text-xs text-muted-foreground'>
+                    {username ? "WELCOME" : "HELLO"}
+                  </div>
+                  <div
+                    className='font-semibold cursor-pointer'
+                    onClick={() => {
+                      if (!username) setShowLogin(true);
+                      else setShowUserMenu((prev) => !prev);
+                    }}
+                  >
+                    {username ? username : "SIGN IN"}
+                  </div>
                 </div>
+                {/* User dropdown menu */}
+                {username && showUserMenu && (
+                  <div className='absolute top-full right-0 mt-2 w-40 bg-white border rounded shadow-lg z-50 flex flex-col'>
+                    <a
+                      href='/dashboard'
+                      className='px-4 py-2 hover:bg-gray-100 border-b text-sm text-black'
+                    >
+                      Dashboard
+                    </a>
+                    <button
+                      className='px-4 py-2 text-left hover:bg-gray-100 text-sm text-black'
+                      onClick={async () => {
+                        try {
+                          const email = localStorage.getItem("email");
+                          if (email) {
+                            await axios.post(
+                              "http://localhost:5000/api_v1/user/logout",
+                              { email }
+                            );
+                          }
+                          Notify.success("Logout Successful");
+                        } catch (err) {
+                          // Optionally handle error
+                        }
+                        // Remove cookies by setting expiry in the past
+                        document.cookie =
+                          "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        document.cookie =
+                          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                        setShowUserMenu(false);
+                        window.location.reload();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
 
               <Link to='/wishlist'>

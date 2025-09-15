@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TopBanner from "@/components/TopBanner";
-import Header from "@/components/Header";
-import CategorySidebar from "@/components/CategorySidebar";
 import HeroSection from "@/components/HeroSection";
 import BannerSection from "@/components/BannerSection";
 

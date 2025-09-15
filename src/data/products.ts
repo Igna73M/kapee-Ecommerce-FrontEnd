@@ -5,15 +5,15 @@ import watchCharger from '@/assets/watch-charger.png';
 import headphones from '@/assets/headphones.png';
 
 export const categories: Category[] = [
-  { id: 'mens-clothing', name: "Men's Clothing" },
-  { id: 'womens-clothing', name: "Women's Clothing" },
-  { id: 'accessories', name: 'Accessories' },
-  { id: 'shoes', name: 'Shoes' },
-  { id: 'jewellery', name: 'Jewellery' },
-  { id: 'bags', name: 'Bags & Backpacks' },
-  { id: 'watches', name: 'Watches' },
-  { id: 'dresses', name: 'Dresses' },
-  { id: 'shirts', name: 'Shirts' },
+  { id: '1', name: "Men's Clothing" },
+  { id: '2', name: "Women's Clothing" },
+  { id: '3', name: 'Accessories' },
+  { id: '4', name: 'Shoes' },
+  { id: '5', name: 'Jewellery' },
+  { id: '6', name: 'Bags & Backpacks' },
+  { id: '7', name: 'Watches' },
+  { id: '8', name: 'Dresses' },
+  { id: '9', name: 'Shirts' },
 ];
 
 export const products: Product[] = [

@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { register } from "module";
+import { Notify } from "notiflix";
+import { Navigate } from "react-router-dom";
 
-// const RegistrationForm = () => {
-
-// };
+// close button
 interface SignupProps {
   open: boolean;
   onClose: () => void;
@@ -18,15 +18,11 @@ export default function Signup({
   onClose,
   onSwitchToLogin,
 }: SignupProps) {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
   const [show, setShow] = useState(open);
   const [animate, setAnimate] = useState(false);
-  const { register, handleSubmit } = useForm<FormData>();
+  const { register, handleSubmit, reset } = useForm<FormData>();
 
+  // toggle signup dialog
   useEffect(() => {
     if (open) {
       setShow(true);
@@ -37,14 +33,13 @@ export default function Signup({
       return () => clearTimeout(timeout);
     }
   }, [open, show]);
-
   if (!show) return null;
 
   interface FormData {
     username: string;
     email: string;
     password: string;
-    confirmPassword: string;
+    confirmPassword?: string;
   }
 
   const onRegister = async (data: FormData) => {
@@ -55,7 +50,7 @@ export default function Signup({
       formData.append("username", username);
       formData.append("email", email);
       formData.append("password", password);
-      formData.append("confirmPassword", confirmPassword);
+      // formData.append("confirmPassword", confirmPassword);
 
       const response = await axios.post(
         "http://localhost:5000/api_v1/user/register",
@@ -66,9 +61,13 @@ export default function Signup({
           },
         }
       );
-      console.log(response);
+
+      Notify.success("Registration Successful");
+      reset();
+      // Navigate("/login");
     } catch (error) {
-      console.log("Registration Failed", error);
+      Notify.failure("Registration Failed");
+      reset();
     }
   };
 
@@ -104,7 +103,6 @@ export default function Signup({
             <div>
               <input
                 type='text'
-                onChange={(e) => setUsername(e.target.value)}
                 placeholder='Username'
                 required
                 {...register("username", {
@@ -117,7 +115,6 @@ export default function Signup({
             <div>
               <input
                 type='email'
-                onChange={(e) => setEmail(e.target.value)}
                 placeholder='Email address'
                 required
                 {...register("email", { required: true })}
@@ -126,7 +123,6 @@ export default function Signup({
             <div>
               <input
                 type='password'
-                onChange={(e) => setPassword(e.target.value)}
                 placeholder='Password'
                 required
                 {...register("password", { required: true })}
@@ -135,7 +131,6 @@ export default function Signup({
             <div>
               <input
                 type='password'
-                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder='Confirm Password'
                 required
                 {...register("confirmPassword", { required: true })}

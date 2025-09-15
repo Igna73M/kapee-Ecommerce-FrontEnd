@@ -3,6 +3,8 @@ import Signup from "./Signup";
 
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { Notify } from "notiflix";
+import { useNavigate } from "react-router-dom";
 
 interface LoginProps {
   open: boolean;
@@ -10,13 +12,12 @@ interface LoginProps {
 }
 
 export default function Login({ open, onClose }: LoginProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
   const [show, setShow] = useState(open);
   const [animate, setAnimate] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+
   const { register, handleSubmit, reset } = useForm<FormData>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open) {
@@ -64,12 +65,20 @@ export default function Login({ open, onClose }: LoginProps) {
           },
         }
       );
-      // Notify.success("Login Successful")
+      // Store username and accessToken in cookies for session
+      if (res.data && res.data.user) {
+        document.cookie = `username=${res.data.user.username}; path=/`;
+        document.cookie = `accessToken=${res.data.user.accessToken}; path=/`;
+      }
+      Notify.success("Login Successful");
       reset();
-      console.log(res);
+      onClose(); // Close the login popup
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 200); // Small delay to allow popup to close
     } catch (error) {
-      console.error("Login failed", error);
-      // Notify.failure("Login failed");
+      Notify.failure("Login failed");
+      reset();
     }
   };
 
@@ -106,7 +115,6 @@ export default function Login({ open, onClose }: LoginProps) {
                 id='email'
                 type='email'
                 placeholder='Email address'
-                onChange={(e) => setUsername(e.target.value)}
                 required
                 {...register("email", { required: true })}
                 className='mb-2 border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -117,7 +125,6 @@ export default function Login({ open, onClose }: LoginProps) {
                 id='password'
                 type='password'
                 placeholder='Enter Password'
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 {...register("password", { required: true })}
                 className='mb-2 border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -125,12 +132,7 @@ export default function Login({ open, onClose }: LoginProps) {
             </div>
             <div className='flex items-center justify-between'>
               <label className='flex items-center gap-2 text-sm text-primary font-bold'>
-                <input
-                  id='remember'
-                  type='checkbox'
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className='mr-2'
-                />
+                <input id='remember' type='checkbox' className='mr-2' />
                 Remember me
               </label>
               <button

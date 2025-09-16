@@ -103,7 +103,7 @@ function DashProduct() {
   return (
     <div className='p-6'>
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-xl font-bold mb-4'>Products In Stock</h2>
+        <h2 className='text-xl font-bold mb-4'>List of Products</h2>
         {/* Add Product Form */}
         <form className='flex items-center gap-2' onSubmit={handleNewSubmit}>
           <input

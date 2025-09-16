@@ -103,7 +103,7 @@ function DashAdvert() {
 
   return (
     <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Advertisement (Hero Slides)</h2>
+      <h2 className='text-xl font-bold mb-4'>Advertisement</h2>
       {/* Add new slide */}
       <form className='flex gap-2 mb-6' onSubmit={handleNewSubmit}>
         <input

@@ -1,48 +1,67 @@
 import React from "react";
-
-const dummyUsers = [
-  {
-    id: "u1",
-    username: "john_doe",
-    email: "john@example.com",
-    joined: "2024-02-10",
-  },
-  {
-    id: "u2",
-    username: "jane_smith",
-    email: "jane@example.com",
-    joined: "2024-03-15",
-  },
-  {
-    id: "u3",
-    username: "adminuser",
-    email: "admin@kapee.com",
-    joined: "2024-01-01",
-  },
-];
+import { dummyUsers } from "../../data/dummyUsers";
 
 function DashCustomers() {
   return (
     <div className='p-6'>
       <h2 className='text-xl font-bold mb-4'>Registered Users</h2>
-      <table className='min-w-full border'>
-        <thead>
-          <tr className='bg-gray-100'>
-            <th className='p-2 border'>Username</th>
-            <th className='p-2 border'>Email</th>
-            <th className='p-2 border'>Joined</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyUsers.map((user) => (
-            <tr key={user.id}>
-              <td className='p-2 border'>{user.username}</td>
-              <td className='p-2 border'>{user.email}</td>
-              <td className='p-2 border'>{user.joined}</td>
+      <div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
+        <table className='w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
+          <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
+            <tr>
+              <th
+                scope='col'
+                className='px-6 py-3 bg-yellow-50 dark:bg-yellow-800'
+              >
+                Username
+              </th>
+              <th scope='col' className='px-6 py-3'>
+                Email
+              </th>
+              <th
+                scope='col'
+                className='px-6 py-3 bg-yellow-50 dark:bg-yellow-800'
+              >
+                Joined
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {dummyUsers.filter((u) => u.userRole !== "admin").length > 0 ? (
+              dummyUsers
+                .filter((u) => u.userRole !== "admin")
+                .map((user, idx) => (
+                  <tr
+                    key={user._id}
+                    className={
+                      "border-b border-gray-200 dark:border-gray-700" +
+                      (idx % 2 === 0
+                        ? " bg-white dark:bg-gray-900"
+                        : " bg-gray-50 dark:bg-gray-800")
+                    }
+                  >
+                    <th
+                      scope='row'
+                      className='px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-yellow-50 dark:text-white dark:bg-yellow-800'
+                    >
+                      {user.username}
+                    </th>
+                    <td className='px-6 py-4'>{user.email}</td>
+                    <td className='px-6 py-4 bg-yellow-50 dark:bg-yellow-800'>
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+            ) : (
+              <tr>
+                <td colSpan={3} className='px-6 py-4 text-center'>
+                  No users available. Please check back later.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

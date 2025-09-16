@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import React, { useState } from "react";
 
@@ -17,35 +17,55 @@ function DashboardAside() {
   const sidebarContent = (
     <div className='flex flex-col h-full justify-between'>
       <div>
-        <h2 className='font-bold mb-6 text-center cursor-pointer'>
-          <Link to='/'>Kapee.</Link>
+        <h2 className='font-extrabold mb-8 text-3xl text-yellow-900 tracking-wide'>
+          <Link to='/' className='hover:text-yellow-600 transition-colors'>
+            Kapee.
+          </Link>
         </h2>
-        <ul className='flex flex-col gap-4'>
-          <li>
-            <a href='/dashboard'>Home</a>
-          </li>
-          <li>
-            <a href='/dashboard/product'>Products</a>
-          </li>
-          <li>
-            <a href='/dashboard/customers'>Customers</a>
-          </li>
-          <li>
-            <a href='/dashboard/brands'>Brands</a>
-          </li>
-          <li>
-            <a href='/dashboard/services'>Services</a>
-          </li>
-          <li>
-            <a href='/dashboard/advertisement'>Advertisement</a>
-          </li>
-          <li>
-            <a href='/dashboard/banners'>Banners</a>
-          </li>
-          <li>
-            <a href='/dashboard/blog'>Blog</a>
-          </li>
-        </ul>
+        <nav>
+          <ul className='flex flex-col gap-2 w-full'>
+            {[
+              { label: "Dashboard", to: "/dashboard", icon: "🏠", exact: true },
+              { label: "Products", to: "/dashboard/product", icon: "📦" },
+              { label: "Customers", to: "/dashboard/customers", icon: "👥" },
+              { label: "Categories", to: "/dashboard/brands", icon: "🗂️" },
+              { label: "Services", to: "/dashboard/services", icon: "🛠️" },
+              {
+                label: "Advertise",
+                to: "/dashboard/advertisement",
+                icon: "📢",
+              },
+              { label: "Banners", to: "/dashboard/banners", icon: "🖼️" },
+              { label: "Blogs", to: "/dashboard/blog", icon: "📝" },
+            ].map(({ label, to, icon, exact }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  end={label === "Dashboard"} // Only Dashboard uses 'end' for exact match
+                  className={({ isActive }) => {
+                    if (label === "Dashboard") {
+                      return [
+                        "flex items-center gap-3 px-4 py-2 rounded-lg font-semibold text-sm transition-colors",
+                        isActive
+                          ? "bg-yellow-400 text-black"
+                          : "text-yellow-900",
+                      ].join(" ");
+                    }
+                    return [
+                      "flex items-center gap-3 px-4 py-2 rounded-lg font-semibold text-sm transition-colors",
+                      isActive
+                        ? "bg-yellow-400 text-black"
+                        : "text-yellow-900 hover:bg-yellow-400 hover:text-black",
+                    ].join(" ");
+                  }}
+                >
+                  <span>{icon}</span>
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
       <button
         className='border p-2 mt-6 font-bold w-full bg-white hover:bg-yellow-400 text-black rounded self-end'

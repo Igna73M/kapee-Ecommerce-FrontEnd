@@ -95,13 +95,16 @@ export default function DashBrand() {
     <div className='p-6'>
       <h2 className='text-xl font-bold mb-4'>Brand Categories</h2>
       {/* Add new brand category */}
-      <form className='flex gap-2 mb-6' onSubmit={handleNewSubmit}>
+      <form
+        className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
+        onSubmit={handleNewSubmit}
+      >
         <input
           name='name'
           value={newCategory.name}
           onChange={handleNewChange}
           placeholder='Name'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
           required
         />
         <input
@@ -109,23 +112,26 @@ export default function DashBrand() {
           value={newCategory.tagline}
           onChange={handleNewChange}
           placeholder='Tagline'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
         <input
           name='initial'
           value={newCategory.initial}
           onChange={handleNewChange}
           placeholder='Initial'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
         <input
           name='bgColor'
           value={newCategory.bgColor}
           onChange={handleNewChange}
           placeholder='Bg Color'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
-        <button type='submit' className='p-2 bg-yellow-500 text-white rounded'>
+        <button
+          type='submit'
+          className='p-2 px-12 bg-yellow-500 text-white rounded w-full sm:w-auto'
+        >
           Add
         </button>
       </form>

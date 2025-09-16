@@ -80,13 +80,16 @@ function DashServices() {
     <div className='p-6'>
       <h2 className='text-xl font-bold mb-4'>Services</h2>
       {/* Add new service */}
-      <form className='flex gap-2 mb-6' onSubmit={handleNewSubmit}>
+      <form
+        className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
+        onSubmit={handleNewSubmit}
+      >
         <input
           name='title'
           value={newService.title}
           onChange={handleNewChange}
           placeholder='Title'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
           required
         />
         <input
@@ -94,9 +97,12 @@ function DashServices() {
           value={newService.description}
           onChange={handleNewChange}
           placeholder='Description'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
-        <button type='submit' className='p-2 bg-yellow-500 text-white rounded'>
+        <button
+          type='submit'
+          className='p-2 px-12 bg-yellow-500 text-white rounded w-full sm:w-auto'
+        >
           Add
         </button>
       </form>

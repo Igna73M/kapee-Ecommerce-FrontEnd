@@ -102,23 +102,26 @@ function DashProduct() {
 
   return (
     <div className='p-6'>
-      <div className='flex justify-between items-center mb-6'>
+      <div className='flex flex-col justify-between items-center mb-6'>
         <h2 className='text-xl font-bold mb-4'>List of Products</h2>
         {/* Add Product Form */}
-        <form className='flex items-center gap-2' onSubmit={handleNewSubmit}>
+        <form
+          className='flex flex-col sm:flex-row items-center gap-2  sm:w-auto sm:flex-wrap'
+          onSubmit={handleNewSubmit}
+        >
           <input
             name='name'
             value={newProduct.name}
             onChange={handleNewChange}
             placeholder='Name'
-            className='p-2 border rounded'
+            className='p-2 border rounded w-full sm:w-auto'
             required
           />
           <select
             name='category'
             value={newProduct.category}
             onChange={handleNewChange}
-            className='p-2 border rounded'
+            className='p-2 border rounded w-full sm:w-auto'
             required
           >
             <option value=''>Select Category</option>
@@ -133,11 +136,11 @@ function DashProduct() {
             value={newProduct.price}
             onChange={handleNewChange}
             placeholder='Price'
-            className='p-2 border rounded'
+            className='p-2 border rounded w-full sm:w-auto'
             required
             type='number'
           />
-          <label className='flex items-center gap-1'>
+          <label className='flex items-center gap-1 w-full sm:w-auto'>
             <input
               type='checkbox'
               name='inStock'
@@ -148,7 +151,7 @@ function DashProduct() {
           </label>
           <button
             type='submit'
-            className='p-2 bg-yellow-500 text-white rounded'
+            className='p-2 px-12 bg-yellow-500 text-white rounded w-full sm:w-auto'
           >
             Add
           </button>

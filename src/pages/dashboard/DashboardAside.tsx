@@ -1,5 +1,4 @@
 import { Link, NavLink } from "react-router-dom";
-
 import React, { useState } from "react";
 
 function DashboardAside() {
@@ -17,8 +16,8 @@ function DashboardAside() {
   const sidebarContent = (
     <div className='flex flex-col h-full justify-between'>
       <div>
-        <h2 className='font-extrabold mb-8 text-3xl text-yellow-900 tracking-wide'>
-          <Link to='/' className='hover:text-yellow-600 transition-colors'>
+        <h2 className='font-extrabold mb-8 text-3xl text-gray-800 tracking-wide'>
+          <Link to='/' className='hover:text-gray-600 transition-colors'>
             Kapee.
           </Link>
         </h2>
@@ -41,21 +40,21 @@ function DashboardAside() {
               <li key={to}>
                 <NavLink
                   to={to}
-                  end={label === "Dashboard"} // Only Dashboard uses 'end' for exact match
+                  end={label === "Dashboard"}
                   className={({ isActive }) => {
                     if (label === "Dashboard") {
                       return [
                         "flex items-center gap-3 px-4 py-2 rounded-lg font-semibold text-sm transition-colors",
                         isActive
-                          ? "bg-yellow-400 text-black"
-                          : "text-yellow-900",
+                          ? "bg-gray-200 text-gray-900"
+                          : "text-gray-800",
                       ].join(" ");
                     }
                     return [
                       "flex items-center gap-3 px-4 py-2 rounded-lg font-semibold text-sm transition-colors",
                       isActive
-                        ? "bg-yellow-400 text-black"
-                        : "text-yellow-900 hover:bg-yellow-400 hover:text-black",
+                        ? "bg-gray-200 text-gray-900"
+                        : "text-gray-800 hover:bg-gray-100 hover:text-gray-900",
                     ].join(" ");
                   }}
                 >
@@ -67,8 +66,15 @@ function DashboardAside() {
           </ul>
         </nav>
       </div>
+      <Link
+        to='/dashboard/settings'
+        className='border-2 border-gray-300 p-2 mt-2 font-bold w-full text-gray-900 rounded-lg shadow self-end flex items-center justify-center transition-all duration-200 bg-gray-50 hover:bg-gray-200 hover:text-gray-900 active:scale-95 active:shadow-inner'
+        style={{ marginTop: "2rem" }}
+      >
+        Settings
+      </Link>
       <button
-        className='border p-2 mt-6 font-bold w-full bg-white hover:bg-yellow-400 text-black rounded self-end'
+        className='border-2 border-gray-300 p-2 mt-6 font-bold w-full bg-gradient-to-r from-gray-50 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 rounded-lg shadow transition-all duration-200 self-end flex items-center justify-center gap-2'
         style={{ marginTop: "auto" }}
         onClick={logout}
       >
@@ -81,7 +87,7 @@ function DashboardAside() {
     <>
       {/* Mobile sidebar toggle button */}
       <button
-        className='md:hidden fixed top-4 left-4 z-50 bg-yellow-400 text-black rounded-full p-2 shadow-lg'
+        className='md:hidden fixed top-4 left-4 z-50 bg-gray-200 text-gray-900 rounded-full p-2 shadow-lg'
         onClick={() => setIsOpen(true)}
         aria-label='Open dashboard menu'
       >
@@ -89,7 +95,7 @@ function DashboardAside() {
       </button>
 
       {/* Sidebar for desktop */}
-      <aside className='hidden md:flex flex-col p-6 h-full bg-yellow-300 text-left min-w-[220px] max-w-[260px]'>
+      <aside className='hidden md:flex fixed top-0 left-0 flex-col p-6 h-screen bg-white text-left min-w-[220px] max-w-[260px] border-r border-gray-200 shadow-lg z-40'>
         {sidebarContent}
       </aside>
 
@@ -101,9 +107,9 @@ function DashboardAside() {
             onClick={() => setIsOpen(false)}
             aria-label='Close dashboard menu overlay'
           />
-          <aside className='fixed top-0 left-0 h-full w-64 bg-yellow-300 z-50 p-6 flex flex-col text-left animate-slide-in'>
+          <aside className='fixed top-0 left-0 h-screen w-64 bg-white z-50 p-6 flex flex-col text-left animate-slide-in border-r border-gray-200 shadow-2xl'>
             <button
-              className='absolute top-4 right-4 text-black bg-white rounded-full p-2 shadow-md'
+              className='absolute top-4 right-4 text-gray-900 bg-gray-100 rounded-full p-2 shadow-md'
               onClick={() => setIsOpen(false)}
               aria-label='Close dashboard menu'
             >

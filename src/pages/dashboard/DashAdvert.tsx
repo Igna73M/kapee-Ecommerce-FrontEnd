@@ -105,13 +105,16 @@ function DashAdvert() {
     <div className='p-6'>
       <h2 className='text-xl font-bold mb-4'>Advertisement</h2>
       {/* Add new slide */}
-      <form className='flex gap-2 mb-6' onSubmit={handleNewSubmit}>
+      <form
+        className='flex flex-col sm:flex-row gap-2 mb-6 w-full max-w-2xl sm:flex-wrap'
+        onSubmit={handleNewSubmit}
+      >
         <input
           name='title'
           value={newSlide.title}
           onChange={handleNewChange}
           placeholder='Title'
-          className='p-2 border rounded'
+          className='p-2 border rounded flex-1  w-full sm:w-auto'
           required
         />
         <input
@@ -119,30 +122,33 @@ function DashAdvert() {
           value={newSlide.subtitle}
           onChange={handleNewChange}
           placeholder='Subtitle'
-          className='p-2 border rounded'
+          className='p-2 border rounded flex-1  w-full sm:w-auto'
         />
         <input
           name='image'
           value={newSlide.image}
           onChange={handleNewChange}
           placeholder='Image URL'
-          className='p-2 border rounded'
+          className='p-2 border rounded flex-1  w-full sm:w-auto'
         />
         <input
           name='discount'
           value={newSlide.discount}
           onChange={handleNewChange}
           placeholder='Discount'
-          className='p-2 border rounded'
+          className='p-2 border rounded flex-1 w-full sm:w-auto'
         />
         <input
           name='buttonText'
           value={newSlide.buttonText}
           onChange={handleNewChange}
           placeholder='Button Text'
-          className='p-2 border rounded'
+          className='p-2 border rounded flex-1  w-full sm:w-auto'
         />
-        <button type='submit' className='p-2 bg-yellow-500 text-white rounded'>
+        <button
+          type='submit'
+          className='p-2 px-12 bg-yellow-500 text-white rounded font-semibold hover:bg-yellow-600 transition-colors w-full sm:w-auto'
+        >
           Add
         </button>
       </form>

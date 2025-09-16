@@ -104,9 +104,11 @@ function Dashboard() {
               <div className='text-sm'>Products In Stock</div>
             </div>
           </div>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-32'>
             <div>
-              <h3 className='font-semibold mb-2'>Products per Category</h3>
+              <h3 className='font-semibold mb-2 text-center'>
+                Products per Category
+              </h3>
               <ResponsiveContainer width='100%' height={300}>
                 <BarChart data={categoryData}>
                   <XAxis dataKey='name' />
@@ -117,7 +119,7 @@ function Dashboard() {
               </ResponsiveContainer>
             </div>
             <div>
-              <h3 className='font-semibold mb-2'>Stock Status</h3>
+              <h3 className='font-semibold mb-2 text-center'>Stock Status</h3>
               <ResponsiveContainer width='100%' height={300}>
                 <PieChart>
                   <Pie

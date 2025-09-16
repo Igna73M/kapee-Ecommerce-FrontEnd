@@ -107,13 +107,16 @@ function DashBanner() {
     <div className='p-6'>
       <h2 className='text-xl font-bold mb-4'>Banners</h2>
       {/* Add new banner */}
-      <form className='flex gap-2 mb-6' onSubmit={handleNewSubmit}>
+      <form
+        className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
+        onSubmit={handleNewSubmit}
+      >
         <input
           name='title'
           value={newBanner.title}
           onChange={handleNewChange}
           placeholder='Title'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
           required
         />
         <input
@@ -121,30 +124,33 @@ function DashBanner() {
           value={newBanner.subtitle}
           onChange={handleNewChange}
           placeholder='Subtitle'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
         <input
           name='image'
           value={newBanner.image}
           onChange={handleNewChange}
           placeholder='Image URL'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
         <input
           name='discount'
           value={newBanner.discount}
           onChange={handleNewChange}
           placeholder='Discount'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
         <input
           name='buttonText'
           value={newBanner.buttonText}
           onChange={handleNewChange}
           placeholder='Button Text'
-          className='p-2 border rounded'
+          className='p-2 border rounded w-full sm:w-auto'
         />
-        <button type='submit' className='p-2 bg-yellow-500 text-white rounded'>
+        <button
+          type='submit'
+          className='p-2 px-12 bg-yellow-500 text-white rounded w-full sm:w-auto'
+        >
           Add
         </button>
       </form>

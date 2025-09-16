@@ -30,6 +30,21 @@ function DashboardAside() {
           <li>
             <a href='/dashboard/customers'>Customers</a>
           </li>
+          <li>
+            <a href='/dashboard/brands'>Brands</a>
+          </li>
+          <li>
+            <a href='/dashboard/services'>Services</a>
+          </li>
+          <li>
+            <a href='/dashboard/advertisement'>Advertisement</a>
+          </li>
+          <li>
+            <a href='/dashboard/banners'>Banners</a>
+          </li>
+          <li>
+            <a href='/dashboard/blog'>Blog</a>
+          </li>
         </ul>
       </div>
       <button

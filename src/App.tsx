@@ -1,3 +1,7 @@
+import DashBrand from "./pages/dashboard/DashBrand";
+import DashServices from "./pages/dashboard/DashServices";
+import DashAdvert from "./pages/dashboard/DashAdvert";
+import DashBanner from "./pages/dashboard/DashBanner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
@@ -21,6 +25,7 @@ import DashProduct from "./pages/dashboard/DashProduct";
 import DashCustomers from "./pages/dashboard/DashCustomers";
 import DashProfile from "./pages/dashboard/DashProfile";
 import DashSettings from "./pages/dashboard/DashSettings";
+import DashBlog from "./pages/dashboard/DashBlog";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +156,11 @@ const App = () => {
             <Route path='/dashboard/customers' element={<DashCustomers />} />
             <Route path='/dashboard/profile' element={<DashProfile />} />
             <Route path='/dashboard/settings' element={<DashSettings />} />
+            <Route path='/dashboard/brands' element={<DashBrand />} />
+            <Route path='/dashboard/services' element={<DashServices />} />
+            <Route path='/dashboard/advertisement' element={<DashAdvert />} />
+            <Route path='/dashboard/banners' element={<DashBanner />} />
+            <Route path='/dashboard/blog' element={<DashBlog />} />
           </Route>
           {/* 404 Page error */}
           <Route path='*' element={<NotFound />} />

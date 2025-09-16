@@ -4,23 +4,23 @@ import { dummyUsers } from "../../data/dummyUsers";
 function DashCustomers() {
   return (
     <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Registered Users</h2>
-      <div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
-        <table className='w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
+      <h2 className='text-xl font-bold mb-4'>Registered Customers</h2>
+      <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
+        <table className='min-w-[400px] w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
           <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
             <tr>
               <th
                 scope='col'
-                className='px-6 py-3 bg-yellow-50 dark:bg-yellow-800'
+                className='px-4 py-2 sm:px-6 sm:py-3 bg-yellow-50 dark:bg-yellow-800'
               >
                 Username
               </th>
-              <th scope='col' className='px-6 py-3'>
+              <th scope='col' className='px-4 py-2 sm:px-6 sm:py-3'>
                 Email
               </th>
               <th
                 scope='col'
-                className='px-6 py-3 bg-yellow-50 dark:bg-yellow-800'
+                className='px-4 py-2 sm:px-6 sm:py-3 bg-yellow-50 dark:bg-yellow-800'
               >
                 Joined
               </th>
@@ -42,12 +42,12 @@ function DashCustomers() {
                   >
                     <th
                       scope='row'
-                      className='px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-yellow-50 dark:text-white dark:bg-yellow-800'
+                      className='px-4 py-2 sm:px-6 sm:py-3 font-medium text-gray-900 whitespace-nowrap bg-yellow-50 dark:text-white dark:bg-yellow-800'
                     >
                       {user.username}
                     </th>
-                    <td className='px-6 py-4'>{user.email}</td>
-                    <td className='px-6 py-4 bg-yellow-50 dark:bg-yellow-800'>
+                    <td className='px-4 py-2 sm:px-6 sm:py-3'>{user.email}</td>
+                    <td className='px-4 py-2 sm:px-6 sm:py-3 bg-yellow-50 dark:bg-yellow-800'>
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

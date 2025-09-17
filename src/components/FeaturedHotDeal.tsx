@@ -22,21 +22,21 @@ const FeaturedHotDeal = ({
     <div className='bg-card rounded-lg border hover:shadow-md transition-all duration-300 group relative overflow-hidden'>
       {/* Discount Badge */}
       {discountPercentage > 0 && (
-        <span className='absolute top-2 left-2 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded'>
+        <span className='absolute top-2 left-2 z-10 bg-green-500 text-white  border-transparent  hover:bg-green-500/80 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'>
           {discountPercentage}% Off
         </span>
       )}
 
       {/* Featured Badge */}
       {product.discount && product.discount > 30 && (
-        <span className='absolute top-2 right-2 z-10 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded'>
+        <span className='absolute top-2 right-2 z-10 bg-blue-500  text-white  border-transparent  hover:bg-green-500/80 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'>
           Featured
         </span>
       )}
 
       {/* Wishlist Button */}
       <button
-        className='absolute bottom-2 right-2 z-10 bg-white/80 hover:bg-red-100 rounded-full p-2 transition-colors duration-150 shadow opacity-0 group-hover:opacity-100'
+        className='absolute top-2 right-2 z-10 bg-white/80 hover:bg-red-100 rounded-full p-2 transition-colors duration-150 shadow opacity-0 group-hover:opacity-100'
         onClick={(e) => {
           e.stopPropagation();
           if (addToCart) {

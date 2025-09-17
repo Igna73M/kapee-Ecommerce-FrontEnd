@@ -34,7 +34,7 @@ const BestSellingSection = ({
       <div className='bg-card rounded-lg border-2 border-yellow-400 hover:shadow-lg transition-all duration-300 group relative overflow-hidden h-full'>
         {/* Discount Badge */}
         {discountPercentage > 0 && (
-          <span className='absolute top-3 left-3 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded'>
+          <span className='absolute top-3 left-3 z-10 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded inline-flex items-center border transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent'>
             {discountPercentage}% OFF
           </span>
         )}

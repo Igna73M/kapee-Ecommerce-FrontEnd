@@ -169,10 +169,10 @@ const Footer = () => {
                 <input
                   type='email'
                   placeholder='Your email address'
-                  className='flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary'
+                  className='flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary flex h-10 w-full  border-input bg-background text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
                 />
                 <button
-                  className='bg-foreground text-background hover:bg-foreground/90 px-4 py-2 rounded font-semibold transition-colors duration-150'
+                  className='bg-foreground text-background hover:bg-foreground/90 px-4 py-2 rounded font-semibold transition-colors duration-150 inline-flex items-center justify-center gap-2 whitespace-nowrap  text-sm ring-offset-background  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   SIGN UP
@@ -182,43 +182,43 @@ const Footer = () => {
               {/* Social Media Icons */}
               <div className='flex gap-2 mt-6'>
                 <button
-                  className='bg-blue-600 hover:bg-blue-700 rounded-full p-2'
+                  className='bg-blue-600 hover:bg-blue-700 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Facebook className='h-4 w-8' />
                 </button>
                 <button
-                  className='bg-black hover:bg-gray-800 rounded-full p-2'
+                  className='bg-black hover:bg-gray-800 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Twitter className='h-4 w-8' />
                 </button>
                 <button
-                  className='bg-blue-700 hover:bg-blue-800 rounded-full p-2'
+                  className='bg-blue-700 hover:bg-blue-800 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Linkedin className='h-4 w-8' />
                 </button>
                 <button
-                  className='bg-pink-500 hover:bg-pink-600 rounded-full p-2'
+                  className='bg-pink-500 hover:bg-pink-600 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Instagram className='h-4 w-8' />
                 </button>
                 <button
-                  className='bg-pink-600 hover:bg-pink-700 rounded-full p-2'
+                  className='bg-pink-600 hover:bg-pink-700 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <span className='text-xs font-bold'>D</span>
                 </button>
                 <button
-                  className='bg-orange-500 hover:bg-orange-600 rounded-full p-2'
+                  className='bg-orange-500 hover:bg-orange-600 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Rss className='h-4 w-8' />
                 </button>
                 <button
-                  className='bg-red-600 hover:bg-red-700 rounded-full p-2'
+                  className='bg-red-600 hover:bg-red-700 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Youtube className='h-4 w-8' />

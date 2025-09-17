@@ -147,7 +147,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   <option value='others'>Others</option>
                 </select>
                 <button
-                  className='rounded-none px-6 bg-foreground text-background hover:bg-foreground/90'
+                  className='rounded-md px-6 bg-foreground text-background hover:bg-foreground/90'
                   type='button'
                 >
                   <Search className='h-4 w-4 text-yellow-400' />
@@ -255,9 +255,9 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
           <nav className='mt-6 border-t pt-4'>
             {/* Desktop nav */}
             <div className='hidden md:flex flex-row items-center justify-between gap-4'>
-              <div className='flex flex-wrap items-center gap-4 md:gap-8 justify-center md:justify-start w-full'>
+              <div className='flex flex-wrap items-center gap-2 md:gap-8 justify-center md:justify-center w-full'>
                 <button
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 md:px-6 md:py-3 relative text-xs md:text-base'
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 lg:px-6 lg:py-3 relative text-xs md:text-base inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium'
                   onClick={() => setShowCategorySidebar((prev) => !prev)}
                   type='button'
                 >
@@ -295,10 +295,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 </span>
               </div>
               <Link to='/checkout'>
-                <button
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-6 text-xs md:text-base'
-                  type='button'
-                >
+                <button className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 lg:px-6 text-xs md:text-base inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium py-2'>
                   BUY NOW
                 </button>
               </Link>
@@ -346,7 +343,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   ELEMENTS
                 </span>
                 <button
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 text-xs'
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 px-4 text-xs py-1'
                   type='button'
                 >
                   BUY NOW

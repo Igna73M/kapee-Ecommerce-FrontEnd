@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
-
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { register } from "module";
 import { Notify } from "notiflix";
-import { Navigate } from "react-router-dom";
 
 // close button
 interface SignupProps {
@@ -36,10 +33,13 @@ export default function Signup({
   if (!show) return null;
 
   interface FormData {
+    firstname: string;
+    lastname: string;
     username: string;
     email: string;
     password: string;
     confirmPassword?: string;
+    userRole: string;
   }
 
   const onRegister = async (data: FormData) => {
@@ -47,9 +47,12 @@ export default function Signup({
       const { username, email, password, confirmPassword } = data;
       const formData = new FormData();
 
+      formData.append("firstname", data.firstname);
+      formData.append("lastname", data.lastname);
       formData.append("username", username);
       formData.append("email", email);
       formData.append("password", password);
+      formData.append("userRole", data.userRole);
       // formData.append("confirmPassword", confirmPassword);
 
       const response = await axios.post(
@@ -64,7 +67,7 @@ export default function Signup({
 
       Notify.success("Registration Successful");
       reset();
-      // Navigate("/login");
+      onSwitchToLogin();
     } catch (error) {
       Notify.failure("Registration Failed");
       reset();
@@ -85,8 +88,8 @@ export default function Signup({
         <div className='p-6 md:p-8 bg-yellow-400 w-full md:w-1/2 flex-shrink-0'>
           <h2 className='text-2xl md:text-3xl font-bold mb-2'>Sign Up</h2>
           <div className='text-sm md:text-base text-black w-full pt-4 md:pt-6'>
-            Create an account to access your Orders, Wishlist and
-            Recommendations.
+            Create an account to access your orders, wishlist and
+            recommendations.
           </div>
         </div>
         <div className='relative bg-white p-6 md:p-8 w-full'>
@@ -99,9 +102,13 @@ export default function Signup({
           </button>
 
           {/* Form section */}
-          <form className='space-y-4' onSubmit={handleSubmit(onRegister)}>
+          <form
+            className='space-y-4 flex flex-wrap'
+            onSubmit={handleSubmit(onRegister)}
+          >
             <div>
               <input
+                className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
                 type='text'
                 placeholder='Username'
                 required
@@ -114,6 +121,25 @@ export default function Signup({
             </div>
             <div>
               <input
+                className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
+                type='text'
+                placeholder='First Name'
+                required
+                {...register("firstname", { required: true })}
+              />
+            </div>
+            <div>
+              <input
+                className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
+                type='text'
+                placeholder='Last Name'
+                required
+                {...register("lastname", { required: true })}
+              />
+            </div>
+            <div>
+              <input
+                className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
                 type='email'
                 placeholder='Email address'
                 required
@@ -122,6 +148,7 @@ export default function Signup({
             </div>
             <div>
               <input
+                className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
                 type='password'
                 placeholder='Password'
                 required
@@ -130,12 +157,21 @@ export default function Signup({
             </div>
             <div>
               <input
+                className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
                 type='password'
                 placeholder='Confirm Password'
                 required
                 {...register("confirmPassword", { required: true })}
               />
             </div>
+            <select
+              className='outline-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent'
+              name='userRole'
+              {...register("userRole", { required: true })}
+            >
+              <option value='user'>Customer</option>
+              <option value='admin'>Admin</option>
+            </select>
             <button
               type='submit'
               className='w-full mt-2 bg-black text-yellow-400 hover:bg-gray-800 hover:text-white'

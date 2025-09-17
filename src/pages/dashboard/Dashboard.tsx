@@ -76,50 +76,80 @@ function Dashboard() {
   const serviceCount = services.length;
 
   return (
-    <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Admin Dashboard</h2>
+    <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
+      <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
+        Admin Dashboard
+      </h2>
       {loading ? (
         <div>Loading...</div>
       ) : (
         <>
           <div className='grid grid-cols-1 md:grid-cols-5 gap-8 mb-8'>
-            <div className='bg-yellow-100 rounded p-4 text-center'>
-              <div className='text-2xl font-bold'>{products.length}</div>
-              <div className='text-sm'>Products</div>
+            <div className='bg-yellow-100 dark:bg-yellow-900 rounded p-4 text-center'>
+              <div className='text-2xl font-bold text-gray-900 dark:text-yellow-100'>
+                {products.length}
+              </div>
+              <div className='text-sm text-gray-700 dark:text-yellow-100'>
+                Products
+              </div>
             </div>
-            <div className='bg-blue-100 rounded p-4 text-center'>
-              <div className='text-2xl font-bold'>{customerCount}</div>
-              <div className='text-sm'>Customers</div>
+            <div className='bg-blue-100 dark:bg-blue-900 rounded p-4 text-center'>
+              <div className='text-2xl font-bold text-gray-900 dark:text-yellow-100'>
+                {customerCount}
+              </div>
+              <div className='text-sm text-gray-700 dark:text-yellow-100'>
+                Customers
+              </div>
             </div>
-            <div className='bg-green-100 rounded p-4 text-center'>
-              <div className='text-2xl font-bold'>{brandCount}</div>
-              <div className='text-sm'>Brands</div>
+            <div className='bg-green-100 dark:bg-green-900 rounded p-4 text-center'>
+              <div className='text-2xl font-bold text-gray-900 dark:text-yellow-100'>
+                {brandCount}
+              </div>
+              <div className='text-sm text-gray-700 dark:text-yellow-100'>
+                Brands
+              </div>
             </div>
-            <div className='bg-purple-100 rounded p-4 text-center'>
-              <div className='text-2xl font-bold'>{serviceCount}</div>
-              <div className='text-sm'>Services</div>
+            <div className='bg-purple-100 dark:bg-purple-900 rounded p-4 text-center'>
+              <div className='text-2xl font-bold text-gray-900 dark:text-yellow-100'>
+                {serviceCount}
+              </div>
+              <div className='text-sm text-gray-700 dark:text-yellow-100'>
+                Services
+              </div>
             </div>
-            <div className='bg-pink-100 rounded p-4 text-center'>
-              <div className='text-2xl font-bold'>{inStock}</div>
-              <div className='text-sm'>Products In Stock</div>
+            <div className='bg-pink-100 dark:bg-pink-900 rounded p-4 text-center'>
+              <div className='text-2xl font-bold text-gray-900 dark:text-yellow-100'>
+                {inStock}
+              </div>
+              <div className='text-sm text-gray-700 dark:text-yellow-100'>
+                Products In Stock
+              </div>
             </div>
           </div>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-32'>
             <div>
-              <h3 className='font-semibold mb-2 text-center'>
+              <h3 className='font-semibold mb-2 text-center text-gray-900 dark:text-yellow-100'>
                 Products per Category
               </h3>
               <ResponsiveContainer width='100%' height={300}>
                 <BarChart data={categoryData}>
-                  <XAxis dataKey='name' />
-                  <YAxis />
-                  <Tooltip />
+                  <XAxis dataKey='name' stroke='#fbbf24' />
+                  <YAxis stroke='#fbbf24' />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#fbbf24",
+                      color: "#222",
+                      borderRadius: "8px",
+                    }}
+                  />
                   <Bar dataKey='value' fill='#fbbf24' />
                 </BarChart>
               </ResponsiveContainer>
             </div>
             <div>
-              <h3 className='font-semibold mb-2 text-center'>Stock Status</h3>
+              <h3 className='font-semibold mb-2 text-center text-gray-900 dark:text-yellow-100'>
+                Stock Status
+              </h3>
               <ResponsiveContainer width='100%' height={300}>
                 <PieChart>
                   <Pie
@@ -138,7 +168,13 @@ function Dashboard() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#fbbf24",
+                      color: "#222",
+                      borderRadius: "8px",
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

@@ -104,8 +104,10 @@ function DashBanner() {
   };
 
   return (
-    <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Banners</h2>
+    <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
+      <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
+        Banners
+      </h2>
       {/* Add new banner */}
       <form
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
@@ -116,7 +118,7 @@ function DashBanner() {
           value={newBanner.title}
           onChange={handleNewChange}
           placeholder='Title'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
           required
         />
         <input
@@ -124,28 +126,28 @@ function DashBanner() {
           value={newBanner.subtitle}
           onChange={handleNewChange}
           placeholder='Subtitle'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='image'
           value={newBanner.image}
           onChange={handleNewChange}
           placeholder='Image URL'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='discount'
           value={newBanner.discount}
           onChange={handleNewChange}
           placeholder='Discount'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='buttonText'
           value={newBanner.buttonText}
           onChange={handleNewChange}
           placeholder='Button Text'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <button
           type='submit'
@@ -159,8 +161,8 @@ function DashBanner() {
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
-            <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
+          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+            <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Title</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Subtitle</th>
@@ -183,32 +185,32 @@ function DashBanner() {
                           name='title'
                           value={editBanner.title}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
                         />
                         <input
                           name='subtitle'
                           value={editBanner.subtitle}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='image'
                           value={editBanner.image}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='discount'
                           value={editBanner.discount}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='buttonText'
                           value={editBanner.buttonText}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <button
                           type='submit'
@@ -218,7 +220,7 @@ function DashBanner() {
                         </button>
                         <button
                           type='button'
-                          className='p-2 bg-gray-300 rounded'
+                          className='p-2 bg-gray-300 dark:bg-gray-700 rounded'
                           onClick={() => setEditId(null)}
                         >
                           Cancel
@@ -230,18 +232,24 @@ function DashBanner() {
                   <tr key={banner._id}>
                     <td className='px-6 py-4'>{banner.title}</td>
                     <td className='px-6 py-4'>{banner.subtitle}</td>
-                    <td className='px-6 py-4'>{banner.image}</td>
+                    <td className='px-6 py-4'>
+                      <span className='cursor-pointer' title={banner.image}>
+                        {banner.image.length > 50
+                          ? `${banner.image.slice(0, 50)}...`
+                          : banner.image}
+                      </span>
+                    </td>
                     <td className='px-6 py-4'>{banner.discount}</td>
                     <td className='px-6 py-4'>{banner.buttonText}</td>
                     <td className='px-6 py-4 flex gap-2'>
                       <button
-                        className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
                         onClick={() => handleEdit(banner)}
                       >
                         Edit
                       </button>
                       <button
-                        className='font-medium text-red-600 dark:text-red-500 hover:underline'
+                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
                         onClick={() => handleDelete(banner._id)}
                       >
                         Delete

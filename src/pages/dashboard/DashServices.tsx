@@ -77,8 +77,10 @@ function DashServices() {
   };
 
   return (
-    <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Services</h2>
+    <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
+      <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
+        Services
+      </h2>
       {/* Add new service */}
       <form
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
@@ -89,7 +91,7 @@ function DashServices() {
           value={newService.title}
           onChange={handleNewChange}
           placeholder='Title'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
           required
         />
         <input
@@ -97,7 +99,7 @@ function DashServices() {
           value={newService.description}
           onChange={handleNewChange}
           placeholder='Description'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <button
           type='submit'
@@ -111,8 +113,8 @@ function DashServices() {
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[400px] w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
-            <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
+          <table className='min-w-[400px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+            <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Title</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Description</th>
@@ -132,14 +134,14 @@ function DashServices() {
                           name='title'
                           value={editService.title}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
                         />
                         <input
                           name='description'
                           value={editService.description}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <button
                           type='submit'
@@ -149,7 +151,7 @@ function DashServices() {
                         </button>
                         <button
                           type='button'
-                          className='p-2 bg-gray-300 rounded'
+                          className='p-2 bg-gray-300 dark:bg-gray-700 rounded'
                           onClick={() => setEditId(null)}
                         >
                           Cancel
@@ -163,13 +165,13 @@ function DashServices() {
                     <td className='px-6 py-4'>{service.description}</td>
                     <td className='px-6 py-4 flex gap-2'>
                       <button
-                        className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
                         onClick={() => handleEdit(service)}
                       >
                         Edit
                       </button>
                       <button
-                        className='font-medium text-red-600 dark:text-red-500 hover:underline'
+                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
                         onClick={() => handleDelete(service._id)}
                       >
                         Delete

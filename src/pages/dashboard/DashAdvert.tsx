@@ -102,8 +102,10 @@ function DashAdvert() {
   };
 
   return (
-    <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Advertisement</h2>
+    <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
+      <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
+        Advertisement
+      </h2>
       {/* Add new slide */}
       <form
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full max-w-2xl sm:flex-wrap'
@@ -114,7 +116,7 @@ function DashAdvert() {
           value={newSlide.title}
           onChange={handleNewChange}
           placeholder='Title'
-          className='p-2 border rounded flex-1  w-full sm:w-auto'
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
           required
         />
         <input
@@ -122,28 +124,28 @@ function DashAdvert() {
           value={newSlide.subtitle}
           onChange={handleNewChange}
           placeholder='Subtitle'
-          className='p-2 border rounded flex-1  w-full sm:w-auto'
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='image'
           value={newSlide.image}
           onChange={handleNewChange}
           placeholder='Image URL'
-          className='p-2 border rounded flex-1  w-full sm:w-auto'
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='discount'
           value={newSlide.discount}
           onChange={handleNewChange}
           placeholder='Discount'
-          className='p-2 border rounded flex-1 w-full sm:w-auto'
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='buttonText'
           value={newSlide.buttonText}
           onChange={handleNewChange}
           placeholder='Button Text'
-          className='p-2 border rounded flex-1  w-full sm:w-auto'
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <button
           type='submit'
@@ -157,8 +159,8 @@ function DashAdvert() {
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
-            <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
+          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+            <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Title</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Subtitle</th>
@@ -181,32 +183,32 @@ function DashAdvert() {
                           name='title'
                           value={editSlide.title}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
                         />
                         <input
                           name='subtitle'
                           value={editSlide.subtitle}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='image'
                           value={editSlide.image}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='discount'
                           value={editSlide.discount}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='buttonText'
                           value={editSlide.buttonText}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <button
                           type='submit'
@@ -216,7 +218,7 @@ function DashAdvert() {
                         </button>
                         <button
                           type='button'
-                          className='p-2 bg-gray-300 rounded'
+                          className='p-2 bg-gray-300 dark:bg-gray-700 rounded'
                           onClick={() => setEditId(null)}
                         >
                           Cancel
@@ -228,18 +230,24 @@ function DashAdvert() {
                   <tr key={slide._id}>
                     <td className='px-6 py-4'>{slide.title}</td>
                     <td className='px-6 py-4'>{slide.subtitle}</td>
-                    <td className='px-6 py-4'>{slide.image}</td>
+                    <td className='px-6 py-4'>
+                      <span className='cursor-pointer' title={slide.image}>
+                        {slide.image.length > 50
+                          ? `${slide.image.slice(0, 50)}...`
+                          : slide.image}
+                      </span>
+                    </td>
                     <td className='px-6 py-4'>{slide.discount}</td>
                     <td className='px-6 py-4'>{slide.buttonText}</td>
                     <td className='px-6 py-4 flex gap-2'>
                       <button
-                        className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
                         onClick={() => handleEdit(slide)}
                       >
                         Edit
                       </button>
                       <button
-                        className='font-medium text-red-600 dark:text-red-500 hover:underline'
+                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
                         onClick={() => handleDelete(slide._id)}
                       >
                         Delete

@@ -138,8 +138,10 @@ function DashBlog() {
   };
 
   return (
-    <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Blog Posts</h2>
+    <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
+      <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
+        Blog Posts
+      </h2>
       <button
         className='mb-4 px-4 py-2 bg-yellow-600 text-white rounded shadow hover:bg-yellow-700 transition'
         onClick={() => setShowModal(true)}
@@ -149,38 +151,42 @@ function DashBlog() {
       {/* Modal for new blog post */}
       {showModal && (
         <div className='fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative'>
+          <div className='bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-lg relative'>
             <button
-              className='absolute top-2 right-2 text-gray-500 hover:text-gray-700'
+              className='absolute top-2 right-2 text-gray-500 dark:text-yellow-100 hover:text-gray-700 dark:hover:text-yellow-400'
               onClick={() => setShowModal(false)}
             >
               &times;
             </button>
-            <h3 className='text-lg font-semibold mb-4'>Create Blog Post</h3>
+            <h3 className='text-lg font-semibold mb-4 text-gray-900 dark:text-yellow-100'>
+              Create Blog Post
+            </h3>
             <form onSubmit={handleNewSubmit} className='flex flex-col gap-4'>
               <input
                 name='title'
                 value={newPost.title}
                 onChange={handleNewChange}
                 placeholder='Title'
-                className='p-2 border rounded'
+                className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                 required
               />
               <ReactQuill
                 value={newPost.excerpt}
                 onChange={handleQuillChange}
                 placeholder='Content'
-                className='bg-white rounded'
+                className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100'
               />
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded p-4 text-center cursor-pointer ${
-                  isDragActive ? "border-yellow-600" : "border-gray-300"
-                }`}
+                  isDragActive
+                    ? "border-yellow-600"
+                    : "border-gray-300 dark:border-gray-700"
+                } bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100`}
               >
                 <input {...getInputProps()} />
                 {imageFile ? (
-                  <span>Selected: {imageFile.name}</span>
+                  <span>{imageFile.name}</span>
                 ) : (
                   <span>Drag & drop image here, or click to select</span>
                 )}
@@ -190,7 +196,7 @@ function DashBlog() {
                 value={newPost.date}
                 onChange={handleNewChange}
                 placeholder='Date'
-                className='p-2 border rounded'
+                className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                 required
               />
               {error && <div className='text-red-500'>{error}</div>}
@@ -205,13 +211,12 @@ function DashBlog() {
           </div>
         </div>
       )}
-      {/* ...existing code... */}
       {loading ? (
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
-            <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
+          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+            <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Title</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Excerpt</th>
@@ -233,26 +238,26 @@ function DashBlog() {
                           name='title'
                           value={editPost.title}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
                         />
                         <input
                           name='excerpt'
                           value={editPost.excerpt}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='image'
                           value={editPost.image}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='date'
                           value={editPost.date}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <button
                           type='submit'
@@ -262,7 +267,7 @@ function DashBlog() {
                         </button>
                         <button
                           type='button'
-                          className='p-2 bg-gray-300 rounded'
+                          className='p-2 bg-gray-300 dark:bg-gray-700 rounded'
                           onClick={() => setEditId(null)}
                         >
                           Cancel
@@ -290,13 +295,13 @@ function DashBlog() {
                     <td className='px-6 py-4'>{post.date}</td>
                     <td className='px-6 py-4 flex gap-2'>
                       <button
-                        className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
                         onClick={() => handleEdit(post)}
                       >
                         Edit
                       </button>
                       <button
-                        className='font-medium text-red-600 dark:text-red-500 hover:underline'
+                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
                         onClick={() => handleDelete(post._id)}
                       >
                         Delete

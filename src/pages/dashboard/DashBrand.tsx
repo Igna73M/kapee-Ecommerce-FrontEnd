@@ -92,8 +92,10 @@ export default function DashBrand() {
   };
 
   return (
-    <div className='p-6'>
-      <h2 className='text-xl font-bold mb-4'>Brand Categories</h2>
+    <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
+      <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
+        Brand Categories
+      </h2>
       {/* Add new brand category */}
       <form
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
@@ -104,7 +106,7 @@ export default function DashBrand() {
           value={newCategory.name}
           onChange={handleNewChange}
           placeholder='Name'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
           required
         />
         <input
@@ -112,21 +114,21 @@ export default function DashBrand() {
           value={newCategory.tagline}
           onChange={handleNewChange}
           placeholder='Tagline'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='initial'
           value={newCategory.initial}
           onChange={handleNewChange}
           placeholder='Initial'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
           name='bgColor'
           value={newCategory.bgColor}
           onChange={handleNewChange}
           placeholder='Bg Color'
-          className='p-2 border rounded w-full sm:w-auto'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <button
           type='submit'
@@ -140,8 +142,8 @@ export default function DashBrand() {
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-yellow-700 dark:text-yellow-400'>
-            <thead className='text-xs uppercase bg-yellow-50 dark:bg-yellow-700 dark:text-yellow-400'>
+          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+            <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Name</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Tagline</th>
@@ -163,26 +165,26 @@ export default function DashBrand() {
                           name='name'
                           value={editCategory.name}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
                         />
                         <input
                           name='tagline'
                           value={editCategory.tagline}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='initial'
                           value={editCategory.initial}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
                           name='bgColor'
                           value={editCategory.bgColor}
                           onChange={handleEditChange}
-                          className='p-2 border rounded'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <button
                           type='submit'
@@ -192,7 +194,7 @@ export default function DashBrand() {
                         </button>
                         <button
                           type='button'
-                          className='p-2 bg-gray-300 rounded'
+                          className='p-2 bg-gray-300 dark:bg-gray-700 rounded'
                           onClick={() => setEditId(null)}
                         >
                           Cancel
@@ -208,13 +210,13 @@ export default function DashBrand() {
                     <td className='px-6 py-4'>{cat.bgColor}</td>
                     <td className='px-6 py-4 flex gap-2'>
                       <button
-                        className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
                         onClick={() => handleEdit(cat)}
                       >
                         Edit
                       </button>
                       <button
-                        className='font-medium text-red-600 dark:text-red-500 hover:underline'
+                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
                         onClick={() => handleDelete(cat._id)}
                       >
                         Delete

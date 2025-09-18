@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBanner from "@/components/TopBanner";
 import Header from "@/components/Header";
 import CategorySidebar from "@/components/CategorySidebar";
@@ -28,6 +28,15 @@ const Shop = ({
   toggleWishlist,
   openCart,
 }: ShopProps) => {
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -42,7 +51,7 @@ const Shop = ({
   };
 
   return (
-    <div className='min-h-screen bg-background'>
+    <div className='min-h-screen bg-background dark:bg-gray-900'>
       <TopBanner />
       {/* <Header cart={cart} /> */}
 
@@ -56,12 +65,14 @@ const Shop = ({
           {/* Products Grid */}
           <div className='lg:col-span-3'>
             <div className='mb-6'>
-              <h1 className='text-3xl font-bold mb-2'>Shop Electronics</h1>
-              <p className='text-muted-foreground'>
+              <h1 className='text-3xl font-bold mb-2 text-gray-900 dark:text-yellow-100'>
+                Shop Electronics
+              </h1>
+              <p className='text-muted-foreground dark:text-yellow-100'>
                 Discover our amazing collection of electronics
               </p>
               <button
-                className='bg-muted text-muted-foreground px-4 py-2 rounded text-sm font-medium hover:bg-muted/80 mt-2'
+                className='bg-muted dark:bg-gray-800 text-muted-foreground dark:text-yellow-100 px-4 py-2 rounded text-sm font-medium hover:bg-muted/80 dark:hover:bg-gray-700 mt-2'
                 onClick={() => {
                   const grid = document.getElementById("products-grid");
                   if (grid) grid.scrollIntoView({ behavior: "smooth" });

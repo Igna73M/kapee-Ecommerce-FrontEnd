@@ -33,12 +33,12 @@ const CategorySidebar = ({ open, onClose }: CategorySidebarProps) => {
   if (!open) return null;
 
   return (
-    <div className='bg-white rounded-lg  shadow-sm border top-12 -left-1 z-50 w-60 h-fit absolute'>
-      <div className='bg-white relative'>
+    <div className='bg-white dark:bg-gray-900 rounded-lg shadow-sm border dark:border-gray-700 top-12 -left-1 z-50 w-60 h-fit absolute'>
+      <div className='bg-white dark:bg-gray-900 relative'>
         {categories.map((category) => (
           <div
             key={category.id}
-            className='flex items-center justify-between px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer relative'
+            className='flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer relative'
             onMouseEnter={() => setHoveredCategory(category.name)}
             onMouseLeave={() =>
               setHoveredCategory((prev) =>
@@ -46,17 +46,17 @@ const CategorySidebar = ({ open, onClose }: CategorySidebarProps) => {
               )
             }
           >
-            <span className='text-sm text-gray-700 group-hover:text-primary'>
+            <span className='text-sm text-gray-700 dark:text-yellow-100 group-hover:text-primary dark:group-hover:text-yellow-400'>
               {category.name}
             </span>
-            <ChevronRight className='h-4 w-4 text-gray-400 group-hover:text-primary' />
+            <ChevronRight className='h-4 w-4 text-gray-400 dark:text-yellow-100 group-hover:text-primary dark:group-hover:text-yellow-400' />
             {hoveredCategory === category.name &&
               categoryMenuMap[category.name] && (
-                <ul className='bg-white shadow-lg rounded-lg py-2 px-3 text-black relative z-50 right-0 top-0 flex flex-col'>
+                <ul className='bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 px-3 text-black dark:text-yellow-100 relative z-50 right-0 top-0 flex flex-col border dark:border-gray-700'>
                   {categoryMenuMap[category.name].map((item) => (
                     <li
                       key={item.id}
-                      className='px-3 py-2 hover:bg-yellow-200 cursor-pointer text-sm text-gray-700 rounded transition-colors duration-150 text-left'
+                      className='px-3 py-2 hover:bg-yellow-200 dark:hover:bg-yellow-600 cursor-pointer text-sm text-gray-700 dark:text-yellow-100 rounded transition-colors duration-150 text-left'
                     >
                       {item.name}
                     </li>

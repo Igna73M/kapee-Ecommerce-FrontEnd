@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TopBanner from "@/components/TopBanner";
 import HeroSection from "@/components/HeroSection";
 import BannerSection from "@/components/BannerSection";
-
 import HotDealCard from "@/components/HotDealCard";
 import FeaturedHotDeal from "@/components/FeaturedHotDeal";
 import ProductModal from "@/components/ProductModal";
@@ -35,6 +34,15 @@ const Index = ({
   toggleWishlist,
   openCart,
 }: IndexProps) => {
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -53,7 +61,7 @@ const Index = ({
   const hotDeals = products.slice(0, 6);
 
   return (
-    <div className='min-h-screen bg-background'>
+    <div className='min-h-screen bg-background dark:bg-gray-900'>
       <TopBanner />
 
       <main className='max-w-7xl mx-auto py-8 px-4'>
@@ -76,15 +84,15 @@ const Index = ({
             {/* Hot Deals Section */}
             <section>
               <div className='flex items-center justify-between mb-6'>
-                <h2 className='text-2xl font-bold text-foreground border-b-2 border-yellow-400 pb-2'>
+                <h2 className='text-2xl font-bold text-foreground dark:text-yellow-100 border-b-2 border-yellow-400 pb-2'>
                   HOT DEALS
                 </h2>
                 <div className='flex items-center gap-4'>
-                  <h3 className='text-xl font-bold text-foreground border-b-2 border-yellow-400 pb-2'>
+                  <h3 className='text-xl font-bold text-foreground dark:text-yellow-100 border-b-2 border-yellow-400 pb-2'>
                     FEATURED PRODUCTS
                   </h3>
                   <button
-                    className='bg-muted text-muted-foreground px-4 py-2 rounded text-sm font-medium hover:bg-muted/80'
+                    className='bg-muted dark:bg-gray-800 text-muted-foreground dark:text-yellow-100 px-4 py-2 rounded text-sm font-medium hover:bg-muted/80 dark:hover:bg-gray-700'
                     onClick={() => navigate("/shop")}
                   >
                     VIEW ALL

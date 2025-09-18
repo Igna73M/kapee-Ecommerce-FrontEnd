@@ -84,7 +84,7 @@ export default function Login({ open, onClose }: LoginProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-gray-900/80 transition-opacity duration-300 ${
         animate ? "opacity-100" : "opacity-0"
       }`}
     >
@@ -99,10 +99,10 @@ export default function Login({ open, onClose }: LoginProps) {
             Get access to your Orders, Wishlist and Recommendations.
           </div>
         </div>
-        <div className='relative bg-white p-6 md:p-8 w-full'>
+        <div className='relative bg-white dark:bg-gray-900 p-6 md:p-8 w-full'>
           <button
             onClick={onClose}
-            className='fixed md:absolute top-0 right-2 z-50 text-black hover:text-gray-600 text-2xl font-bold focus:outline-none bg-transparent border-0 p-0'
+            className='fixed md:absolute top-0 right-2 z-50 text-black dark:text-yellow-100 hover:text-gray-600 dark:hover:text-yellow-400 text-2xl font-bold focus:outline-none bg-transparent border-0 p-0'
             aria-label='Close login dialog'
           >
             ×
@@ -117,7 +117,7 @@ export default function Login({ open, onClose }: LoginProps) {
                 placeholder='Email address'
                 required
                 {...register("email", { required: true })}
-                className='mb-2 border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className='mb-2 border border-gray-300 dark:border-gray-700 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-yellow-100'
               />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function Login({ open, onClose }: LoginProps) {
                 placeholder='Enter Password'
                 required
                 {...register("password", { required: true })}
-                className='mb-2 border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className='mb-2 border border-gray-300 dark:border-gray-700 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-yellow-100'
               />
             </div>
             <div className='flex items-center justify-between'>
@@ -144,15 +144,17 @@ export default function Login({ open, onClose }: LoginProps) {
             </div>
             <button
               type='submit'
-              className='w-full mt-2 bg-black text-yellow-400 hover:bg-gray-800 hover:text-white'
+              className='w-full mt-2 bg-black dark:bg-yellow-500 text-yellow-400 dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-yellow-400 hover:text-white dark:hover:text-gray-900'
             >
               Log in
             </button>
             <div className='text-center pt-2'>
-              <span className='text-sm'>Don't have an account? </span>
+              <span className='text-sm text-gray-900 dark:text-yellow-100'>
+                Don't have an account?{" "}
+              </span>
               <button
                 type='button'
-                className='text-primary font-bold hover:underline bg-transparent border-0 p-0 text-sm'
+                className='text-primary dark:text-yellow-400 font-bold hover:underline bg-transparent border-0 p-0 text-sm'
                 onClick={() => setShowSignup(true)}
               >
                 Sign up

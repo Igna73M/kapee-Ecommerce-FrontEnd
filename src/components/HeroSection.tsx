@@ -53,27 +53,31 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
   const slide = heroSlides[currentSlide];
 
   return (
-    <div className='relative bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg overflow-hidden'>
+    <div className='relative bg-gradient-to-br from-primary/10 to-primary/5 dark:from-gray-800 dark:to-gray-900 rounded-lg overflow-hidden'>
       <div className='flex items-center min-h-[400px] p-8 md:p-12 transition-transform duration-700 ease-in-out'>
         {/* Slide Content with pop-in animation */}
         <div
           className={`flex-1 space-y-6 ${animating ? "" : "animate-pop-in"}`}
         >
           <div className='space-y-2'>
-            <div className='text-primary text-sm font-semibold tracking-wider'>
+            <div className='text-primary dark:text-yellow-400 text-sm font-semibold tracking-wider'>
               {slide.title}
             </div>
             <h1 className='text-4xl md:text-6xl font-bold leading-tight'>
-              <div className='text-gradient'>{slide.subtitle}</div>
-              <div className='text-foreground'>{slide.highlight}</div>
+              <div className='text-gradient dark:text-yellow-400'>
+                {slide.subtitle}
+              </div>
+              <div className='text-foreground dark:text-yellow-100'>
+                {slide.highlight}
+              </div>
             </h1>
-            <div className='text-lg md:text-xl text-muted-foreground'>
+            <div className='text-lg md:text-xl text-muted-foreground dark:text-yellow-100'>
               {slide.discount}
             </div>
           </div>
 
           <button
-            className='mt-8 bg-primary text-primary-foreground px-8 py-3 rounded text-lg font-bold shadow hover:bg-primary/90 transition-colors duration-150'
+            className='mt-8 bg-primary dark:bg-yellow-500 text-primary-foreground dark:text-gray-900 px-8 py-3 rounded text-lg font-bold shadow hover:bg-primary/90 dark:hover:bg-yellow-400 transition-colors duration-150'
             onClick={() => {
               const product = getProductForSlide();
               if (product) {
@@ -102,20 +106,20 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
 
       {/* Navigation Arrows */}
       <button
-        className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow transition-colors duration-150'
+        className='absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 dark:bg-gray-900/80 hover:bg-white dark:hover:bg-gray-800 rounded-full p-2 shadow transition-colors duration-150'
         onClick={prevSlide}
         type='button'
         aria-label='Previous Slide'
       >
-        <ChevronLeft className='h-6 w-6' />
+        <ChevronLeft className='h-6 w-6 text-gray-900 dark:text-yellow-100' />
       </button>
       <button
-        className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow transition-colors duration-150'
+        className='absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 dark:bg-gray-900/80 hover:bg-white dark:hover:bg-gray-800 rounded-full p-2 shadow transition-colors duration-150'
         onClick={nextSlide}
         type='button'
         aria-label='Next Slide'
       >
-        <ChevronRight className='h-6 w-6' />
+        <ChevronRight className='h-6 w-6 text-gray-900 dark:text-yellow-100' />
       </button>
 
       {/* Slide Indicators */}
@@ -123,8 +127,10 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
         {heroSlides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-colors border border-yellow-300 ${
-              index === currentSlide ? "bg-primary" : "bg-white/50"
+            className={`w-3 h-3 rounded-full transition-colors border border-yellow-300 dark:border-yellow-500 ${
+              index === currentSlide
+                ? "bg-primary dark:bg-yellow-500"
+                : "bg-white/50 dark:bg-gray-700"
             }`}
             onClick={() => setCurrentSlide(index)}
           />

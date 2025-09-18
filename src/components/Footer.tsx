@@ -9,21 +9,21 @@ import {
 
 const Footer = () => {
   return (
-    <footer className='bg-background'>
+    <footer className='bg-background dark:bg-gray-900'>
       {/* Main Footer Content */}
-      <div className='bg-gray-50 py-12 border-t'>
+      <div className='bg-gray-50 dark:bg-gray-800 py-12 border-t dark:border-gray-700'>
         <div className='max-w-7xl mx-auto px-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8'>
             {/* Company Info */}
             <div className='lg:col-span-1'>
-              <h3 className='text-2xl font-bold text-foreground mb-4'>
+              <h3 className='text-2xl font-bold text-foreground dark:text-yellow-100 mb-4'>
                 kapee.
               </h3>
-              <p className='text-muted-foreground mb-6'>
+              <p className='text-muted-foreground dark:text-yellow-100 mb-6'>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               </p>
 
-              <div className='space-y-3 text-sm text-muted-foreground'>
+              <div className='space-y-3 text-sm text-muted-foreground dark:text-yellow-100'>
                 <div className='flex items-center gap-2'>
                   <span>📍</span>
                   <span>Lorem Ipsum, 2046 Lorem Ipsum</span>
@@ -45,37 +45,55 @@ const Footer = () => {
 
             {/* Information */}
             <div>
-              <h4 className='font-semibold text-foreground mb-4'>
+              <h4 className='font-semibold text-foreground dark:text-yellow-100 mb-4'>
                 INFORMATION
               </h4>
-              <ul className='space-y-2 text-sm text-muted-foreground'>
+              <ul className='space-y-2 text-sm text-muted-foreground dark:text-yellow-100'>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     About Us
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Store Location
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Contact Us
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Shipping & Delivery
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Latest News
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Our Sitemap
                   </a>
                 </li>
@@ -84,37 +102,55 @@ const Footer = () => {
 
             {/* Our Service */}
             <div>
-              <h4 className='font-semibold text-foreground mb-4'>
+              <h4 className='font-semibold text-foreground dark:text-yellow-100 mb-4'>
                 OUR SERVICE
               </h4>
-              <ul className='space-y-2 text-sm text-muted-foreground'>
+              <ul className='space-y-2 text-sm text-muted-foreground dark:text-yellow-100'>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Terms of Sale
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Customer Service
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Delivery Information
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Payments
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Saved Cards
                   </a>
                 </li>
@@ -123,35 +159,55 @@ const Footer = () => {
 
             {/* My Account */}
             <div>
-              <h4 className='font-semibold text-foreground mb-4'>MY ACCOUNT</h4>
-              <ul className='space-y-2 text-sm text-muted-foreground'>
+              <h4 className='font-semibold text-foreground dark:text-yellow-100 mb-4'>
+                MY ACCOUNT
+              </h4>
+              <ul className='space-y-2 text-sm text-muted-foreground dark:text-yellow-100'>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     My Account
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     My Shop
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     My Cart
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Checkout
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     My Wishlist
                   </a>
                 </li>
                 <li>
-                  <a href='#' className='hover:text-primary'>
+                  <a
+                    href='#'
+                    className='hover:text-primary dark:hover:text-yellow-400'
+                  >
                     Tracking Order
                   </a>
                 </li>
@@ -160,8 +216,10 @@ const Footer = () => {
 
             {/* Newsletter */}
             <div>
-              <h4 className='font-semibold text-foreground mb-4'>NEWSLETTER</h4>
-              <p className='text-sm text-muted-foreground mb-4'>
+              <h4 className='font-semibold text-foreground dark:text-yellow-100 mb-4'>
+                NEWSLETTER
+              </h4>
+              <p className='text-sm text-muted-foreground dark:text-yellow-100 mb-4'>
                 Subscribe to our mailing list to get the new updates!
               </p>
 
@@ -169,10 +227,10 @@ const Footer = () => {
                 <input
                   type='email'
                   placeholder='Your email address'
-                  className='flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary flex h-10 w-full  border-input bg-background text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
+                  className='flex-1 border border-gray-300 dark:border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary flex h-10 w-full  border-input bg-background dark:bg-gray-900 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground dark:file:text-yellow-100 placeholder:text-muted-foreground dark:placeholder:text-yellow-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'
                 />
                 <button
-                  className='bg-foreground text-background hover:bg-foreground/90 px-4 py-2 rounded font-semibold transition-colors duration-150 inline-flex items-center justify-center gap-2 whitespace-nowrap  text-sm ring-offset-background  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
+                  className='bg-foreground dark:bg-yellow-500 text-background dark:text-gray-900 hover:bg-foreground/90 dark:hover:bg-yellow-400 px-4 py-2 rounded font-semibold transition-colors duration-150 inline-flex items-center justify-center gap-2 whitespace-nowrap  text-sm ring-offset-background  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   SIGN UP
@@ -188,7 +246,7 @@ const Footer = () => {
                   <Facebook className='h-4 w-8' />
                 </button>
                 <button
-                  className='bg-black hover:bg-gray-800 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
+                  className='bg-black dark:bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-800 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'
                 >
                   <Twitter className='h-4 w-8' />
@@ -230,11 +288,11 @@ const Footer = () => {
       </div>
 
       {/* Copyright and Payment Methods Section */}
-      <div className='bg-white border-t py-4'>
+      <div className='bg-white dark:bg-gray-900 border-t dark:border-gray-700 py-4'>
         <div className='max-w-7xl mx-auto px-4'>
           <div className='flex flex-col md:flex-row justify-between items-center gap-4'>
             {/* Copyright */}
-            <div className='text-sm text-muted-foreground'>
+            <div className='text-sm text-muted-foreground dark:text-yellow-100'>
               Kapee © 2025 by PressLayouts All Rights Reserved.
             </div>
 

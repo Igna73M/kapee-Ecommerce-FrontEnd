@@ -29,7 +29,7 @@ const ScrollToTop = () => {
       {isVisible && (
         <button
           onClick={scrollToTop}
-          className='fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-colors duration-150'
+          className='fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-primary dark:bg-yellow-500 text-primary-foreground dark:text-gray-900 shadow-lg hover:bg-primary/90 dark:hover:bg-yellow-400 flex items-center justify-center transition-colors duration-150'
           aria-label='Scroll to top'
         >
           <ArrowUp className='h-5 w-5' />

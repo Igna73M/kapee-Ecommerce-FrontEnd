@@ -34,7 +34,7 @@ const ProductTabs = ({ onProductClick }: ProductTabsProps) => {
   return (
     <section className='my-12'>
       {/* Tab Navigation */}
-      <div className='flex flex-wrap gap-8 mb-8 border-b'>
+      <div className='flex flex-wrap gap-8 mb-8 border-b dark:border-gray-700'>
         {tabs.map((tab) => (
           <button
             key={tab}
@@ -44,8 +44,8 @@ const ProductTabs = ({ onProductClick }: ProductTabsProps) => {
             }}
             className={`pb-3 px-1 font-medium transition-all duration-200 relative transform hover:scale-105 hover:text-yellow-500 focus:outline-none ${
               !showAll && activeTab === tab
-                ? "text-foreground border-b-2 border-yellow-400"
-                : "text-muted-foreground"
+                ? "text-foreground dark:text-yellow-100 border-b-2 border-yellow-400"
+                : "text-muted-foreground dark:text-yellow-100"
             }`}
           >
             {tab}
@@ -53,8 +53,8 @@ const ProductTabs = ({ onProductClick }: ProductTabsProps) => {
         ))}
         <div className='ml-auto'>
           <button
-            className={`bg-muted text-muted-foreground px-4 py-2 rounded text-sm font-medium transition-all duration-200 transform hover:scale-105 hover:bg-yellow-400 hover:text-black focus:outline-none ${
-              showAll ? "ring-2 ring-yellow-400" : ""
+            className={`bg-muted dark:bg-gray-800 text-muted-foreground dark:text-yellow-100 px-4 py-2 rounded text-sm font-medium transition-all duration-200 transform hover:scale-105 hover:bg-yellow-400 dark:hover:bg-yellow-600 hover:text-black dark:hover:text-gray-900 focus:outline-none ${
+              showAll ? "ring-2 ring-yellow-400 dark:ring-yellow-600" : ""
             }`}
             onClick={() => setShowAll(true)}
           >
@@ -68,9 +68,9 @@ const ProductTabs = ({ onProductClick }: ProductTabsProps) => {
         {tabProducts.map((product) => (
           <div
             key={product.id}
-            className='flex gap-4 p-4 bg-card rounded-lg border hover:shadow-md transition-shadow'
+            className='flex gap-4 p-4 bg-card dark:bg-gray-800 rounded-lg border dark:border-gray-700 hover:shadow-md transition-shadow'
           >
-            <div className='w-16 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0'>
+            <div className='w-16 h-16 bg-muted dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0'>
               <img
                 src={product.image}
                 alt={product.name}
@@ -80,16 +80,18 @@ const ProductTabs = ({ onProductClick }: ProductTabsProps) => {
             </div>
             <div className='flex-1 min-w-0'>
               <h4
-                className='font-medium text-sm leading-tight mb-1 cursor-pointer hover:text-primary transition-colors'
+                className='font-medium text-sm leading-tight mb-1 cursor-pointer hover:text-primary dark:hover:text-yellow-400 transition-colors text-gray-900 dark:text-yellow-100'
                 onClick={() => onProductClick(product)}
               >
                 {product.name}
               </h4>
               <div className='flex items-center gap-2'>
-                <span className='font-bold text-sm'>${product.price}.00</span>
+                <span className='font-bold text-sm text-gray-900 dark:text-yellow-100'>
+                  ${product.price}.00
+                </span>
                 {product.originalPrice &&
                   product.originalPrice !== product.price && (
-                    <span className='text-xs text-muted-foreground line-through'>
+                    <span className='text-xs text-muted-foreground dark:text-yellow-100 line-through'>
                       ${product.originalPrice}.00
                     </span>
                   )}

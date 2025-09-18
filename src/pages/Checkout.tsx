@@ -30,6 +30,15 @@ export default function Checkout({
   cart: cartProp,
   onPlaceOrder,
 }: CheckoutProps) {
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -144,26 +153,34 @@ export default function Checkout({
   };
 
   return (
-    <div className='min-h-screen bg-background'>
+    <div className='min-h-screen bg-background dark:bg-gray-900'>
       <TopBanner />
 
       <main className='max-w-7xl mx-auto py-8 px-4'>
-        <h1 className='text-2xl font-bold mb-6'>Checkout</h1>
+        <h1 className='text-2xl font-bold mb-6 text-gray-900 dark:text-yellow-100'>
+          Checkout
+        </h1>
 
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {/* Shipping form */}
           <form
-            className='md:col-span-2 bg-card rounded-lg p-6 shadow-sm'
+            className='md:col-span-2 bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm'
             onSubmit={handlePlaceOrder}
             autoComplete='off'
           >
-            <h2 className='text-lg font-medium mb-4'>Shipping details</h2>
+            <h2 className='text-lg font-medium mb-4 text-gray-900 dark:text-yellow-100'>
+              Shipping details
+            </h2>
 
-            {error && <div className='mb-4 text-sm text-red-600'>{error}</div>}
+            {error && (
+              <div className='mb-4 text-sm text-red-600 dark:text-red-400'>
+                {error}
+              </div>
+            )}
 
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               <input
-                className='border rounded px-3 py-2'
+                className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                 placeholder='Full name'
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -171,7 +188,7 @@ export default function Checkout({
                 autoComplete='name'
               />
               <input
-                className='border rounded px-3 py-2'
+                className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                 placeholder='Email'
                 type='email'
                 value={email}
@@ -180,7 +197,7 @@ export default function Checkout({
                 autoComplete='email'
               />
               <input
-                className='col-span-1 sm:col-span-2 border rounded px-3 py-2'
+                className='col-span-1 sm:col-span-2 border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                 placeholder='Address'
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
@@ -188,7 +205,7 @@ export default function Checkout({
                 autoComplete='street-address'
               />
               <input
-                className='border rounded px-3 py-2'
+                className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                 placeholder='City'
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
@@ -196,7 +213,7 @@ export default function Checkout({
                 autoComplete='address-level2'
               />
               <input
-                className='border rounded px-3 py-2'
+                className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                 placeholder='Postal code'
                 value={postal}
                 onChange={(e) => setPostal(e.target.value)}
@@ -204,7 +221,7 @@ export default function Checkout({
                 autoComplete='postal-code'
               />
               <input
-                className='border rounded px-3 py-2'
+                className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                 placeholder='Country'
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
@@ -214,15 +231,17 @@ export default function Checkout({
             </div>
 
             <div className='mt-6'>
-              <h3 className='font-medium mb-2'>Payment</h3>
-              <p className='text-sm text-muted-foreground mb-3'>
+              <h3 className='font-medium mb-2 text-gray-900 dark:text-yellow-100'>
+                Payment
+              </h3>
+              <p className='text-sm text-muted-foreground dark:text-yellow-100 mb-3'>
                 This demo does not process payments. Add payment integration
                 where indicated.
               </p>
 
               <div className='space-y-3'>
                 <input
-                  className='border rounded px-3 py-2 w-full'
+                  className='border dark:border-gray-700 rounded px-3 py-2 w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                   placeholder='Card number (demo)'
                   value={cardNumber}
                   onChange={(e) => setCardNumber(e.target.value)}
@@ -233,7 +252,7 @@ export default function Checkout({
                 />
                 <div className='grid grid-cols-2 gap-3'>
                   <input
-                    className='border rounded px-3 py-2'
+                    className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                     placeholder='MM/YY'
                     value={expiry}
                     onChange={(e) => setExpiry(e.target.value)}
@@ -243,7 +262,7 @@ export default function Checkout({
                     required
                   />
                   <input
-                    className='border rounded px-3 py-2'
+                    className='border dark:border-gray-700 rounded px-3 py-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                     placeholder='CVC'
                     value={cvc}
                     onChange={(e) => setCvc(e.target.value)}
@@ -262,7 +281,7 @@ export default function Checkout({
                 disabled={processing || cart.length === 0}
                 className={`px-4 py-2 rounded text-white ${
                   processing || cart.length === 0
-                    ? "bg-gray-300 cursor-not-allowed"
+                    ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
                     : "bg-primary hover:bg-primary/90"
                 }`}
               >
@@ -274,7 +293,7 @@ export default function Checkout({
               <button
                 type='button'
                 onClick={() => navigate(-1)}
-                className='px-4 py-2 rounded border'
+                className='px-4 py-2 rounded border dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
               >
                 Return to shop
               </button>
@@ -282,18 +301,20 @@ export default function Checkout({
           </form>
 
           {/* Order summary */}
-          <aside className='bg-card rounded-lg p-6 shadow-sm'>
-            <h2 className='text-lg font-medium mb-4'>Order summary</h2>
+          <aside className='bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm'>
+            <h2 className='text-lg font-medium mb-4 text-gray-900 dark:text-yellow-100'>
+              Order summary
+            </h2>
 
             {cart.length === 0 ? (
-              <div className='text-sm text-muted-foreground'>
+              <div className='text-sm text-muted-foreground dark:text-yellow-100'>
                 Your cart is empty.
               </div>
             ) : (
               <div className='space-y-4'>
                 {cart.map((it) => (
                   <div key={it.product.id} className='flex items-center gap-3'>
-                    <div className='w-14 h-14 bg-muted rounded overflow-hidden flex-shrink-0'>
+                    <div className='w-14 h-14 bg-muted dark:bg-gray-700 rounded overflow-hidden flex-shrink-0'>
                       {it.product.image ? (
                         <img
                           src={it.product.image}
@@ -301,17 +322,17 @@ export default function Checkout({
                           className='w-full h-full object-cover'
                         />
                       ) : (
-                        <div className='w-full h-full flex items-center justify-center text-xs text-muted-foreground'>
+                        <div className='w-full h-full flex items-center justify-center text-xs text-muted-foreground dark:text-yellow-100'>
                           img
                         </div>
                       )}
                     </div>
 
                     <div className='flex-1'>
-                      <div className='font-medium text-sm'>
+                      <div className='font-medium text-sm text-gray-900 dark:text-yellow-100'>
                         {it.product.name}
                       </div>
-                      <div className='text-xs text-muted-foreground flex items-center gap-2'>
+                      <div className='text-xs text-muted-foreground dark:text-yellow-100 flex items-center gap-2'>
                         Qty:{" "}
                         <input
                           type='number'
@@ -323,19 +344,19 @@ export default function Checkout({
                               Number(e.target.value)
                             )
                           }
-                          className='w-12 border rounded px-1 py-0.5 text-xs'
+                          className='w-12 border dark:border-gray-700 rounded px-1 py-0.5 text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
                         />
                         × ${Number(it.product.price ?? 0).toFixed(2)}
                       </div>
                     </div>
 
-                    <div className='font-medium'>
+                    <div className='font-medium text-gray-900 dark:text-yellow-100'>
                       ${((it.product.price ?? 0) * it.quantity).toFixed(2)}
                     </div>
                     <button
                       type='button'
                       aria-label='Remove item'
-                      className='ml-2 text-red-500 hover:underline text-xs'
+                      className='ml-2 text-red-500 dark:text-red-400 hover:underline text-xs'
                       onClick={() => handleRemoveItem(it.product.id)}
                     >
                       Remove
@@ -343,16 +364,16 @@ export default function Checkout({
                   </div>
                 ))}
 
-                <div className='border-t pt-4'>
-                  <div className='flex justify-between text-sm'>
+                <div className='border-t dark:border-gray-700 pt-4'>
+                  <div className='flex justify-between text-sm text-gray-900 dark:text-yellow-100'>
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
-                  <div className='flex justify-between text-sm mt-2'>
+                  <div className='flex justify-between text-sm mt-2 text-gray-900 dark:text-yellow-100'>
                     <span>Shipping</span>
                     <span>—</span>
                   </div>
-                  <div className='flex justify-between text-lg font-bold mt-4'>
+                  <div className='flex justify-between text-lg font-bold mt-4 text-gray-900 dark:text-yellow-100'>
                     <span>Total</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>

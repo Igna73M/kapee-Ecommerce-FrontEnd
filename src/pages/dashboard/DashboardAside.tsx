@@ -9,6 +9,11 @@ function DashboardAside() {
       "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie =
       "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    // Remove all user settings from localStorage/sessionStorage
+    localStorage.removeItem("dashboardDarkMode");
+    localStorage.removeItem("email");
+    // If you store other settings, remove them here as well
+    sessionStorage.clear();
     window.location.href = "/";
   }
 

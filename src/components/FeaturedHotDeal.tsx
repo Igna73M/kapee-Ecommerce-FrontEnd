@@ -47,7 +47,6 @@ const FeaturedHotDeal = ({
       >
         <Heart className='h-4 w-4 text-gray-400 dark:text-yellow-100' />
       </button>
-      <Heart className='h-3 w-3 dark:text-yellow-100' />
 
       {/* Product Image */}
       <div

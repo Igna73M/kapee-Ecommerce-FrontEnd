@@ -26,6 +26,7 @@ import DashCustomers from "./pages/dashboard/DashCustomers";
 import DashProfile from "./pages/dashboard/DashProfile";
 import DashSettings from "./pages/dashboard/DashSettings";
 import DashBlog from "./pages/dashboard/DashBlog";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +137,7 @@ const App = () => {
           />
           <Route path='/checkout' element={<Checkout cart={cart} />} />
           <Route path='/blog' element={<Blog />} />
+          <Route path='/blog/:id' element={<BlogPost />} />
           <Route
             path='/wishlist'
             element={

@@ -61,7 +61,7 @@ function DashCustomers() {
                 </th>
                 <th
                   scope='col'
-                  className='px-4 py-2 sm:px-6 sm:py-3 bg-white dark:bg-gray-900'
+                  className='px-4 py-2 sm:px-6 sm:py-3 bg-white dark:bg-gray-800'
                 >
                   Email
                 </th>

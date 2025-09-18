@@ -16,8 +16,9 @@ function DashAdvert() {
   const [newSlide, setNewSlide] = useState({
     title: "",
     subtitle: "",
-    image: "",
+    highlight: "",
     discount: "",
+    image: "",
     buttonText: "",
   });
 
@@ -59,6 +60,7 @@ function DashAdvert() {
         setNewSlide({
           title: "",
           subtitle: "",
+          highlight: "",
           image: "",
           discount: "",
           buttonText: "",
@@ -136,10 +138,10 @@ function DashAdvert() {
           className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
-          name='image'
-          value={newSlide.image}
+          name='highlight'
+          value={newSlide.highlight}
           onChange={handleNewChange}
-          placeholder='Image URL'
+          placeholder='Highlight'
           className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
@@ -147,6 +149,13 @@ function DashAdvert() {
           value={newSlide.discount}
           onChange={handleNewChange}
           placeholder='Discount'
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+        />
+        <input
+          name='image'
+          value={newSlide.image}
+          onChange={handleNewChange}
+          placeholder='Image URL'
           className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input

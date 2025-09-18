@@ -16,15 +16,18 @@ function DashBlog() {
     excerpt: "",
     image: "",
     date: "",
+    body: "",
   });
   const [newPost, setNewPost] = useState({
     title: "",
     excerpt: "",
     image: "",
     date: "",
+    body: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Fetch blog posts
   useEffect(() => {
@@ -58,6 +61,9 @@ function DashBlog() {
   const handleQuillChange = (value) => {
     setNewPost((prev) => ({ ...prev, excerpt: value }));
   };
+  const handleBodyChange = (value) => {
+    setNewPost((prev) => ({ ...prev, body: value }));
+  };
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       setImageFile(acceptedFiles[0]);
@@ -71,9 +77,10 @@ function DashBlog() {
 
   const validateForm = () => {
     if (!newPost.title.trim()) return "Title is required.";
-    if (!newPost.excerpt.trim()) return "Content is required.";
+    if (!newPost.excerpt.trim()) return "Excerpt is required.";
+    if (!newPost.body.trim()) return "Body is required.";
     if (!newPost.date.trim()) return "Date is required.";
-    if (!imageFile) return "Image is required.";
+    if (!imageFile && !newPost.image.trim()) return "Image is required.";
     return "";
   };
 
@@ -88,8 +95,9 @@ function DashBlog() {
       return;
     }
     let imageUrl = "";
-    // Simulate image upload (replace with actual upload logic if needed)
-    if (imageFile) {
+    if (newPost.image && newPost.image.trim().length > 0) {
+      imageUrl = newPost.image.trim();
+    } else if (imageFile) {
       imageUrl = URL.createObjectURL(imageFile);
     }
     const postData = { ...newPost, image: imageUrl };
@@ -99,10 +107,9 @@ function DashBlog() {
         postData
       );
       setPosts((prev) => [...prev, res.data]);
-      setNewPost({ title: "", excerpt: "", image: "", date: "" });
+      setNewPost({ title: "", excerpt: "", image: "", date: "", body: "" });
       setImageFile(null);
       setShowModal(false);
-      setSuccess("Blog post created successfully!");
       Notiflix.Notify.success("Blog post created successfully!");
     } catch {
       setError("Failed to add blog post");
@@ -118,22 +125,40 @@ function DashBlog() {
       excerpt: post.excerpt,
       image: post.image,
       date: post.date,
+      body: post.body,
     });
+    setShowEditModal(true);
+    setError("");
+    setSuccess("");
   };
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditPost((prev) => ({ ...prev, [name]: value }));
   };
-  const handleEditSubmit = (e) => {
+  const handleEditExcerptChange = (value) => {
+    setEditPost((prev) => ({ ...prev, excerpt: value }));
+  };
+  const handleEditBodyChange = (value) => {
+    setEditPost((prev) => ({ ...prev, body: value }));
+  };
+
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    axios
-      .patch(`http://localhost:5000/api_v1/blog-posts/${editId}`, editPost)
-      .then((res) => {
-        setPosts((prev) => prev.map((p) => (p._id === editId ? res.data : p)));
-        setEditId(null);
-        setEditPost({ title: "", excerpt: "", image: "", date: "" });
-      })
-      .catch(() => setError("Failed to update blog post"));
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/api_v1/blog-posts/${editId}`,
+        editPost
+      );
+      setPosts((prev) => prev.map((p) => (p._id === editId ? res.data : p)));
+      setEditId(null);
+      setEditPost({ title: "", excerpt: "", image: "", date: "", body: "" });
+      setShowEditModal(false);
+      Notiflix.Notify.success("Blog post updated successfully!");
+    } catch {
+      setError("Failed to update blog post");
+      Notiflix.Notify.failure("Failed to update blog post");
+    }
   };
 
   // Delete post
@@ -182,9 +207,16 @@ function DashBlog() {
               <ReactQuill
                 value={newPost.excerpt}
                 onChange={handleQuillChange}
-                placeholder='Content'
+                placeholder='Excerpt'
                 className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100'
               />
+              <ReactQuill
+                value={newPost.body}
+                onChange={handleBodyChange}
+                placeholder='Body'
+                className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100'
+              />
+              {/* Drag & drop OR paste image link */}
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded p-4 text-center cursor-pointer ${
@@ -200,6 +232,13 @@ function DashBlog() {
                   <span>Drag & drop image here, or click to select</span>
                 )}
               </div>
+              <input
+                name='image'
+                value={newPost.image}
+                onChange={handleNewChange}
+                placeholder='Paste image link (optional)'
+                className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+              />
               <input
                 name='date'
                 value={newPost.date}
@@ -220,6 +259,135 @@ function DashBlog() {
           </div>
         </div>
       )}
+
+      {/* Modal for editing blog post */}
+      {showEditModal && (
+        <div className='fixed inset-0 z-50 flex items-start justify-center bg-black/30 backdrop-blur-sm'>
+          <div className='relative w-full max-w-2xl sm:max-w-3xl mt-8 mx-2 sm:mx-6 bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700'>
+            {/* Sticky header with close button */}
+            <div className='sticky top-0 bg-white dark:bg-gray-900 rounded-t-lg z-10 flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700'>
+              <h3 className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-yellow-100 text-center w-full'>
+                Edit Blog Post
+              </h3>
+              <button
+                className='absolute right-4 top-3 text-gray-500 dark:text-yellow-100 hover:text-gray-700 dark:hover:text-yellow-400 text-2xl'
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditId(null);
+                }}
+                aria-label='Close edit modal'
+              >
+                &times;
+              </button>
+            </div>
+            {/* Scrollable form */}
+            <form
+              onSubmit={handleEditSubmit}
+              className='flex flex-col gap-8 px-4 sm:px-8 py-6 overflow-y-auto'
+              style={{ maxHeight: "80vh" }}
+            >
+              <div>
+                <label
+                  htmlFor='title'
+                  className='block mb-2 font-semibold text-gray-700 dark:text-yellow-100'
+                >
+                  Title
+                </label>
+                <input
+                  id='title'
+                  name='title'
+                  value={editPost.title}
+                  onChange={handleEditChange}
+                  placeholder='Title'
+                  className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100 w-full'
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor='header'
+                  className='block mb-2 font-semibold text-gray-700 dark:text-yellow-100'
+                >
+                  Header
+                </label>
+                <div className='border rounded bg-white dark:bg-gray-800 h-32 sm:h-40 mb-2'>
+                  <ReactQuill
+                    id='header'
+                    value={editPost.excerpt}
+                    onChange={handleEditExcerptChange}
+                    placeholder='Header'
+                    className='h-full'
+                  />
+                </div>
+              </div>
+              <div className='h-64'></div>
+              <div className='mt-6'>
+                <label className='block mb-2 font-semibold text-gray-700 dark:text-yellow-100'>
+                  Body
+                </label>
+                <div className='border rounded bg-white dark:bg-gray-800 h-40 sm:h-60 mb-2'>
+                  <ReactQuill
+                    value={editPost.body}
+                    onChange={handleEditBodyChange}
+                    placeholder='Body'
+                    className='h-full'
+                  />
+                </div>
+              </div>
+              <div className='h-64'></div>
+              <div className='mt-6'>
+                <label
+                  htmlFor='image'
+                  className='block mb-2 font-semibold text-gray-700 dark:text-yellow-100'
+                >
+                  Image
+                </label>
+                <input
+                  name='image'
+                  id='image'
+                  value={editPost.image}
+                  onChange={handleEditChange}
+                  placeholder='Paste image link'
+                  className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100 w-full mb-2'
+                />
+              </div>
+              <div>
+                <label className='block mb-2 font-semibold text-gray-700 dark:text-yellow-100'>
+                  Date
+                </label>
+                <input
+                  name='date'
+                  value={editPost.date}
+                  onChange={handleEditChange}
+                  placeholder='Date'
+                  className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100 w-full mb-2'
+                  required
+                />
+              </div>
+              {error && <div className='text-red-500'>{error}</div>}
+              {success && <div className='text-green-600'>{success}</div>}
+              <div className='flex flex-col sm:flex-row gap-2 justify-end mt-2'>
+                <button
+                  type='submit'
+                  className='px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-700 transition font-semibold w-full sm:w-auto'
+                >
+                  Save
+                </button>
+                <button
+                  type='button'
+                  className='px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded font-semibold text-gray-900 dark:text-yellow-100 w-full sm:w-auto'
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditId(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       {loading ? (
         <div>Loading...</div>
       ) : (
@@ -235,90 +403,40 @@ function DashBlog() {
               </tr>
             </thead>
             <tbody>
-              {posts.map((post) =>
-                editId === post._id ? (
-                  <tr key={post._id}>
-                    <td colSpan={5} className='px-6 py-4'>
-                      <form
-                        className='flex gap-2 items-center'
-                        onSubmit={handleEditSubmit}
-                      >
-                        <input
-                          name='title'
-                          value={editPost.title}
-                          onChange={handleEditChange}
-                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-                          required
-                        />
-                        <input
-                          name='excerpt'
-                          value={editPost.excerpt}
-                          onChange={handleEditChange}
-                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-                        />
-                        <input
-                          name='image'
-                          value={editPost.image}
-                          onChange={handleEditChange}
-                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-                        />
-                        <input
-                          name='date'
-                          value={editPost.date}
-                          onChange={handleEditChange}
-                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-                        />
-                        <button
-                          type='submit'
-                          className='p-2 bg-blue-500 text-white rounded'
-                        >
-                          Save
-                        </button>
-                        <button
-                          type='button'
-                          className='p-2 bg-gray-300 dark:bg-gray-700 rounded'
-                          onClick={() => setEditId(null)}
-                        >
-                          Cancel
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr key={post._id}>
-                    <td className='px-6 py-4'>{post.title}</td>
-                    <td className='px-6 py-4'>
-                      <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
-                    </td>
-                    <td className='px-6 py-4'>
-                      {post.image ? (
-                        <img
-                          src={post.image}
-                          alt='blog'
-                          className='h-12 w-12 object-cover rounded'
-                        />
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                    <td className='px-6 py-4'>{post.date}</td>
-                    <td className='px-6 py-4 flex gap-2'>
-                      <button
-                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
-                        onClick={() => handleEdit(post)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
-                        onClick={() => handleDelete(post._id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                )
-              )}
+              {posts.map((post) => (
+                <tr key={post._id}>
+                  <td className='px-6 py-4'>{post.title}</td>
+                  <td className='px-6 py-4'>
+                    <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+                  </td>
+                  <td className='px-6 py-4'>
+                    {post.image ? (
+                      <img
+                        src={post.image}
+                        alt='blog'
+                        className='h-12 w-12 object-cover rounded'
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </td>
+                  <td className='px-6 py-4'>{post.date}</td>
+                  <td className='px-6 py-4 flex gap-2'>
+                    <button
+                      className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
+                      onClick={() => handleEdit(post)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className='font-medium text-red-600 dark:text-red-400 hover:underline'
+                      onClick={() => handleDelete(post._id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

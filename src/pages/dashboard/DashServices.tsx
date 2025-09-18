@@ -7,10 +7,15 @@ function DashServices() {
   const [error, setError] = useState("");
   const [editId, setEditId] = useState(null);
   const [editService, setEditService] = useState({
+    icon: "",
     title: "",
     description: "",
   });
-  const [newService, setNewService] = useState({ title: "", description: "" });
+  const [newService, setNewService] = useState({
+    icon: "",
+    title: "",
+    description: "",
+  });
 
   // Fetch services
   useEffect(() => {
@@ -47,7 +52,7 @@ function DashServices() {
       .post("http://localhost:5000/api_v1/services", newService)
       .then((res) => {
         setServices((prev) => [...prev, res.data]);
-        setNewService({ title: "", description: "" });
+        setNewService({ icon: "", title: "", description: "" });
       })
       .catch(() => setError("Failed to add service"));
   };
@@ -55,7 +60,11 @@ function DashServices() {
   // Edit service
   const handleEdit = (service) => {
     setEditId(service._id);
-    setEditService({ title: service.title, description: service.description });
+    setEditService({
+      icon: service.icon,
+      title: service.title,
+      description: service.description,
+    });
   };
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -70,7 +79,7 @@ function DashServices() {
           prev.map((s) => (s._id === editId ? res.data : s))
         );
         setEditId(null);
-        setEditService({ title: "", description: "" });
+        setEditService({ icon: "", title: "", description: "" });
       })
       .catch(() => setError("Failed to update service"));
   };
@@ -95,6 +104,15 @@ function DashServices() {
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
         onSubmit={handleNewSubmit}
       >
+        <input
+          type='text'
+          name='icon'
+          value={newService.icon}
+          onChange={handleNewChange}
+          placeholder='Icon'
+          className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+          required
+        />
         <input
           name='title'
           value={newService.title}

@@ -32,6 +32,15 @@ function DashProduct() {
       });
   }, []);
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   // Edit product
   const handleEdit = (product) => {
     setEditId(product._id);

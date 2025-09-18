@@ -49,6 +49,15 @@ function Dashboard() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   // Only count non-admin users (customers)
   const customerCount = Array.isArray(users)
     ? users.filter((u) => u.userRole !== "admin" && u._id && u.username).length

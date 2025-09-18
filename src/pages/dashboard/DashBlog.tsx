@@ -41,6 +41,15 @@ function DashBlog() {
       });
   }, []);
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   // Add new post
   const handleNewChange = (e) => {
     const { name, value } = e.target;

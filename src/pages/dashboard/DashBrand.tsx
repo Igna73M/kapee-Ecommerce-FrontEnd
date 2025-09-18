@@ -34,6 +34,15 @@ export default function DashBrand() {
       });
   }, []);
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   // Add new brand category
   const handleNewChange = (e) => {
     const { name, value } = e.target;

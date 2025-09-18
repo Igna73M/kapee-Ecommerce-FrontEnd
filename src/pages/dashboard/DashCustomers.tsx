@@ -29,6 +29,15 @@ function DashCustomers() {
       });
   }, []);
 
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
   const customers = users.filter((u) => u.userRole !== "admin");
 
   return (

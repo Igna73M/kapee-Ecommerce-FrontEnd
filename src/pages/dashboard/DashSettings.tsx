@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 
 function DashSettings() {
   // Read initial dark mode from localStorage
@@ -6,6 +7,15 @@ function DashSettings() {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("dashboardDarkMode") === "true"
   );
+
+  useEffect(() => {
+    const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, []);
 
   // Save settings handler
   const handleSave = () => {

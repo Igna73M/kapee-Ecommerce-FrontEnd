@@ -1,4 +1,5 @@
 import { User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -21,13 +22,13 @@ function DashboardNav() {
           !
         </p>
         <div className='flex justify-end w-full md:w-auto'>
-          <a
-            href='/dashboard/profile'
+          <Link
+            to='/dashboard/profile'
             className='text-gray-600 dark:text-yellow-100 hover:underline hover:text-yellow-600 dark:hover:text-yellow-400 hover:decoration-gray-800 md:ml-4 flex flex-col items-center'
           >
             <User className='self-center' />
             Profile
-          </a>
+          </Link>
         </div>
       </div>
     </div>

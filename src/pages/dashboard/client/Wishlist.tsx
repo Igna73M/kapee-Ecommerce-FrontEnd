@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import ProductCard from "../components/ProductCard";
-import { Product } from "../types/product";
+import ProductCard from "../../../components/ProductCard";
+import { Product } from "../../../types/product";
 
 type WishlistPageProps = {
   wishlist: Product[];

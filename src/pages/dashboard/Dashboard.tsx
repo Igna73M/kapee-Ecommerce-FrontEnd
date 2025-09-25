@@ -12,21 +12,37 @@ import {
   Cell,
 } from "recharts";
 
+// Helper to get access token from localStorage or cookies
+const getToken = () => {
+  const local = localStorage.getItem("accessToken");
+  if (local) return local;
+  const match = document.cookie.match(/accessToken=([^;]+)/);
+  return match ? match[1] : "";
+};
+
 function Dashboard() {
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
   const [brands, setBrands] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setError("");
       try {
+        const token = getToken();
         const [productsRes, usersRes, brandsRes, servicesRes] =
           await Promise.all([
             axios.get("http://localhost:5000/api_v1/products"),
-            axios.get("http://localhost:5000/api_v1/user/users"),
+            // Customers route is protected: requireSignin, isAdmin
+            token
+              ? axios.get("http://localhost:5000/api_v1/user/users", {
+                  headers: { Authorization: `Bearer ${token}` },
+                })
+              : Promise.resolve({ data: [] }),
             axios.get("http://localhost:5000/api_v1/brand-categories"),
             axios.get("http://localhost:5000/api_v1/services"),
           ]);
@@ -42,7 +58,7 @@ function Dashboard() {
         setBrands(Array.isArray(brandsRes.data) ? brandsRes.data : []);
         setServices(Array.isArray(servicesRes.data) ? servicesRes.data : []);
       } catch (err) {
-        // handle error, optionally set error state
+        setError("Failed to fetch dashboard data");
       }
       setLoading(false);
     }
@@ -89,6 +105,7 @@ function Dashboard() {
       <h2 className='text-xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
         Admin Dashboard
       </h2>
+      {error && <div className='text-red-500 mb-2'>{error}</div>}
       {loading ? (
         <div>Loading...</div>
       ) : (

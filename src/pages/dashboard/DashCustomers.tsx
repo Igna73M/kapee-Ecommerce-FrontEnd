@@ -14,17 +14,39 @@ function DashCustomers() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Helper to get access token from localStorage or cookies
+  const getToken = () => {
+    const local = localStorage.getItem("accessToken");
+    if (local) return local;
+    const match = document.cookie.match(/accessToken=([^;]+)/);
+    return match ? match[1] : "";
+  };
+
   useEffect(() => {
     setLoading(true);
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to view users.");
+      setLoading(false);
+      return;
+    }
     axios
-      .get("http://localhost:5000/api_v1/user/users")
+      .get("http://localhost:5000/api_v1/user/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         const data = Array.isArray(res.data) ? res.data : res.data.users || [];
         setUsers(data);
         setLoading(false);
       })
-      .catch(() => {
-        setError("Failed to fetch users");
+      .catch((err) => {
+        let msg = "Failed to fetch users";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
         setLoading(false);
       });
   }, []);

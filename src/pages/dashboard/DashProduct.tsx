@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 function DashProduct() {
@@ -8,13 +8,30 @@ function DashProduct() {
   const [error, setError] = useState("");
   const [editId, setEditId] = useState(null);
   const [editProduct, setEditProduct] = useState({
+    quantity: "",
     name: "",
-    category: "",
+    description: "",
     price: "",
+    originalPrice: "",
+    discount: "",
+    image: "",
+    category: "",
+    features: "",
+    rating: "",
     inStock: true,
   });
+  const [editImageFile, setEditImageFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
-  // Fetch products from backend
+  // Helper to get access token from localStorage or cookies
+  const getToken = () => {
+    const local = localStorage.getItem("accessToken");
+    if (local) return local;
+    const match = document.cookie.match(/accessToken=([^;]+)/);
+    return match ? match[1] : "";
+  };
+
+  // Fetch products from backend (public route)
   useEffect(() => {
     setLoading(true);
     Promise.all([
@@ -45,11 +62,21 @@ function DashProduct() {
   const handleEdit = (product) => {
     setEditId(product._id);
     setEditProduct({
-      name: product.name,
-      category: product.category?._id || product.category, // store category id
-      price: product.price,
-      inStock: product.inStock,
+      quantity: product.quantity ?? "",
+      name: product.name ?? "",
+      description: product.description ?? "",
+      price: product.price ?? "",
+      originalPrice: product.originalPrice ?? "",
+      discount: product.discount ?? "",
+      image: product.image ?? "",
+      category: product.category?._id || product.category || "",
+      features: Array.isArray(product.features)
+        ? product.features.join(", ")
+        : product.features ?? "",
+      rating: product.rating ?? "",
+      inStock: product.inStock ?? true,
     });
+    setEditImageFile(null);
   };
 
   const handleEditChange = (e) => {
@@ -60,31 +87,109 @@ function DashProduct() {
     }));
   };
 
+  const handleEditImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setEditImageFile(e.target.files[0]);
+      setEditProduct((prev) => ({
+        ...prev,
+        image: e.target.files[0].name,
+      }));
+    }
+  };
+
   const handleEditSubmit = (e) => {
     e.preventDefault();
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to update products.");
+      return;
+    }
+    const payload = {
+      ...editProduct,
+      features: editProduct.features
+        ? editProduct.features.split(",").map((f) => f.trim())
+        : [],
+      quantity: Number(editProduct.quantity),
+      price: Number(editProduct.price),
+      originalPrice: Number(editProduct.originalPrice),
+      discount: Number(editProduct.discount),
+      rating: Number(editProduct.rating),
+    };
+    const formData = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => formData.append(`${key}[]`, String(v)));
+      } else {
+        formData.append(key, String(value));
+      }
+    });
+    if (editImageFile) {
+      formData.append("image", editImageFile);
+    }
     axios
-      .patch(`http://localhost:5000/api_v1/products/${editId}`, editProduct)
+      .patch(`http://localhost:5000/api_v1/products/${editId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setProducts((prev) =>
           prev.map((p) => (p._id === editId ? res.data : p))
         );
         setEditId(null);
-        setEditProduct({ name: "", category: "", price: "", inStock: true });
+        setEditProduct({
+          quantity: "",
+          name: "",
+          description: "",
+          price: "",
+          originalPrice: "",
+          discount: "",
+          image: "",
+          category: "",
+          features: "",
+          rating: "",
+          inStock: true,
+        });
+        setEditImageFile(null);
+        setError("");
       })
-      .catch(() => setError("Failed to update product"));
+      .catch((err) => {
+        let msg = "Failed to update product";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
-  // Delete product
+  // Delete product (protected)
   const handleDelete = (id) => {
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to delete products.");
+      return;
+    }
     axios
-      .delete(`http://localhost:5000/api_v1/products/${id}`)
+      .delete(`http://localhost:5000/api_v1/products/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setProducts((prev) => prev.filter((p) => p._id !== id));
+        setError("");
       })
-      .catch(() => setError("Failed to delete product"));
+      .catch((err) => {
+        let msg = "Failed to delete product";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
-  // Add product
+  // Add product (protected)
   const [newProduct, setNewProduct] = useState({
     quantity: "",
     name: "",
@@ -98,6 +203,8 @@ function DashProduct() {
     rating: "",
     inStock: true,
   });
+  const fileInputRef = useRef(null);
+
   const handleNewChange = (e) => {
     const { name, value, type, checked } = e.target;
     setNewProduct((prev) => ({
@@ -106,9 +213,18 @@ function DashProduct() {
     }));
   };
 
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+      setNewProduct((prev) => ({
+        ...prev,
+        image: e.target.files[0].name,
+      }));
+    }
+  };
+
   const handleNewSubmit = (e) => {
     e.preventDefault();
-    // Convert features to array, rating/quantity/price/originalPrice/discount to numbers
     const payload = {
       ...newProduct,
       features: newProduct.features
@@ -120,8 +236,32 @@ function DashProduct() {
       discount: Number(newProduct.discount),
       rating: Number(newProduct.rating),
     };
+
+    const formData = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => formData.append(`${key}[]`, String(v)));
+      } else {
+        formData.append(key, String(value));
+      }
+    });
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to add products.");
+      return;
+    }
+
     axios
-      .post("http://localhost:5000/api_v1/products", payload)
+      .post("http://localhost:5000/api_v1/products", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setProducts((prev) => [...prev, res.data]);
         setNewProduct({
@@ -137,8 +277,17 @@ function DashProduct() {
           rating: "",
           inStock: true,
         });
+        setImageFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setError("");
       })
-      .catch(() => setError("Failed to add product"));
+      .catch((err) => {
+        let msg = "Failed to add product";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
   return (
@@ -151,6 +300,7 @@ function DashProduct() {
         <form
           className='flex flex-col sm:flex-row items-center gap-2 sm:w-auto sm:flex-wrap'
           onSubmit={handleNewSubmit}
+          encType='multipart/form-data'
         >
           <input
             name='name'
@@ -169,12 +319,11 @@ function DashProduct() {
             required
           />
           <input
-            name='image'
-            value={newProduct.image}
-            onChange={handleNewChange}
-            placeholder='Image URL'
+            type='file'
+            accept='image/*'
+            ref={fileInputRef}
+            onChange={handleImageChange}
             className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-            required
           />
           <input
             name='quantity'
@@ -262,30 +411,43 @@ function DashProduct() {
             Add
           </button>
         </form>
+        {imageFile && (
+          <div className='text-xs text-gray-600 dark:text-yellow-100 mt-1'>
+            Selected file: {imageFile.name}
+            <button
+              type='button'
+              className='ml-2 text-red-500 underline'
+              onClick={() => {
+                setImageFile(null);
+                setNewProduct((prev) => ({ ...prev, image: "" }));
+                if (fileInputRef.current) fileInputRef.current.value = "";
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
       </div>
       {error && <div className='text-red-500 mb-2'>{error}</div>}
       {loading ? (
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[600px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+          <table className='min-w-[900px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
             <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
-                <th scope='col' className='px-4 py-2 sm:px-6 sm:py-3'>
-                  Product name
-                </th>
-                <th scope='col' className='px-4 py-2 sm:px-6 sm:py-3'>
-                  Category
-                </th>
-                <th scope='col' className='px-4 py-2 sm:px-6 sm:py-3'>
-                  Price
-                </th>
-                <th scope='col' className='px-4 py-2 sm:px-6 sm:py-3'>
-                  In Stock
-                </th>
-                <th scope='col' className='px-4 py-2 sm:px-6 sm:py-3'>
-                  Action
-                </th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Name</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Description</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Image</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Quantity</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Price</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Original Price</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Discount</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Rating</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Features</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Category</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>In Stock</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -300,10 +462,11 @@ function DashProduct() {
                       " border-b border-gray-200 dark:border-gray-700"
                     }
                   >
-                    <td className='px-6 py-4' colSpan={5}>
+                    <td colSpan={12} className='px-6 py-4'>
                       <form
-                        className='flex gap-2 items-center'
+                        className='flex flex-wrap gap-2 items-center'
                         onSubmit={handleEditSubmit}
+                        encType='multipart/form-data'
                       >
                         <input
                           name='name'
@@ -311,6 +474,77 @@ function DashProduct() {
                           onChange={handleEditChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
+                          placeholder='Name'
+                        />
+                        <input
+                          name='description'
+                          value={editProduct.description}
+                          onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          required
+                          placeholder='Description'
+                        />
+                        <input
+                          type='file'
+                          accept='image/*'
+                          onChange={handleEditImageChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                        />
+                        <input
+                          name='quantity'
+                          value={editProduct.quantity}
+                          onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          required
+                          type='number'
+                          min='0'
+                          placeholder='Quantity'
+                        />
+                        <input
+                          name='price'
+                          value={editProduct.price}
+                          onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          required
+                          type='number'
+                          min='0'
+                          placeholder='Price'
+                        />
+                        <input
+                          name='originalPrice'
+                          value={editProduct.originalPrice}
+                          onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          type='number'
+                          min='0'
+                          placeholder='Original Price'
+                        />
+                        <input
+                          name='discount'
+                          value={editProduct.discount}
+                          onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          type='number'
+                          min='0'
+                          placeholder='Discount'
+                        />
+                        <input
+                          name='rating'
+                          value={editProduct.rating}
+                          onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100 min-w-40'
+                          type='number'
+                          min='0'
+                          max='5'
+                          step='0.1'
+                          placeholder='Rating'
+                        />
+                        <input
+                          name='features'
+                          value={editProduct.features}
+                          onChange={handleEditChange}
+                          placeholder='Features (comma separated)'
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <select
                           name='category'
@@ -326,14 +560,6 @@ function DashProduct() {
                             </option>
                           ))}
                         </select>
-                        <input
-                          name='price'
-                          value={editProduct.price}
-                          onChange={handleEditChange}
-                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-                          required
-                          type='number'
-                        />
                         <label className='flex items-center gap-1 text-gray-900 dark:text-yellow-100'>
                           <input
                             type='checkbox'
@@ -357,6 +583,24 @@ function DashProduct() {
                           Cancel
                         </button>
                       </form>
+                      {editImageFile && (
+                        <div className='text-xs text-gray-600 dark:text-yellow-100 mt-1'>
+                          Selected file: {editImageFile.name}
+                          <button
+                            type='button'
+                            className='ml-2 text-red-500 underline'
+                            onClick={() => {
+                              setEditImageFile(null);
+                              setEditProduct((prev) => ({
+                                ...prev,
+                                image: "",
+                              }));
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ) : (
@@ -369,21 +613,44 @@ function DashProduct() {
                       " border-b border-gray-200 dark:border-gray-700"
                     }
                   >
-                    <td className='px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-yellow-100'>
-                      {product.name}
+                    <td className='px-4 py-2'>{product.name}</td>
+                    <td className='px-4 py-2'>{product.description}</td>
+                    <td className='px-4 py-2'>
+                      {product.image ? (
+                        <img
+                          src={
+                            product.image.startsWith("http")
+                              ? product.image
+                              : `/uploads/${product.image}`
+                          }
+                          alt={product.name}
+                          className='w-16 h-16 object-cover rounded'
+                        />
+                      ) : (
+                        <span className='italic text-gray-400'>No image</span>
+                      )}
                     </td>
-                    <td className='px-6 py-4'>
+                    <td className='px-4 py-2'>{product.quantity}</td>
+                    <td className='px-4 py-2'>${product.price}</td>
+                    <td className='px-4 py-2'>${product.originalPrice}</td>
+                    <td className='px-4 py-2'>{product.discount}%</td>
+                    <td className='px-4 py-2'>{product.rating}</td>
+                    <td className='px-4 py-2'>
+                      {Array.isArray(product.features)
+                        ? product.features.join(", ")
+                        : product.features}
+                    </td>
+                    <td className='px-4 py-2'>
                       {categories.find(
                         (cat) =>
                           cat._id ===
                           (product.category?._id || product.category)
                       )?.name || ""}
                     </td>
-                    <td className='px-6 py-4'>${product.price}</td>
-                    <td className='px-6 py-4'>
+                    <td className='px-4 py-2'>
                       {product.inStock ? "Yes" : "No"}
                     </td>
-                    <td className='px-6 py-4 flex gap-2'>
+                    <td className='px-4 py-2 flex gap-2'>
                       <button
                         className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
                         onClick={() => handleEdit(product)}

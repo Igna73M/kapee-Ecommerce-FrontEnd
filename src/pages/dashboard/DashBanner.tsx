@@ -1,5 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+
+// Helper to get access token from localStorage or cookies
+const getToken = () => {
+  const local = localStorage.getItem("accessToken");
+  if (local) return local;
+  const match = document.cookie.match(/accessToken=([^;]+)/);
+  return match ? match[1] : "";
+};
 
 function DashBanner() {
   const [banners, setBanners] = useState([]);
@@ -20,8 +28,12 @@ function DashBanner() {
     discount: "",
     buttonText: "",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [editImageFile, setEditImageFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const editFileInputRef = useRef(null);
 
-  // Fetch banners
+  // Fetch banners (public)
   useEffect(() => {
     setLoading(true);
     axios
@@ -45,15 +57,41 @@ function DashBanner() {
     }
   }, []);
 
-  // Add new banner
+  // Add new banner (protected, multipart/form-data)
   const handleNewChange = (e) => {
     const { name, value } = e.target;
     setNewBanner((prev) => ({ ...prev, [name]: value }));
   };
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
   const handleNewSubmit = (e) => {
     e.preventDefault();
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to add banners.");
+      return;
+    }
+    if (!imageFile) {
+      setError("Image file is required.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("title", newBanner.title);
+    formData.append("subtitle", newBanner.subtitle);
+    formData.append("discount", newBanner.discount);
+    formData.append("buttonText", newBanner.buttonText);
+    formData.append("image", imageFile);
+
     axios
-      .post("http://localhost:5000/api_v1/banners", newBanner)
+      .post("http://localhost:5000/api_v1/banners", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setBanners((prev) => [...prev, res.data]);
         setNewBanner({
@@ -63,11 +101,20 @@ function DashBanner() {
           discount: "",
           buttonText: "",
         });
+        setImageFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setError("");
       })
-      .catch(() => setError("Failed to add banner"));
+      .catch((err) => {
+        let msg = "Failed to add banner";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
-  // Edit banner
+  // Edit banner (protected, multipart/form-data for image)
   const handleEdit = (banner) => {
     setEditId(banner._id);
     setEditBanner({
@@ -77,15 +124,40 @@ function DashBanner() {
       discount: banner.discount,
       buttonText: banner.buttonText,
     });
+    setEditImageFile(null);
+    if (editFileInputRef.current) editFileInputRef.current.value = "";
   };
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditBanner((prev) => ({ ...prev, [name]: value }));
   };
+  const handleEditImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setEditImageFile(e.target.files[0]);
+    }
+  };
   const handleEditSubmit = (e) => {
     e.preventDefault();
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to update banners.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("title", editBanner.title);
+    formData.append("subtitle", editBanner.subtitle);
+    formData.append("discount", editBanner.discount);
+    formData.append("buttonText", editBanner.buttonText);
+    if (editImageFile) {
+      formData.append("image", editImageFile);
+    }
     axios
-      .patch(`http://localhost:5000/api_v1/banners/${editId}`, editBanner)
+      .patch(`http://localhost:5000/api_v1/banners/${editId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setBanners((prev) =>
           prev.map((b) => (b._id === editId ? res.data : b))
@@ -98,18 +170,43 @@ function DashBanner() {
           discount: "",
           buttonText: "",
         });
+        setEditImageFile(null);
+        if (editFileInputRef.current) editFileInputRef.current.value = "";
+        setError("");
       })
-      .catch(() => setError("Failed to update banner"));
+      .catch((err) => {
+        let msg = "Failed to update banner";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
-  // Delete banner
+  // Delete banner (protected)
   const handleDelete = (id) => {
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to delete banners.");
+      return;
+    }
     axios
-      .delete(`http://localhost:5000/api_v1/banners/${id}`)
+      .delete(`http://localhost:5000/api_v1/banners/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setBanners((prev) => prev.filter((b) => b._id !== id));
+        setError("");
       })
-      .catch(() => setError("Failed to delete banner"));
+      .catch((err) => {
+        let msg = "Failed to delete banner";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
   return (
@@ -121,6 +218,7 @@ function DashBanner() {
       <form
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full sm:flex-wrap'
         onSubmit={handleNewSubmit}
+        encType='multipart/form-data'
       >
         <input
           name='title'
@@ -138,11 +236,12 @@ function DashBanner() {
           className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
-          name='image'
-          value={newBanner.image}
-          onChange={handleNewChange}
-          placeholder='Image URL'
+          type='file'
+          accept='image/*'
+          ref={fileInputRef}
+          onChange={handleImageChange}
           className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+          required
         />
         <input
           name='discount'
@@ -165,6 +264,21 @@ function DashBanner() {
           Add
         </button>
       </form>
+      {imageFile && (
+        <div className='text-xs text-gray-600 dark:text-yellow-100 mt-1'>
+          Selected file: {imageFile.name}
+          <button
+            type='button'
+            className='ml-2 text-red-500 underline'
+            onClick={() => {
+              setImageFile(null);
+              if (fileInputRef.current) fileInputRef.current.value = "";
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      )}
       {error && <div className='text-red-500 mb-2'>{error}</div>}
       {loading ? (
         <div>Loading...</div>
@@ -189,6 +303,7 @@ function DashBanner() {
                       <form
                         className='flex gap-2 items-center'
                         onSubmit={handleEditSubmit}
+                        encType='multipart/form-data'
                       >
                         <input
                           name='title'
@@ -204,9 +319,10 @@ function DashBanner() {
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
-                          name='image'
-                          value={editBanner.image}
-                          onChange={handleEditChange}
+                          type='file'
+                          accept='image/*'
+                          ref={editFileInputRef}
+                          onChange={handleEditImageChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
@@ -235,6 +351,22 @@ function DashBanner() {
                           Cancel
                         </button>
                       </form>
+                      {editImageFile && (
+                        <div className='text-xs text-gray-600 dark:text-yellow-100 mt-1'>
+                          Selected file: {editImageFile.name}
+                          <button
+                            type='button'
+                            className='ml-2 text-red-500 underline'
+                            onClick={() => {
+                              setEditImageFile(null);
+                              if (editFileInputRef.current)
+                                editFileInputRef.current.value = "";
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ) : (
@@ -242,11 +374,15 @@ function DashBanner() {
                     <td className='px-6 py-4'>{banner.title}</td>
                     <td className='px-6 py-4'>{banner.subtitle}</td>
                     <td className='px-6 py-4'>
-                      <span className='cursor-pointer' title={banner.image}>
-                        {banner.image.length > 50
-                          ? `${banner.image.slice(0, 50)}...`
-                          : banner.image}
-                      </span>
+                      {banner.image ? (
+                        <img
+                          src={banner.image}
+                          alt={banner.title}
+                          className='h-12 w-12 object-cover rounded'
+                        />
+                      ) : (
+                        <span className='italic text-gray-400'>No image</span>
+                      )}
                     </td>
                     <td className='px-6 py-4'>{banner.discount}</td>
                     <td className='px-6 py-4'>{banner.buttonText}</td>

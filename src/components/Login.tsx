@@ -49,6 +49,7 @@ export default function Login({ open, onClose }: LoginProps) {
     email: string;
     password: string;
   }
+
   const onLogin = async (data: FormData) => {
     try {
       const { email, password } = data;
@@ -69,12 +70,18 @@ export default function Login({ open, onClose }: LoginProps) {
       if (res.data && res.data.user) {
         document.cookie = `username=${res.data.user.username}; path=/`;
         document.cookie = `accessToken=${res.data.user.accessToken}; path=/`;
+        document.cookie = `userRole=${res.data.user.userRole}; path=/`;
       }
       Notify.success("Login Successful");
       reset();
       onClose(); // Close the login popup
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        // Redirect based on user role
+        if (res.data && res.data.user && res.data.user.userRole === "admin") {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/client-dashboard";
+        }
       }, 200); // Small delay to allow popup to close
     } catch (error) {
       Notify.failure("Login failed");

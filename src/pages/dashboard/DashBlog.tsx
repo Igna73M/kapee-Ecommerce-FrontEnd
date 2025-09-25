@@ -5,6 +5,14 @@ import "react-quill/dist/quill.snow.css";
 import { useDropzone } from "react-dropzone";
 import Notiflix from "notiflix";
 
+// Helper to get access token from localStorage or cookies
+const getToken = () => {
+  const local = localStorage.getItem("accessToken");
+  if (local) return local;
+  const match = document.cookie.match(/accessToken=([^;]+)/);
+  return match ? match[1] : "";
+};
+
 function DashBlog() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,7 +37,7 @@ function DashBlog() {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Fetch blog posts
+  // Fetch blog posts (public)
   useEffect(() => {
     setLoading(true);
     axios
@@ -53,7 +61,7 @@ function DashBlog() {
     }
   }, []);
 
-  // Add new post
+  // Add new post (protected, multipart/form-data)
   const handleNewChange = (e) => {
     const { name, value } = e.target;
     setNewPost((prev) => ({ ...prev, [name]: value }));
@@ -67,7 +75,6 @@ function DashBlog() {
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles.length > 0) {
       setImageFile(acceptedFiles[0]);
-      setNewPost((prev) => ({ ...prev, image: acceptedFiles[0].name }));
     }
   };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -80,7 +87,7 @@ function DashBlog() {
     if (!newPost.excerpt.trim()) return "Excerpt is required.";
     if (!newPost.body.trim()) return "Body is required.";
     if (!newPost.date.trim()) return "Date is required.";
-    if (!imageFile && !newPost.image.trim()) return "Image is required.";
+    if (!imageFile) return "Image file is required.";
     return "";
   };
 
@@ -94,30 +101,51 @@ function DashBlog() {
       Notiflix.Notify.failure(validationError);
       return;
     }
-    let imageUrl = "";
-    if (newPost.image && newPost.image.trim().length > 0) {
-      imageUrl = newPost.image.trim();
-    } else if (imageFile) {
-      imageUrl = URL.createObjectURL(imageFile);
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to add blog posts.");
+      Notiflix.Notify.failure(
+        "You must be signed in as admin to add blog posts."
+      );
+      return;
     }
-    const postData = { ...newPost, image: imageUrl };
+    // Prepare multipart/form-data
+    const formData = new FormData();
+    formData.append("title", newPost.title);
+    formData.append("excerpt", newPost.excerpt);
+    formData.append("date", newPost.date);
+    formData.append("body", newPost.body);
+    formData.append("image", imageFile);
+
     try {
       const res = await axios.post(
         "http://localhost:5000/api_v1/blog-posts",
-        postData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setPosts((prev) => [...prev, res.data]);
       setNewPost({ title: "", excerpt: "", image: "", date: "", body: "" });
       setImageFile(null);
       setShowModal(false);
+      setError("");
+      setSuccess("Blog post created successfully!");
       Notiflix.Notify.success("Blog post created successfully!");
-    } catch {
-      setError("Failed to add blog post");
-      Notiflix.Notify.failure("Failed to add blog post");
+    } catch (err) {
+      let msg = "Failed to add blog post";
+      if (err.response && err.response.data && err.response.data.message) {
+        msg += `: ${err.response.data.message}`;
+      }
+      setError(msg);
+      Notiflix.Notify.failure(msg);
     }
   };
 
-  // Edit post
+  // Edit post (protected, multipart/form-data for image)
   const handleEdit = (post) => {
     setEditId(post._id);
     setEditPost({
@@ -130,6 +158,7 @@ function DashBlog() {
     setShowEditModal(true);
     setError("");
     setSuccess("");
+    setImageFile(null);
   };
 
   const handleEditChange = (e) => {
@@ -142,33 +171,97 @@ function DashBlog() {
   const handleEditBodyChange = (value) => {
     setEditPost((prev) => ({ ...prev, body: value }));
   };
+  const handleEditImageDrop = (acceptedFiles) => {
+    if (acceptedFiles.length > 0) {
+      setImageFile(acceptedFiles[0]);
+    }
+  };
+  const {
+    getRootProps: getEditRootProps,
+    getInputProps: getEditInputProps,
+    isDragActive: isEditDragActive,
+  } = useDropzone({
+    onDrop: handleEditImageDrop,
+    accept: { "image/*": [] },
+  });
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to update blog posts.");
+      Notiflix.Notify.failure(
+        "You must be signed in as admin to update blog posts."
+      );
+      return;
+    }
+    // Prepare multipart/form-data
+    const formData = new FormData();
+    formData.append("title", editPost.title);
+    formData.append("excerpt", editPost.excerpt);
+    formData.append("date", editPost.date);
+    formData.append("body", editPost.body);
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
     try {
       const res = await axios.patch(
         `http://localhost:5000/api_v1/blog-posts/${editId}`,
-        editPost
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setPosts((prev) => prev.map((p) => (p._id === editId ? res.data : p)));
       setEditId(null);
       setEditPost({ title: "", excerpt: "", image: "", date: "", body: "" });
       setShowEditModal(false);
+      setImageFile(null);
+      setError("");
+      setSuccess("Blog post updated successfully!");
       Notiflix.Notify.success("Blog post updated successfully!");
-    } catch {
-      setError("Failed to update blog post");
-      Notiflix.Notify.failure("Failed to update blog post");
+    } catch (err) {
+      let msg = "Failed to update blog post";
+      if (err.response && err.response.data && err.response.data.message) {
+        msg += `: ${err.response.data.message}`;
+      }
+      setError(msg);
+      Notiflix.Notify.failure(msg);
     }
   };
 
-  // Delete post
+  // Delete post (protected)
   const handleDelete = (id) => {
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to delete blog posts.");
+      Notiflix.Notify.failure(
+        "You must be signed in as admin to delete blog posts."
+      );
+      return;
+    }
     axios
-      .delete(`http://localhost:5000/api_v1/blog-posts/${id}`)
+      .delete(`http://localhost:5000/api_v1/blog-posts/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setPosts((prev) => prev.filter((p) => p._id !== id));
+        setError("");
+        Notiflix.Notify.success("Blog post deleted successfully!");
       })
-      .catch(() => setError("Failed to delete blog post"));
+      .catch((err) => {
+        let msg = "Failed to delete blog post";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+        Notiflix.Notify.failure(msg);
+      });
   };
 
   return (
@@ -195,7 +288,11 @@ function DashBlog() {
             <h3 className='text-lg font-semibold mb-4 text-gray-900 dark:text-yellow-100'>
               Create Blog Post
             </h3>
-            <form onSubmit={handleNewSubmit} className='flex flex-col gap-4'>
+            <form
+              onSubmit={handleNewSubmit}
+              className='flex flex-col gap-4'
+              encType='multipart/form-data'
+            >
               <input
                 name='title'
                 value={newPost.title}
@@ -216,7 +313,7 @@ function DashBlog() {
                 placeholder='Body'
                 className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100'
               />
-              {/* Drag & drop OR paste image link */}
+              {/* Drag & drop image only */}
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded p-4 text-center cursor-pointer ${
@@ -232,13 +329,6 @@ function DashBlog() {
                   <span>Drag & drop image here, or click to select</span>
                 )}
               </div>
-              <input
-                name='image'
-                value={newPost.image}
-                onChange={handleNewChange}
-                placeholder='Paste image link (optional)'
-                className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-              />
               <input
                 name='date'
                 value={newPost.date}
@@ -285,6 +375,7 @@ function DashBlog() {
               onSubmit={handleEditSubmit}
               className='flex flex-col gap-8 px-4 sm:px-8 py-6 overflow-y-auto'
               style={{ maxHeight: "80vh" }}
+              encType='multipart/form-data'
             >
               <div>
                 <label
@@ -342,13 +433,29 @@ function DashBlog() {
                 >
                   Image
                 </label>
+                <div
+                  {...getEditRootProps()}
+                  className={`border-2 border-dashed rounded p-4 text-center cursor-pointer ${
+                    isEditDragActive
+                      ? "border-yellow-600"
+                      : "border-gray-300 dark:border-gray-700"
+                  } bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100 mb-2`}
+                >
+                  <input {...getEditInputProps()} />
+                  {imageFile ? (
+                    <span>{imageFile.name}</span>
+                  ) : (
+                    <span>Drag & drop new image here, or click to select</span>
+                  )}
+                </div>
                 <input
                   name='image'
                   id='image'
                   value={editPost.image}
                   onChange={handleEditChange}
-                  placeholder='Paste image link'
+                  placeholder='Current image link (read-only)'
                   className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100 w-full mb-2'
+                  readOnly
                 />
               </div>
               <div>

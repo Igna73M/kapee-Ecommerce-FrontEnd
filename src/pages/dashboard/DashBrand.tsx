@@ -19,6 +19,16 @@ export default function DashBrand() {
     bgColor: "",
   });
 
+  // Helper to get access token from localStorage or cookies
+  const getToken = () => {
+    // Try localStorage first
+    const local = localStorage.getItem("accessToken");
+    if (local) return local;
+    // Fallback to cookies
+    const match = document.cookie.match(/accessToken=([^;]+)/);
+    return match ? match[1] : "";
+  };
+
   // Fetch brand categories
   useEffect(() => {
     setLoading(true);
@@ -51,16 +61,24 @@ export default function DashBrand() {
   const handleNewSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:5000/api_v1/brand-categories", newCategory)
+      .post("http://localhost:5000/api_v1/brand-categories", newCategory, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then((res) => {
         setCategories((prev) => [...prev, res.data]);
         setNewCategory({ name: "", tagline: "", initial: "", bgColor: "" });
       })
-      .catch(() => setError("Failed to add brand category"));
+      .catch(() => setError("Failed to add brand category (admin only)"));
   };
 
   // Edit brand category
   const handleEdit = (cat) => {
+    if (!cat._id) {
+      setError("Invalid category: missing _id");
+      return;
+    }
     setEditId(cat._id);
     setEditCategory({
       name: cat.name,
@@ -73,31 +91,50 @@ export default function DashBrand() {
     const { name, value } = e.target;
     setEditCategory((prev) => ({ ...prev, [name]: value }));
   };
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    axios
-      .patch(
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to update categories.");
+      return;
+    }
+    try {
+      const res = await axios.patch(
         `http://localhost:5000/api_v1/brand-categories/${editId}`,
-        editCategory
-      )
-      .then((res) => {
-        setCategories((prev) =>
-          prev.map((c) => (c._id === editId ? res.data : c))
-        );
-        setEditId(null);
-        setEditCategory({ name: "", tagline: "", initial: "", bgColor: "" });
-      })
-      .catch(() => setError("Failed to update brand category"));
+        editCategory,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCategories((prev) =>
+        prev.map((c) => (c._id === editId ? res.data : c))
+      );
+      setEditId(null);
+      setEditCategory({ name: "", tagline: "", initial: "", bgColor: "" });
+      setError(""); // clear error on success
+    } catch (err) {
+      let msg = "Failed to update brand category";
+      if (err.response && err.response.data && err.response.data.message) {
+        msg += `: ${err.response.data.message}`;
+      }
+      setError(msg);
+    }
   };
 
   // Delete brand category
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:5000/api_v1/brand-categories/${id}`)
+      .delete(`http://localhost:5000/api_v1/brand-categories/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
       .then(() => {
         setCategories((prev) => prev.filter((c) => c._id !== id));
       })
-      .catch(() => setError("Failed to delete brand category"));
+      .catch(() => setError("Failed to delete brand category (admin only)"));
   };
 
   return (

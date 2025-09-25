@@ -49,7 +49,10 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
   // Calculate wishlist count
   const wishlistCount = Array.isArray(wishlist) ? wishlist.length : 0;
   // Only show header if not on dashboard or return routes
-  if (location.pathname.startsWith("/dashboard")) {
+  if (
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname.startsWith("/client-dashboard")
+  ) {
     return null;
   }
   return (
@@ -221,7 +224,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 )}
               </div>
 
-              <Link to='/wishlist'>
+              <Link to='/client-dashboard/wishlist'>
                 <button
                   className='relative bg-transparent border-0 p-0'
                   aria-label='View wishlist'

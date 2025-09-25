@@ -1,5 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+
+// Helper to get access token from localStorage or cookies
+const getToken = () => {
+  const local = localStorage.getItem("accessToken");
+  if (local) return local;
+  const match = document.cookie.match(/accessToken=([^;]+)/);
+  return match ? match[1] : "";
+};
 
 function DashAdvert() {
   const [slides, setSlides] = useState([]);
@@ -9,6 +17,7 @@ function DashAdvert() {
   const [editSlide, setEditSlide] = useState({
     title: "",
     subtitle: "",
+    highlight: "",
     image: "",
     discount: "",
     buttonText: "",
@@ -21,6 +30,10 @@ function DashAdvert() {
     image: "",
     buttonText: "",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [editImageFile, setEditImageFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const editFileInputRef = useRef(null);
 
   // Fetch hero slides
   useEffect(() => {
@@ -46,15 +59,42 @@ function DashAdvert() {
     }
   }, []);
 
-  // Add new slide
+  // Add new slide (protected, multipart/form-data)
   const handleNewChange = (e) => {
     const { name, value } = e.target;
     setNewSlide((prev) => ({ ...prev, [name]: value }));
   };
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
   const handleNewSubmit = (e) => {
     e.preventDefault();
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to add slides.");
+      return;
+    }
+    if (!imageFile) {
+      setError("Image file is required.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("title", newSlide.title);
+    formData.append("subtitle", newSlide.subtitle);
+    formData.append("highlight", newSlide.highlight);
+    formData.append("discount", newSlide.discount);
+    formData.append("buttonText", newSlide.buttonText);
+    formData.append("image", imageFile);
+
     axios
-      .post("http://localhost:5000/api_v1/hero-slides", newSlide)
+      .post("http://localhost:5000/api_v1/hero-slides", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setSlides((prev) => [...prev, res.data]);
         setNewSlide({
@@ -65,51 +105,113 @@ function DashAdvert() {
           discount: "",
           buttonText: "",
         });
+        setImageFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setError("");
       })
-      .catch(() => setError("Failed to add hero slide"));
+      .catch((err) => {
+        let msg = "Failed to add hero slide";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
-  // Edit slide
+  // Edit slide (protected, multipart/form-data for image)
   const handleEdit = (slide) => {
     setEditId(slide._id);
     setEditSlide({
       title: slide.title,
       subtitle: slide.subtitle,
+      highlight: slide.highlight || "",
       image: slide.image,
       discount: slide.discount,
       buttonText: slide.buttonText,
     });
+    setEditImageFile(null);
+    if (editFileInputRef.current) editFileInputRef.current.value = "";
   };
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditSlide((prev) => ({ ...prev, [name]: value }));
   };
+  const handleEditImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setEditImageFile(e.target.files[0]);
+    }
+  };
   const handleEditSubmit = (e) => {
     e.preventDefault();
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to update slides.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("title", editSlide.title);
+    formData.append("subtitle", editSlide.subtitle);
+    formData.append("highlight", editSlide.highlight);
+    formData.append("discount", editSlide.discount);
+    formData.append("buttonText", editSlide.buttonText);
+    if (editImageFile) {
+      formData.append("image", editImageFile);
+    }
     axios
-      .patch(`http://localhost:5000/api_v1/hero-slides/${editId}`, editSlide)
+      .patch(`http://localhost:5000/api_v1/hero-slides/${editId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setSlides((prev) => prev.map((s) => (s._id === editId ? res.data : s)));
         setEditId(null);
         setEditSlide({
           title: "",
           subtitle: "",
+          highlight: "",
           image: "",
           discount: "",
           buttonText: "",
         });
+        setEditImageFile(null);
+        if (editFileInputRef.current) editFileInputRef.current.value = "";
+        setError("");
       })
-      .catch(() => setError("Failed to update hero slide"));
+      .catch((err) => {
+        let msg = "Failed to update hero slide";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
-  // Delete slide
+  // Delete slide (protected)
   const handleDelete = (id) => {
+    const token = getToken();
+    if (!token) {
+      setError("You must be signed in as admin to delete slides.");
+      return;
+    }
     axios
-      .delete(`http://localhost:5000/api_v1/hero-slides/${id}`)
+      .delete(`http://localhost:5000/api_v1/hero-slides/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setSlides((prev) => prev.filter((s) => s._id !== id));
+        setError("");
       })
-      .catch(() => setError("Failed to delete hero slide"));
+      .catch((err) => {
+        let msg = "Failed to delete hero slide";
+        if (err.response && err.response.data && err.response.data.message) {
+          msg += `: ${err.response.data.message}`;
+        }
+        setError(msg);
+      });
   };
 
   return (
@@ -121,6 +223,7 @@ function DashAdvert() {
       <form
         className='flex flex-col sm:flex-row gap-2 mb-6 w-full max-w-2xl sm:flex-wrap'
         onSubmit={handleNewSubmit}
+        encType='multipart/form-data'
       >
         <input
           name='title'
@@ -145,17 +248,18 @@ function DashAdvert() {
           className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
+          type='file'
+          accept='image/*'
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+          required
+        />
+        <input
           name='discount'
           value={newSlide.discount}
           onChange={handleNewChange}
           placeholder='Discount'
-          className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
-        />
-        <input
-          name='image'
-          value={newSlide.image}
-          onChange={handleNewChange}
-          placeholder='Image URL'
           className='p-2 border rounded flex-1 w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
         />
         <input
@@ -172,16 +276,32 @@ function DashAdvert() {
           Add
         </button>
       </form>
+      {imageFile && (
+        <div className='text-xs text-gray-600 dark:text-yellow-100 mt-1'>
+          Selected file: {imageFile.name}
+          <button
+            type='button'
+            className='ml-2 text-red-500 underline'
+            onClick={() => {
+              setImageFile(null);
+              if (fileInputRef.current) fileInputRef.current.value = "";
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      )}
       {error && <div className='text-red-500 mb-2'>{error}</div>}
       {loading ? (
         <div>Loading...</div>
       ) : (
         <div className='w-full overflow-x-auto sm:rounded-lg shadow-md'>
-          <table className='min-w-[500px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
+          <table className='min-w-[700px] w-full text-sm text-left rtl:text-right text-gray-800 dark:text-yellow-100'>
             <thead className='text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-yellow-100'>
               <tr>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Title</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Subtitle</th>
+                <th className='px-4 py-2 sm:px-6 sm:py-3'>Highlight</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Image</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Discount</th>
                 <th className='px-4 py-2 sm:px-6 sm:py-3'>Button Text</th>
@@ -192,10 +312,11 @@ function DashAdvert() {
               {slides.map((slide) =>
                 editId === slide._id ? (
                   <tr key={slide._id}>
-                    <td colSpan={6} className='px-6 py-4'>
+                    <td colSpan={7} className='px-6 py-4'>
                       <form
-                        className='flex gap-2 items-center'
+                        className='flex gap-2 items-center flex-wrap'
                         onSubmit={handleEditSubmit}
+                        encType='multipart/form-data'
                       >
                         <input
                           name='title'
@@ -203,17 +324,27 @@ function DashAdvert() {
                           onChange={handleEditChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                           required
+                          placeholder='Title'
                         />
                         <input
                           name='subtitle'
                           value={editSlide.subtitle}
                           onChange={handleEditChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          placeholder='Subtitle'
                         />
                         <input
-                          name='image'
-                          value={editSlide.image}
+                          name='highlight'
+                          value={editSlide.highlight}
                           onChange={handleEditChange}
+                          className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          placeholder='Highlight'
+                        />
+                        <input
+                          type='file'
+                          accept='image/*'
+                          ref={editFileInputRef}
+                          onChange={handleEditImageChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
                         />
                         <input
@@ -221,12 +352,14 @@ function DashAdvert() {
                           value={editSlide.discount}
                           onChange={handleEditChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          placeholder='Discount'
                         />
                         <input
                           name='buttonText'
                           value={editSlide.buttonText}
                           onChange={handleEditChange}
                           className='p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
+                          placeholder='Button Text'
                         />
                         <button
                           type='submit'
@@ -242,18 +375,39 @@ function DashAdvert() {
                           Cancel
                         </button>
                       </form>
+                      {editImageFile && (
+                        <div className='text-xs text-gray-600 dark:text-yellow-100 mt-1'>
+                          Selected file: {editImageFile.name}
+                          <button
+                            type='button'
+                            className='ml-2 text-red-500 underline'
+                            onClick={() => {
+                              setEditImageFile(null);
+                              if (editFileInputRef.current)
+                                editFileInputRef.current.value = "";
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ) : (
                   <tr key={slide._id}>
                     <td className='px-6 py-4'>{slide.title}</td>
                     <td className='px-6 py-4'>{slide.subtitle}</td>
+                    <td className='px-6 py-4'>{slide.highlight}</td>
                     <td className='px-6 py-4'>
-                      <span className='cursor-pointer' title={slide.image}>
-                        {slide.image.length > 50
-                          ? `${slide.image.slice(0, 50)}...`
-                          : slide.image}
-                      </span>
+                      {slide.image ? (
+                        <img
+                          src={slide.image}
+                          alt={slide.title}
+                          className='h-12 w-12 object-cover rounded'
+                        />
+                      ) : (
+                        <span className='italic text-gray-400'>No image</span>
+                      )}
                     </td>
                     <td className='px-6 py-4'>{slide.discount}</td>
                     <td className='px-6 py-4'>{slide.buttonText}</td>

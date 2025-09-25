@@ -16,8 +16,8 @@ import { useState } from "react";
 import { Product } from "@/types/product";
 import Shop from "./pages/Shop";
 import Index from "./pages/Index";
-import Wishlist from "./pages/Wishlist";
-import WishlistPage from "./pages/Wishlist";
+import Wishlist from "./pages/dashboard/client/Wishlist";
+import WishlistPage from "./pages/dashboard/client/Wishlist";
 import { products } from "./data/products";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -27,6 +27,12 @@ import DashProfile from "./pages/dashboard/DashProfile";
 import DashSettings from "./pages/dashboard/DashSettings";
 import DashBlog from "./pages/dashboard/DashBlog";
 import BlogPost from "./pages/BlogPost";
+import ClientDashboard from "./pages/dashboard/client/ClientDashboard";
+import ClientDashboardLayout from "./pages/dashboard/client/ClientDashboardLayout";
+import ClientProfile from "./pages/dashboard/client/ClientDashProfile";
+import ClientSettings from "./pages/dashboard/client/ClientDashSettings";
+import ClientOrders from "./pages/dashboard/client/ClientOrders";
+import ClientSupport from "./pages/dashboard/client/ClientSupport";
 
 const queryClient = new QueryClient();
 
@@ -138,20 +144,7 @@ const App = () => {
           <Route path='/checkout' element={<Checkout cart={cart} />} />
           <Route path='/blog' element={<Blog />} />
           <Route path='/blog/:id' element={<BlogPost />} />
-          <Route
-            path='/wishlist'
-            element={
-              <WishlistPage
-                wishlist={products.filter((p) => wishlist.includes(p.id))}
-                onProductClick={() => {}}
-                addToCart={(product, quantity) => {
-                  addToCart(product, quantity);
-                  openCart();
-                }}
-                toggleWishlist={toggleWishlist}
-              />
-            }
-          />
+
           <Route path='/dashboard' element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path='/dashboard/product' element={<DashProduct />} />
@@ -163,6 +156,37 @@ const App = () => {
             <Route path='/dashboard/advertisement' element={<DashAdvert />} />
             <Route path='/dashboard/banners' element={<DashBanner />} />
             <Route path='/dashboard/blog' element={<DashBlog />} />
+          </Route>
+          {/* Client Dashboard */}
+          <Route path='/client-dashboard' element={<ClientDashboardLayout />}>
+            <Route index element={<ClientDashboard />} />
+            <Route
+              path='/client-dashboard/profile'
+              element={<ClientProfile />}
+            />
+            <Route
+              path='/client-dashboard/settings'
+              element={<ClientSettings />}
+            />
+            <Route path='/client-dashboard/orders' element={<ClientOrders />} />
+            <Route
+              path='/client-dashboard/support'
+              element={<ClientSupport />}
+            />
+            <Route
+              path='/client-dashboard/wishlist'
+              element={
+                <WishlistPage
+                  wishlist={products.filter((p) => wishlist.includes(p.id))}
+                  onProductClick={() => {}}
+                  addToCart={(product, quantity) => {
+                    addToCart(product, quantity);
+                    openCart();
+                  }}
+                  toggleWishlist={toggleWishlist}
+                />
+              }
+            />
           </Route>
           {/* 404 Page error */}
           <Route path='*' element={<NotFound />} />

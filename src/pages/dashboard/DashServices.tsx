@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import * as LucideIcons from "lucide-react";
 
 function DashServices() {
   const [services, setServices] = useState([]);
@@ -150,11 +151,13 @@ function DashServices() {
       });
   };
 
-  // Helper: check if icon string is valid for rendering
+  // Helper: render Lucide icon by name, fallback to text/icon/image
   const renderIcon = (icon) => {
-    // If using FontAwesome or similar, icon should be a string like "fa-solid fa-truck"
-    // If icon is an SVG or image URL, render <img>
     if (!icon) return <span className='italic text-gray-400'>No icon</span>;
+    const LucideIcon = LucideIcons[icon];
+    if (LucideIcon) {
+      return <LucideIcon className='w-8 h-8 text-yellow-500 inline-block' />;
+    }
     if (icon.startsWith("http") || icon.startsWith("/")) {
       return (
         <img
@@ -164,7 +167,6 @@ function DashServices() {
         />
       );
     }
-    // Otherwise, treat as icon class (FontAwesome, etc)
     return <i className={`${icon} text-xl`} aria-label={icon} />;
   };
 
@@ -183,7 +185,7 @@ function DashServices() {
           name='icon'
           value={newService.icon}
           onChange={handleNewChange}
-          placeholder='Icon (e.g. fa-solid fa-truck or /img/icon.svg)'
+          placeholder='Lucide icon name (e.g. Truck, Package, ShoppingCart)'
           className='p-2 border rounded w-full sm:w-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-yellow-100'
           required
         />

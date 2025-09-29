@@ -1,6 +1,7 @@
 import { Product } from "@/types/product";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface CartItem {
   product: Product;
@@ -9,9 +10,24 @@ interface CartItem {
 
 interface CartProps {
   cart: CartItem[];
-  removeFromCart: (productId: string) => void;
-  updateCartQuantity: (productId: string, quantity: number) => void;
   onClose: () => void;
+  removeFromCart?: (productId: string) => void;
+  updateCartQuantity?: (productId: string, quantity: number) => void;
+}
+
+const LOCAL_CART_KEY = "localCart";
+
+function getLocalCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setLocalCart(cart: CartItem[]) {
+  localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cart));
 }
 
 const Cart = ({
@@ -21,33 +37,101 @@ const Cart = ({
   onClose,
 }: CartProps) => {
   const navigate = useNavigate();
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [localCart, setLocalCartState] = useState<CartItem[]>(getLocalCart());
+
+  // Sync local cart with backend cart if logged in
+  React.useEffect(() => {
+    if (cart.length > 0) {
+      setLocalCartState(cart);
+      setLocalCart(cart);
+    }
+  }, [cart]);
+
+  // Filter out invalid cart items
+  const validLocalCart = localCart.filter(
+    (item) => item.product && typeof item.product.price === "number"
+  );
 
   const total = useMemo(
     () =>
-      cart.reduce(
+      validLocalCart.reduce(
         (sum, item) => sum + (item.product.price || 0) * item.quantity,
         0
       ),
-    [cart]
+    [validLocalCart]
   );
+
+  // Remove product from cart (local + backend)
+  const handleRemove = async (productId: string) => {
+    setUpdatingId(productId);
+    // Remove from local cart
+    const updatedLocalCart = validLocalCart.filter(
+      (item) => item.product._id !== productId
+    );
+    setLocalCartState(updatedLocalCart);
+    setLocalCart(updatedLocalCart);
+
+    // Remove from backend if logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        await axios.delete("http://localhost:5000/api_v1/carts/remove", {
+          data: { productId },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (removeFromCart) removeFromCart(productId);
+      } catch (err) {
+        // Optionally show error feedback
+      }
+    }
+    setUpdatingId(null);
+  };
+
+  // Update quantity (local + backend)
+  const handleUpdateQuantity = async (productId: string, quantity: number) => {
+    setUpdatingId(productId);
+    // Update local cart
+    const updatedLocalCart = validLocalCart.map((item) =>
+      item.product._id === productId ? { ...item, quantity } : item
+    );
+    setLocalCartState(updatedLocalCart);
+    setLocalCart(updatedLocalCart);
+
+    // Update backend if logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        await axios.patch(
+          "http://localhost:5000/api_v1/carts/update",
+          { productId, quantity },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (updateCartQuantity) updateCartQuantity(productId, quantity);
+      } catch (err) {
+        // Optionally show error feedback
+      }
+    }
+    setUpdatingId(null);
+  };
 
   const handleViewCart = () => {
     onClose();
-    navigate("/cart", { state: { cart } });
+    navigate("/cart", { state: { cart: validLocalCart } });
   };
 
   const handleCheckout = () => {
     onClose();
-    navigate("/checkout", { state: { cart } });
+    navigate("/checkout", { state: { cart: validLocalCart } });
   };
 
   const handleDecrease = (item: CartItem) => {
     const next = Math.max(1, item.quantity - 1);
-    updateCartQuantity(item.product.id, next);
+    handleUpdateQuantity(item.product._id, next);
   };
 
   const handleIncrease = (item: CartItem) => {
-    updateCartQuantity(item.product.id, item.quantity + 1);
+    handleUpdateQuantity(item.product._id, item.quantity + 1);
   };
 
   return (
@@ -68,7 +152,7 @@ const Cart = ({
         {/* Header */}
         <header className='flex items-center justify-between p-4 border-b dark:border-gray-700'>
           <h2 className='text-lg font-semibold text-gray-900 dark:text-yellow-100'>
-            Your Cart ({cart.length})
+            Your Cart ({validLocalCart.length})
           </h2>
           <button
             aria-label='Close cart'
@@ -81,7 +165,7 @@ const Cart = ({
 
         {/* Items */}
         <div className='flex-1 overflow-y-auto p-4 space-y-4'>
-          {cart.length === 0 ? (
+          {validLocalCart.length === 0 ? (
             <div className='text-center text-muted-foreground dark:text-yellow-100 py-12'>
               Your cart is empty.
               <div className='mt-4'>
@@ -97,9 +181,9 @@ const Cart = ({
               </div>
             </div>
           ) : (
-            cart.map((item) => (
+            validLocalCart.map((item) => (
               <div
-                key={item.product.id}
+                key={item.product._id}
                 className='flex items-center gap-4 border dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800'
               >
                 {/* optional small image */}
@@ -136,6 +220,7 @@ const Cart = ({
                         onClick={() => handleDecrease(item)}
                         aria-label={`Decrease quantity for ${item.product.name}`}
                         className='px-2 py-1 text-gray-900 dark:text-yellow-100'
+                        disabled={updatingId === item.product._id}
                       >
                         −
                       </button>
@@ -146,14 +231,16 @@ const Cart = ({
                         onClick={() => handleIncrease(item)}
                         aria-label={`Increase quantity for ${item.product.name}`}
                         className='px-2 py-1 text-gray-900 dark:text-yellow-100'
+                        disabled={updatingId === item.product._id}
                       >
                         +
                       </button>
                     </div>
 
                     <button
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => handleRemove(item.product._id)}
                       className='text-sm text-red-600 dark:text-red-400 hover:underline'
+                      disabled={updatingId === item.product._id}
                     >
                       Remove
                     </button>
@@ -185,9 +272,9 @@ const Cart = ({
 
             <button
               onClick={handleCheckout}
-              disabled={cart.length === 0}
+              disabled={validLocalCart.length === 0}
               className={`w-full py-2 px-4 rounded text-white transition ${
-                cart.length === 0
+                validLocalCart.length === 0
                   ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
                   : "bg-[tomato] hover:bg-[tomato]"
               }`}

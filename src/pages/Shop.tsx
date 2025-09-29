@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import TopBanner from "@/components/TopBanner";
 import Header from "@/components/Header";
 import CategorySidebar from "@/components/CategorySidebar";
@@ -6,7 +7,6 @@ import ProductCard from "@/components/ProductCard";
 import ProductModal from "@/components/ProductModal";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import { products } from "@/data/products";
 import { Product } from "@/types/product";
 
 interface ShopProps {
@@ -17,6 +17,21 @@ interface ShopProps {
   wishlist: string[];
   toggleWishlist: (productId: string) => void;
   openCart: () => void;
+}
+
+const LOCAL_CART_KEY = "localCart";
+
+function getLocalCart(): { product: Product; quantity: number }[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setLocalCart(cart: { product: Product; quantity: number }[]) {
+  localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cart));
 }
 
 const Shop = ({
@@ -37,8 +52,18 @@ const Shop = ({
     }
   }, []);
 
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api_v1/products")
+      .then((res) => setProducts(res.data))
+      .catch(() => setProducts([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -48,6 +73,37 @@ const Shop = ({
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedProduct(null);
+  };
+
+  // Add to cart handler (localStorage + backend)
+  const handleAddToCart = async (product: Product, quantity: number = 1) => {
+    // Local cart update
+    const localCart = getLocalCart();
+    const idx = localCart.findIndex((item) => item.product._id === product._id);
+    if (idx > -1) {
+      localCart[idx].quantity += quantity;
+    } else {
+      localCart.push({ product, quantity });
+    }
+    setLocalCart(localCart);
+
+    // Backend cart update if logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        await axios.post(
+          "http://localhost:5000/api_v1/carts/add",
+          { productId: product._id, quantity },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (err) {
+        // Optionally show error feedback
+      }
+    }
+
+    // Call parent handler for UI update
+    if (addToCart) addToCart(product, quantity);
+    openCart();
   };
 
   return (
@@ -86,19 +142,22 @@ const Shop = ({
               id='products-grid'
               className='grid sm:grid-cols-2 lg:grid-cols-3 gap-6'
             >
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onProductClick={handleProductClick}
-                  addToCart={(p, q) => {
-                    addToCart(p, q);
-                    openCart();
-                  }}
-                  wishlist={wishlist}
-                  toggleWishlist={toggleWishlist}
-                />
-              ))}
+              {loading ? (
+                <div className='col-span-3 flex items-center justify-center min-h-[200px]'>
+                  <span>Loading products...</span>
+                </div>
+              ) : (
+                products.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    onProductClick={handleProductClick}
+                    addToCart={handleAddToCart}
+                    wishlist={wishlist}
+                    toggleWishlist={toggleWishlist}
+                  />
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -111,10 +170,7 @@ const Shop = ({
         product={selectedProduct}
         isOpen={isModalOpen}
         onClose={closeModal}
-        addToCart={(product, quantity) => {
-          addToCart(product, quantity);
-          openCart();
-        }}
+        addToCart={handleAddToCart}
       />
     </div>
   );

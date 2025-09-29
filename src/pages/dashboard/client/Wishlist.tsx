@@ -24,6 +24,9 @@ function WishlistPage({
     }
   }, []);
 
+  // Get wishlist product IDs for ProductCard
+  const wishlistIds = wishlist.map((p) => p._id);
+
   return (
     <div className='max-w-7xl mx-auto px-4 py-8 bg-background dark:bg-gray-900 min-h-screen'>
       <h1 className='text-2xl font-bold mb-6 text-gray-900 dark:text-yellow-100'>
@@ -37,11 +40,11 @@ function WishlistPage({
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
           {wishlist.map((product) => (
             <ProductCard
-              key={product.id}
+              key={product._id || product._id}
               product={product}
               onProductClick={onProductClick}
               addToCart={addToCart}
-              wishlist={wishlist.map((p) => p.id)}
+              wishlist={wishlistIds}
               toggleWishlist={toggleWishlist}
             />
           ))}

@@ -3,22 +3,25 @@ import DashServices from "./pages/dashboard/DashServices";
 import DashAdvert from "./pages/dashboard/DashAdvert";
 import DashBanner from "./pages/dashboard/DashBanner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 import Cart from "@/components/Cart";
 import Header from "@/components/Header";
 import Checkout from "./pages/Checkout";
 import CartPage from "./pages/CartPage";
-
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import { Product } from "@/types/product";
 import Shop from "./pages/Shop";
 import Index from "./pages/Index";
-import Wishlist from "./pages/dashboard/client/Wishlist";
 import WishlistPage from "./pages/dashboard/client/Wishlist";
-import { products } from "./data/products";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import DashProduct from "./pages/dashboard/DashProduct";
@@ -33,20 +36,97 @@ import ClientProfile from "./pages/dashboard/client/ClientDashProfile";
 import ClientSettings from "./pages/dashboard/client/ClientDashSettings";
 import ClientOrders from "./pages/dashboard/client/ClientOrders";
 import ClientSupport from "./pages/dashboard/client/ClientSupport";
+import Login from "@/components/Login"; // Make sure you have a Login component
+import OrderSuccess from "./pages/OrderSuccess";
+import DashMessage from "./pages/dashboard/DashMessage";
 
 const queryClient = new QueryClient();
 
+// Helper to get cookie value
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+}
+
+// Route guard for dashboard/admin/client-dashboard
+function ProtectedRoute({
+  children,
+  type,
+}: {
+  children: JSX.Element;
+  type: "admin" | "user";
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    const userRole = getCookie("userRole");
+    const isLoggedIn = !!getCookie("token") || !!getCookie("accessToken");
+
+    // For admin dashboard
+    if (type === "admin") {
+      if (!isLoggedIn || userRole !== "admin") {
+        setShowLogin(true);
+        window.location.replace("http://localhost:8080/");
+      }
+    }
+    // For client dashboard
+    if (type === "user") {
+      if (!isLoggedIn || userRole !== "user") {
+        setShowLogin(true);
+        window.location.replace("http://localhost:8080/");
+      }
+    }
+  }, [location.pathname, type]);
+
+  return (
+    <>
+      {showLogin && <Login open={true} onClose={() => setShowLogin(false)} />}
+      {!showLogin && children}
+    </>
+  );
+}
+
 const App = () => {
-  // Get current location for conditional header rendering
-  const location =
-    typeof window !== "undefined" ? window.location : { pathname: "/" };
-  // Cart state: array of {product, quantity}
   const [cart, setCart] = useState<{ product: Product; quantity: number }[]>(
     []
   );
-  // Wishlist state: array of product ids
   const [wishlist, setWishlist] = useState<string[]>([]);
-  // Add/remove product from wishlist
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
+
+  // Fetch products from backend
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api_v1/products")
+      .then((res) => setProducts(res.data))
+      .catch(() => setProducts([]))
+      .finally(() => setLoadingProducts(false));
+  }, []);
+
+  // Helper to refresh cart from backend
+  const refreshCart = useCallback(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    axios
+      .get("http://localhost:5000/api_v1/carts", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setCart(res.data.items || []))
+      .catch(() => setCart([]));
+  }, []);
+
+  // Initial cart fetch
+  useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
+
+  // Wishlist logic
   const toggleWishlist = (productId: string) => {
     setWishlist((prev) =>
       prev.includes(productId)
@@ -54,40 +134,55 @@ const App = () => {
         : [...prev, productId]
     );
   };
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  // Open cart
+
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
-  // Add product to cart
-  const addToCart = (product: Product, quantity: number = 1) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prevCart.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prevCart, { product, quantity }];
-    });
+  // Add product to cart via backend
+  const addToCart = async (product: Product, quantity: number = 1) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      await axios.post(
+        "http://localhost:5000/api_v1/carts/add",
+        { productId: product._id, quantity },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      refreshCart();
+    } catch (err) {
+      // Optionally show error feedback
+    }
   };
 
-  // Remove product from cart
-  const removeFromCart = (productId: string) => {
-    setCart((prevCart) =>
-      prevCart.filter((item) => item.product.id !== productId)
-    );
+  // Remove product from cart via backend
+  const removeFromCart = async (productId: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      await axios.delete("http://localhost:5000/api_v1/carts/remove", {
+        data: { productId },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      refreshCart();
+    } catch (err) {
+      // Optionally show error feedback
+    }
   };
 
-  // Update quantity
-  const updateCartQuantity = (productId: string, quantity: number) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
-      )
-    );
+  // Update quantity via backend
+  const updateCartQuantity = async (productId: string, quantity: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      await axios.patch(
+        "http://localhost:5000/api_v1/carts/update",
+        { productId, quantity },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      refreshCart();
+    } catch (err) {
+      // Optionally show error feedback
+    }
   };
 
   return (
@@ -102,17 +197,9 @@ const App = () => {
             onClose={closeCart}
           />
         )}
+        {showLogin && <Login open={true} onClose={() => setShowLogin(false)} />}
         <Routes>
-          <Route
-            path='/cart'
-            element={
-              <CartPage
-                cart={cart}
-                removeFromCart={removeFromCart}
-                updateCartQuantity={updateCartQuantity}
-              />
-            }
-          />
+          <Route path='/cart' element={<CartPage />} />
           <Route
             path='/'
             element={
@@ -141,53 +228,58 @@ const App = () => {
               />
             }
           />
-          <Route path='/checkout' element={<Checkout cart={cart} />} />
+          <Route path='/checkout' element={<Checkout />} />
           <Route path='/blog' element={<Blog />} />
           <Route path='/blog/:id' element={<BlogPost />} />
 
-          <Route path='/dashboard' element={<DashboardLayout />}>
+          {/* Admin Dashboard */}
+          <Route
+            path='/dashboard/*'
+            element={
+              <ProtectedRoute type='admin'>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<Dashboard />} />
-            <Route path='/dashboard/product' element={<DashProduct />} />
-            <Route path='/dashboard/customers' element={<DashCustomers />} />
-            <Route path='/dashboard/profile' element={<DashProfile />} />
-            <Route path='/dashboard/settings' element={<DashSettings />} />
-            <Route path='/dashboard/brands' element={<DashBrand />} />
-            <Route path='/dashboard/services' element={<DashServices />} />
-            <Route path='/dashboard/advertisement' element={<DashAdvert />} />
-            <Route path='/dashboard/banners' element={<DashBanner />} />
-            <Route path='/dashboard/blog' element={<DashBlog />} />
+            <Route path='product' element={<DashProduct />} />
+            <Route path='customers' element={<DashCustomers />} />
+            <Route path='profile' element={<DashProfile />} />
+            <Route path='settings' element={<DashSettings />} />
+            <Route path='brands' element={<DashBrand />} />
+            <Route path='services' element={<DashServices />} />
+            <Route path='advertisement' element={<DashAdvert />} />
+            <Route path='banners' element={<DashBanner />} />
+            <Route path='blog' element={<DashBlog />} />
+            <Route path='messages' element={<DashMessage />} />
           </Route>
           {/* Client Dashboard */}
-          <Route path='/client-dashboard' element={<ClientDashboardLayout />}>
+          <Route
+            path='/client-dashboard/*'
+            element={
+              <ProtectedRoute type='user'>
+                <ClientDashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<ClientDashboard />} />
+            <Route path='profile' element={<ClientProfile />} />
+            <Route path='settings' element={<ClientSettings />} />
+            <Route path='orders' element={<ClientOrders />} />
+            <Route path='support' element={<ClientSupport />} />
             <Route
-              path='/client-dashboard/profile'
-              element={<ClientProfile />}
-            />
-            <Route
-              path='/client-dashboard/settings'
-              element={<ClientSettings />}
-            />
-            <Route path='/client-dashboard/orders' element={<ClientOrders />} />
-            <Route
-              path='/client-dashboard/support'
-              element={<ClientSupport />}
-            />
-            <Route
-              path='/client-dashboard/wishlist'
+              path='wishlist'
               element={
                 <WishlistPage
-                  wishlist={products.filter((p) => wishlist.includes(p.id))}
+                  wishlist={products.filter((p) => wishlist.includes(p._id))}
                   onProductClick={() => {}}
-                  addToCart={(product, quantity) => {
-                    addToCart(product, quantity);
-                    openCart();
-                  }}
+                  addToCart={addToCart}
                   toggleWishlist={toggleWishlist}
                 />
               }
             />
           </Route>
+          <Route path='/order-success' element={<OrderSuccess />} />
           {/* 404 Page error */}
           <Route path='*' element={<NotFound />} />
         </Routes>

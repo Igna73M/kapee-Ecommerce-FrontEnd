@@ -1,49 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-// --- DUMMY DATA FOR DEVELOPMENT ---
-const dummyProducts = [
-  {
-    id: "p1",
-    name: "Wireless Headphones",
-    image: "/src/assets/headphones.png",
-    price: 99.99,
-  },
-  {
-    id: "p2",
-    name: "Smart Watch",
-    image: "/src/assets/watch-charger.png",
-    price: 149.99,
-  },
-  {
-    id: "p3",
-    name: "Bluetooth Speaker",
-    image: "/src/assets/wireless-speaker.png",
-    price: 59.99,
-  },
-];
-
-const dummyOrders = [
-  {
-    _id: "order1",
-    createdAt: "2025-09-20T10:00:00Z",
-    status: "delivered",
-    total: 249.98,
-    items: [
-      { product: { id: "p1" }, quantity: 2 },
-      { product: { id: "p3" }, quantity: 1 },
-    ],
-  },
-  {
-    _id: "order2",
-    createdAt: "2025-09-22T15:30:00Z",
-    status: "processing",
-    total: 149.99,
-    items: [{ product: { id: "p2" }, quantity: 1 }],
-  },
-];
-// --- END DUMMY DATA ---
-
 type Product = {
   id?: string;
   _id?: string;
@@ -65,30 +22,44 @@ type Order = {
   items: OrderItem[];
 };
 
-function ClientOrders({ products = dummyProducts }: { products?: Product[] }) {
-  const [orders, setOrders] = useState<Order[]>(dummyOrders);
-  const [loading, setLoading] = useState(false);
+// Helper to get accessToken from cookies
+function getAccessTokenFromCookies(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
-  // Uncomment this block to use real API instead of dummy data
-  /*
+function ClientOrders({ products = [] }: { products?: Product[] }) {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     async function fetchOrders() {
       setLoading(true);
+      setError(null);
       try {
-        const token = localStorage.getItem("accessToken");
+        const token = getAccessTokenFromCookies();
+        if (!token) {
+          setError("You must be logged in to view orders.");
+          setLoading(false);
+          return;
+        }
         const res = await axios.get("http://localhost:5000/api_v1/orders/me", {
-  // Helper to get product info from global list
-  const getProduct = (id: string) =>
-    products.find((p) => p.id === id || p._id === id);
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         setOrders([]);
+        setError(
+          err?.response?.data?.message ||
+            err?.message ||
+            "Failed to fetch orders."
+        );
       }
       setLoading(false);
     }
     fetchOrders();
   }, []);
-  */
 
   useEffect(() => {
     const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
@@ -100,7 +71,8 @@ function ClientOrders({ products = dummyProducts }: { products?: Product[] }) {
   }, []);
 
   // Helper to get product info from global list
-  const getProduct = (id) => products.find((p) => p.id === id || p._id === id);
+  const getProduct = (id: string) =>
+    products.find((p) => p.id === id || p._id === id);
 
   return (
     <div className='p-6 bg-white dark:bg-gray-900 min-h-screen'>
@@ -109,6 +81,10 @@ function ClientOrders({ products = dummyProducts }: { products?: Product[] }) {
       </h2>
       {loading ? (
         <div>Loading...</div>
+      ) : error ? (
+        <div className='text-red-500 dark:text-red-400 text-center'>
+          {error}
+        </div>
       ) : orders.length === 0 ? (
         <div className='text-gray-500 dark:text-yellow-100 text-center'>
           You have no orders yet.
@@ -141,7 +117,8 @@ function ClientOrders({ products = dummyProducts }: { products?: Product[] }) {
                         : "bg-gray-200 text-gray-800"
                     }`}
                   >
-                    {order.status || "Pending"}
+                    {order.status?.charAt(0).toUpperCase() +
+                      order.status?.slice(1) || "Pending"}
                   </span>
                 </div>
               </div>

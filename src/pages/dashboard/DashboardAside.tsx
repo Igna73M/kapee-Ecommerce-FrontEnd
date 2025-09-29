@@ -44,6 +44,7 @@ function DashboardAside() {
               },
               { label: "Banners", to: "/dashboard/banners", icon: "🖼️" },
               { label: "Blogs", to: "/dashboard/blog", icon: "📝" },
+              { label: "Messages", to: "/dashboard/messages", icon: "✉️" },
             ].map(({ label, to, icon, exact }) => (
               <li key={to}>
                 <NavLink

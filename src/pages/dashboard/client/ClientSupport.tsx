@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function ClientSupport() {
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
@@ -14,12 +17,46 @@ function ClientSupport() {
     }
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would send the message to your backend
-    setSubmitted(true);
-    setMessage("");
-    setEmail("");
+    setError(null);
+    setLoading(true);
+
+    // Basic email validation
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+    if (!message || message.length < 10) {
+      setError("Please enter a message with at least 10 characters.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api_v1/support/contact",
+        { email, message },
+        { withCredentials: true }
+      );
+      if (res.data?.message === "Message sent successfully.") {
+        setSubmitted(true);
+        setMessage("");
+        setEmail("");
+      } else {
+        setError(
+          res.data?.message || "Failed to send message. Please try again."
+        );
+      }
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to send message. Please try again."
+      );
+    }
+    setLoading(false);
   };
 
   return (
@@ -38,6 +75,11 @@ function ClientSupport() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className='space-y-4'>
+          {error && (
+            <div className='text-red-500 dark:text-red-400 text-center font-semibold'>
+              {error}
+            </div>
+          )}
           <div>
             <label className='block mb-1 font-semibold text-gray-800 dark:text-yellow-100'>
               Your Email
@@ -49,6 +91,7 @@ function ClientSupport() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder='you@example.com'
+              autoComplete='email'
             />
           </div>
           <div>
@@ -67,18 +110,19 @@ function ClientSupport() {
           <button
             type='submit'
             className='w-full py-2 px-4 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition-colors'
+            disabled={loading}
           >
-            Send Message
+            {loading ? "Sending..." : "Send Message"}
           </button>
         </form>
       )}
       <div className='mt-8 text-center text-gray-500 dark:text-yellow-100 text-sm'>
         Or email us directly at{" "}
         <a
-          href='mailto:support@kapee.com'
+          href='mailto:i08690199@gmail.com'
           className='text-yellow-600 dark:text-yellow-300 underline'
         >
-          support@kapee.com
+          i08690199@gmail.com
         </a>
       </div>
     </div>

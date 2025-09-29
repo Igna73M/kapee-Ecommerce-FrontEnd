@@ -132,7 +132,7 @@ function Dashboard() {
                 {brandCount}
               </div>
               <div className='text-sm text-gray-700 dark:text-yellow-100'>
-                Brands
+                Categories
               </div>
             </div>
             <div className='bg-purple-100 dark:bg-purple-900 rounded p-4 text-center'>

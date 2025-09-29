@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import TopBanner from "@/components/TopBanner";
 import HeroSection from "@/components/HeroSection";
 import BannerSection from "@/components/BannerSection";
@@ -12,8 +13,9 @@ import BrandsSection from "@/components/BrandsSection";
 import ProductTabs from "@/components/ProductTabs";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import { products } from "@/data/products";
 import { Product } from "@/types/product";
+
+import Login from "@/components/Login";
 
 interface IndexProps {
   addToCart: (product: Product, quantity?: number) => void;
@@ -43,9 +45,65 @@ const Index = ({
     }
   }, []);
 
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check login status using token or cookies
+    const token =
+      localStorage.getItem("token") || localStorage.getItem("accessToken");
+    const cookies = document.cookie;
+    const hasUserRole = cookies.includes("userRole=");
+    const hasUsername = cookies.includes("username=");
+    const loggedIn = !!token || !hasUserRole || !hasUsername;
+    setIsLoggedIn(loggedIn);
+    setShowLogin(!loggedIn);
+  }, []);
+
+  useEffect(() => {
+    // Always sync localCart with backend on render
+    const syncLocalCartWithBackend = async () => {
+      const localCartRaw = localStorage.getItem("localCart");
+      let localCart: { product: Product; quantity: number }[] = [];
+      try {
+        localCart = localCartRaw ? JSON.parse(localCartRaw) : [];
+      } catch {
+        localCart = [];
+      }
+      const token =
+        localStorage.getItem("token") || localStorage.getItem("accessToken");
+      if (localCart.length > 0 && token) {
+        try {
+          await axios.post(
+            "http://localhost:5000/api_v1/carts/add",
+            {
+              items: localCart.map((item) => ({
+                product: item.product._id,
+                quantity: item.quantity,
+              })),
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          localStorage.removeItem("localCart");
+        } catch (err) {
+          // Optionally handle sync error
+        }
+      }
+    };
+
+    syncLocalCartWithBackend();
+
+    axios
+      .get("http://localhost:5000/api_v1/products")
+      .then((res) => setProducts(res.data))
+      .catch(() => setProducts([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -60,9 +118,12 @@ const Index = ({
   // Show first 6 products as "Hot Deals"
   const hotDeals = products.slice(0, 6);
 
+  // Show login modal if not logged in
+
   return (
     <div className='min-h-screen bg-background dark:bg-gray-900'>
       <TopBanner />
+      {showLogin && <Login open={true} onClose={() => setShowLogin(false)} />}
 
       <main className='max-w-7xl mx-auto py-8 px-4'>
         <div className='grid lg:grid-cols-4 gap-8'>
@@ -75,11 +136,7 @@ const Index = ({
             <HeroSection addToCart={addToCart} openCart={openCart} />
 
             {/* Banner Section */}
-            <BannerSection
-              addToCart={addToCart}
-              openCart={openCart}
-              products={products}
-            />
+            <BannerSection addToCart={addToCart} openCart={openCart} />
 
             {/* Hot Deals Section */}
             <section>
@@ -103,12 +160,8 @@ const Index = ({
                 {/* Featured Hot Deal - Left Side */}
                 <div>
                   <FeaturedHotDeal
-                    product={hotDeals[0]}
                     onProductClick={handleProductClick}
-                    addToCart={(product, quantity) => {
-                      addToCart(product, quantity);
-                      openCart();
-                    }}
+                    addToCart={addToCart}
                   />
                 </div>
 
@@ -116,13 +169,10 @@ const Index = ({
                 <div className='grid grid-cols-2 gap-4'>
                   {hotDeals.slice(1, 5).map((product) => (
                     <HotDealCard
-                      key={product.id}
+                      key={product._id}
                       product={product}
                       onProductClick={handleProductClick}
-                      addToCart={(p, q) => {
-                        addToCart(p, q);
-                        openCart();
-                      }}
+                      addToCart={addToCart}
                       wishlist={wishlist}
                       toggleWishlist={toggleWishlist}
                     />
@@ -132,11 +182,7 @@ const Index = ({
             </section>
 
             {/* Best Selling Products Section */}
-            <BestSellingSection
-              onProductClick={handleProductClick}
-              wishlist={wishlist}
-              toggleWishlist={toggleWishlist}
-            />
+            <BestSellingSection />
           </div>
         </div>
 
@@ -157,10 +203,7 @@ const Index = ({
         product={selectedProduct}
         isOpen={isModalOpen}
         onClose={closeModal}
-        addToCart={(product, quantity) => {
-          addToCart(product, quantity);
-          openCart();
-        }}
+        addToCart={addToCart}
         openCart={openCart}
         wishlist={wishlist}
         toggleWishlist={toggleWishlist}
@@ -168,5 +211,4 @@ const Index = ({
     </div>
   );
 };
-
 export default Index;

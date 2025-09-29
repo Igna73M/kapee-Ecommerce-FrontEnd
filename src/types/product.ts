@@ -1,5 +1,5 @@
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -10,10 +10,11 @@ export interface Product {
   features?: string[];
   rating?: number;
   inStock?: boolean;
+  quantity?: number;
 }
 
 export interface Category {
-  id: string;
+  _id: string;
   name: string;
   icon?: string;
 }

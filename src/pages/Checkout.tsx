@@ -4,77 +4,167 @@ import TopBanner from "@/components/TopBanner";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Product } from "@/types/product";
+import axios from "axios";
 
 type CartItem = {
   product: Product;
   quantity: number;
 };
 
-type CheckoutProps = {
-  cart?: CartItem[];
-  onPlaceOrder?: (order: {
-    items: CartItem[];
-    shipping: {
-      name: string;
-      email: string;
-      address: string;
-      city: string;
-      postal: string;
-      country: string;
-    };
-    total: number;
-  }) => void;
-};
+function getAccessTokenFromCookies(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
-export default function Checkout({
-  cart: cartProp,
-  onPlaceOrder,
-}: CheckoutProps) {
+function getLocalCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem("localCart");
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export default function Checkout() {
   useEffect(() => {
     const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
-    if (darkMode) {
-      document.body.classList.add("dark");
-    } else {
-      document.body.classList.remove("dark");
-    }
+    document.body.classList.toggle("dark", darkMode);
   }, []);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Try props -> location state -> localStorage -> empty
-  const cartFromState = (location.state as { cart?: CartItem[] } | null)
-    ?.cart as CartItem[] | undefined;
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartId, setCartId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Load cart from prop, location, or localStorage
+  // Fetch cart from backend on mount
   useEffect(() => {
-    let localCart: CartItem[] | null = null;
-    if (typeof window !== "undefined") {
+    async function fetchCart() {
+      setLoading(true);
+      const token = getAccessTokenFromCookies();
       try {
-        const localCartRaw = localStorage.getItem("cart");
-        localCart = localCartRaw ? JSON.parse(localCartRaw) : null;
-      } catch {
-        localCart = null;
+        const res = await axios.get("http://localhost:5000/api_v1/carts/", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (
+          res.data &&
+          Array.isArray(res.data.items) &&
+          res.data.items.length > 0
+        ) {
+          setCartId(res.data._id);
+          const items: CartItem[] = res.data.items.map(
+            (item: { product: Product; quantity: number }) => ({
+              product: item.product,
+              quantity: item.quantity,
+            })
+          );
+          setCart(items);
+        } else {
+          setCart(getLocalCart());
+          setCartId(null);
+        }
+      } catch (err) {
+        setCart(getLocalCart());
+        setCartId(null);
+      } finally {
+        setLoading(false);
       }
     }
-    setCart(cartProp ?? cartFromState ?? localCart ?? []);
-  }, [cartProp, cartFromState]);
+    fetchCart();
+  }, []);
 
-  // Update localStorage when cart changes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("cart", JSON.stringify(cart));
+  // Filter out valid and invalid cart items
+  const validCart = cart.filter(
+    (it) => it.product && typeof it.product.price === "number"
+  );
+  const invalidItems = cart.filter((it) => !it.product || !it.product._id);
+
+  // Remove item from cart (backend sync if possible)
+  const handleRemoveItem = async (id: string) => {
+    const token = getAccessTokenFromCookies();
+    if (cartId) {
+      try {
+        await axios.delete("http://localhost:5000/api_v1/carts/remove", {
+          data: { cartId, productId: id },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        // Refresh cart
+        const res = await axios.get("http://localhost:5000/api_v1/carts/", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.data && Array.isArray(res.data.items)) {
+          setCart(
+            res.data.items.map(
+              (item: { product: Product; quantity: number }) => ({
+                product: item.product,
+                quantity: item.quantity,
+              })
+            )
+          );
+        }
+      } catch {
+        // fallback: remove locally
+        setCart((prev) =>
+          prev.filter((it) => it.product && it.product._id !== id)
+        );
+      }
+    } else {
+      setCart((prev) =>
+        prev.filter((it) => it.product && it.product._id !== id)
+      );
     }
-  }, [cart]);
+  };
+
+  // Update quantity (backend sync if possible)
+  const handleQuantityChange = async (id: string, qty: number) => {
+    if (qty < 1) return;
+    const token = getAccessTokenFromCookies();
+    if (cartId) {
+      try {
+        await axios.patch(
+          "http://localhost:5000/api_v1/carts/update",
+          { cartId, productId: id, quantity: qty },
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        );
+        // Refresh cart
+        const res = await axios.get("http://localhost:5000/api_v1/carts/", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (res.data && Array.isArray(res.data.items)) {
+          setCart(
+            res.data.items.map(
+              (item: { product: Product; quantity: number }) => ({
+                product: item.product,
+                quantity: item.quantity,
+              })
+            )
+          );
+        }
+      } catch {
+        // fallback: update locally
+        setCart((prev) =>
+          prev.map((it) =>
+            it.product && it.product._id === id ? { ...it, quantity: qty } : it
+          )
+        );
+      }
+    } else {
+      setCart((prev) =>
+        prev.map((it) =>
+          it.product && it.product._id === id ? { ...it, quantity: qty } : it
+        )
+      );
+    }
+  };
 
   const subtotal = useMemo(
     () =>
-      cart.reduce(
+      validCart.reduce(
         (sum, it) => sum + (it.product?.price ?? 0) * (it.quantity ?? 0),
         0
       ),
-    [cart]
+    [validCart]
   );
 
   // Simple form state
@@ -92,59 +182,76 @@ export default function Checkout({
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
 
-  // Remove item from cart
-  const handleRemoveItem = (id: string | number) => {
-    const updated = cart.filter((it) => it.product.id !== id);
-    setCart(updated);
-  };
-
-  // Update quantity
-  const handleQuantityChange = (id: string | number, qty: number) => {
-    if (qty < 1) return;
-    setCart((prev) =>
-      prev.map((it) => (it.product.id === id ? { ...it, quantity: qty } : it))
-    );
-  };
-
+  // Place order (send to backend)
   const handlePlaceOrder = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setError(null);
 
-    if (cart.length === 0) {
+    if (validCart.length === 0) {
       setError("Your cart is empty.");
+      return;
+    }
+    if (invalidItems.length > 0) {
+      setError(
+        "Please remove unavailable items from your cart before placing the order."
+      );
       return;
     }
     if (!name || !email || !address || !city || !postal || !country) {
       setError("Please fill all shipping fields.");
       return;
     }
-    // Demo: Validate payment fields
     if (!cardNumber || !expiry || !cvc) {
       setError("Please fill all payment fields.");
       return;
     }
 
-    const order = {
-      items: cart,
-      shipping: { name, email, address, city, postal, country },
-      total: subtotal,
-    };
+    // Use cartId if available, else send items array
+    const orderPayload = cartId
+      ? {
+          cartId,
+          shipping: { name, email, address, city, postal, country },
+        }
+      : {
+          items: validCart.map((it) => ({
+            product: it.product._id,
+            quantity: it.quantity,
+            price: it.product.price,
+          })),
+          shipping: { name, email, address, city, postal, country },
+          total: subtotal,
+        };
 
     setProcessing(true);
 
     try {
-      if (onPlaceOrder) {
-        await Promise.resolve(onPlaceOrder(order));
+      const token = getAccessTokenFromCookies();
+      await axios.post("http://localhost:5000/api_v1/orders/", orderPayload, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      // Delete cart from backend if cartId exists
+      if (cartId && token) {
+        try {
+          await axios.delete("http://localhost:5000/api_v1/carts/", {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { cartId },
+          });
+        } catch {
+          // Ignore backend cart delete errors
+        }
       }
+
+      // Always remove localCart from localStorage
       if (typeof window !== "undefined") {
         try {
-          localStorage.removeItem("cart");
+          localStorage.removeItem("localCart");
         } catch {
           // Ignore localStorage errors
         }
       }
       setCart([]);
-      navigate("/order-success", { state: { order } });
+      navigate("/order-success", { state: { order: orderPayload } });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to place order.");
     } finally {
@@ -161,10 +268,101 @@ export default function Checkout({
           Checkout
         </h1>
 
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+        {/* Responsive: Order summary first on mobile, side on desktop */}
+        <div className='flex flex-col md:grid md:grid-cols-3 gap-8'>
+          {/* Order summary */}
+          <aside className='bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm mb-8 md:mb-0 md:order-2 md:col-span-1'>
+            <h2 className='text-lg font-medium mb-4 text-gray-900 dark:text-yellow-100'>
+              Order summary
+            </h2>
+
+            {loading ? (
+              <div className='text-sm text-muted-foreground dark:text-yellow-100'>
+                Loading cart...
+              </div>
+            ) : validCart.length === 0 ? (
+              <div className='text-sm text-muted-foreground dark:text-yellow-100'>
+                Your cart is empty.
+              </div>
+            ) : (
+              <div className='space-y-4'>
+                {validCart.map((it) => (
+                  <div
+                    key={it.product._id}
+                    className='flex flex-col items-center gap-3'
+                  >
+                    {/* Image always on top */}
+                    <div className='w-full h-32 bg-muted dark:bg-gray-700 rounded overflow-hidden flex-shrink-0 flex items-center justify-center mb-2'>
+                      {it.product.image ? (
+                        <img
+                          src={it.product.image}
+                          alt={it.product.name}
+                          className='w-auto h-full object-contain'
+                        />
+                      ) : (
+                        <div className='w-full h-full flex items-center justify-center text-xs text-muted-foreground dark:text-yellow-100'>
+                          img
+                        </div>
+                      )}
+                    </div>
+
+                    <div className='flex flex-col w-full items-center'>
+                      <div className='font-medium text-sm text-gray-900 dark:text-yellow-100 text-center'>
+                        {it.product.name}
+                      </div>
+                      <div className='text-xs text-muted-foreground dark:text-yellow-100 flex items-center gap-2 justify-center'>
+                        Qty:{" "}
+                        <input
+                          type='number'
+                          min={1}
+                          value={it.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              it.product._id,
+                              Number(e.target.value)
+                            )
+                          }
+                          className='w-12 border dark:border-gray-700 rounded px-1 py-0.5 text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
+                        />
+                        × ${Number(it.product.price ?? 0).toFixed(2)}
+                      </div>
+                    </div>
+
+                    <div className='font-medium text-gray-900 dark:text-yellow-100'>
+                      ${((it.product.price ?? 0) * it.quantity).toFixed(2)}
+                    </div>
+                    <button
+                      type='button'
+                      aria-label='Remove item'
+                      className='mt-2 text-red-500 dark:text-red-400 hover:underline text-xs'
+                      onClick={() => handleRemoveItem(it.product._id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+
+                <div className='border-t dark:border-gray-700 pt-4'>
+                  <div className='flex justify-between text-sm text-gray-900 dark:text-yellow-100'>
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className='flex justify-between text-sm mt-2 text-gray-900 dark:text-yellow-100'>
+                    <span>Shipping</span>
+                    <span>—</span>
+                  </div>
+                  <div className='flex justify-between text-lg font-bold mt-4 text-gray-900 dark:text-yellow-100'>
+                    <span>Total</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </aside>
+
           {/* Shipping form */}
           <form
-            className='md:col-span-2 bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm'
+            className='bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm md:col-span-2 md:order-1'
             onSubmit={handlePlaceOrder}
             autoComplete='off'
           >
@@ -175,6 +373,13 @@ export default function Checkout({
             {error && (
               <div className='mb-4 text-sm text-red-600 dark:text-red-400'>
                 {error}
+              </div>
+            )}
+
+            {invalidItems.length > 0 && (
+              <div className='mb-4 text-sm text-red-600 dark:text-red-400'>
+                Some items in your cart are no longer available. Please remove
+                them before placing your order.
               </div>
             )}
 
@@ -235,8 +440,8 @@ export default function Checkout({
                 Payment
               </h3>
               <p className='text-sm text-muted-foreground dark:text-yellow-100 mb-3'>
-                This demo does not process payments. Add payment integration
-                where indicated.
+                payment details are simulated for demo purposes. Use any card
+                number.
               </p>
 
               <div className='space-y-3'>
@@ -278,9 +483,15 @@ export default function Checkout({
             <div className='mt-6 flex items-center gap-3'>
               <button
                 type='submit'
-                disabled={processing || cart.length === 0}
+                disabled={
+                  processing ||
+                  validCart.length === 0 ||
+                  invalidItems.length > 0
+                }
                 className={`px-4 py-2 rounded text-white ${
-                  processing || cart.length === 0
+                  processing ||
+                  validCart.length === 0 ||
+                  invalidItems.length > 0
                     ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
                     : "bg-primary hover:bg-primary/90"
                 }`}
@@ -299,88 +510,6 @@ export default function Checkout({
               </button>
             </div>
           </form>
-
-          {/* Order summary */}
-          <aside className='bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm'>
-            <h2 className='text-lg font-medium mb-4 text-gray-900 dark:text-yellow-100'>
-              Order summary
-            </h2>
-
-            {cart.length === 0 ? (
-              <div className='text-sm text-muted-foreground dark:text-yellow-100'>
-                Your cart is empty.
-              </div>
-            ) : (
-              <div className='space-y-4'>
-                {cart.map((it) => (
-                  <div key={it.product.id} className='flex items-center gap-3'>
-                    <div className='w-14 h-14 bg-muted dark:bg-gray-700 rounded overflow-hidden flex-shrink-0'>
-                      {it.product.image ? (
-                        <img
-                          src={it.product.image}
-                          alt={it.product.name}
-                          className='w-full h-full object-cover'
-                        />
-                      ) : (
-                        <div className='w-full h-full flex items-center justify-center text-xs text-muted-foreground dark:text-yellow-100'>
-                          img
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='flex-1'>
-                      <div className='font-medium text-sm text-gray-900 dark:text-yellow-100'>
-                        {it.product.name}
-                      </div>
-                      <div className='text-xs text-muted-foreground dark:text-yellow-100 flex items-center gap-2'>
-                        Qty:{" "}
-                        <input
-                          type='number'
-                          min={1}
-                          value={it.quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              it.product.id,
-                              Number(e.target.value)
-                            )
-                          }
-                          className='w-12 border dark:border-gray-700 rounded px-1 py-0.5 text-xs bg-white dark:bg-gray-900 text-gray-900 dark:text-yellow-100'
-                        />
-                        × ${Number(it.product.price ?? 0).toFixed(2)}
-                      </div>
-                    </div>
-
-                    <div className='font-medium text-gray-900 dark:text-yellow-100'>
-                      ${((it.product.price ?? 0) * it.quantity).toFixed(2)}
-                    </div>
-                    <button
-                      type='button'
-                      aria-label='Remove item'
-                      className='ml-2 text-red-500 dark:text-red-400 hover:underline text-xs'
-                      onClick={() => handleRemoveItem(it.product.id)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-
-                <div className='border-t dark:border-gray-700 pt-4'>
-                  <div className='flex justify-between text-sm text-gray-900 dark:text-yellow-100'>
-                    <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className='flex justify-between text-sm mt-2 text-gray-900 dark:text-yellow-100'>
-                    <span>Shipping</span>
-                    <span>—</span>
-                  </div>
-                  <div className='flex justify-between text-lg font-bold mt-4 text-gray-900 dark:text-yellow-100'>
-                    <span>Total</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </aside>
         </div>
       </main>
 

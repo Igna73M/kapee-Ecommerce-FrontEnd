@@ -1,7 +1,6 @@
 import { Search, ShoppingCart, User, Heart, Menu } from "lucide-react";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
-
 import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import CategorySidebar from "../components/CategorySidebar";
@@ -21,6 +20,8 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
   const [showLogin, setShowLogin] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [wishlistState, setWishlistState] = useState<string[]>([]);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
 
   // Helper to get cookie value
   function getCookie(name: string) {
@@ -35,6 +36,43 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
     setUsername(getCookie("username"));
   }, []);
 
+  // Wishlist sync: fetch from backend if logged in, else from localStorage
+  useEffect(() => {
+    async function fetchWishlist() {
+      setLoadingWishlist(true);
+      const accessToken = getCookie("accessToken");
+      if (accessToken) {
+        try {
+          const res = await axios.get("http://localhost:5000/api_v1/wishlist", {
+            withCredentials: true,
+          });
+          if (Array.isArray(res.data?.wishlist)) {
+            setWishlistState(res.data.wishlist);
+            localStorage.setItem("wishlist", JSON.stringify(res.data.wishlist));
+          } else {
+            setWishlistState([]);
+            localStorage.setItem("wishlist", "[]");
+          }
+        } catch (err) {
+          setWishlistState([]);
+          Notify.failure("Failed to fetch wishlist");
+        }
+      } else {
+        // Not logged in: use localStorage
+        try {
+          const localWishlist = JSON.parse(
+            localStorage.getItem("wishlist") || "[]"
+          );
+          setWishlistState(Array.isArray(localWishlist) ? localWishlist : []);
+        } catch {
+          setWishlistState([]);
+        }
+      }
+      setLoadingWishlist(false);
+    }
+    fetchWishlist();
+  }, [username, showLogin]);
+
   // Calculate cart item count and total value
   const cartCount = Array.isArray(cart)
     ? cart.reduce((sum, item) => sum + (item.quantity || 0), 0)
@@ -47,7 +85,8 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
     : 0;
 
   // Calculate wishlist count
-  const wishlistCount = Array.isArray(wishlist) ? wishlist.length : 0;
+  const wishlistCount = Array.isArray(wishlistState) ? wishlistState.length : 0;
+
   // Only show header if not on dashboard or return routes
   if (
     location.pathname.startsWith("/dashboard") ||
@@ -128,29 +167,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 />
                 <select className='bg-muted dark:bg-gray-700 px-4 border-l dark:border-gray-700 text-sm outline-none min-w-[110px] text-gray-900 dark:text-yellow-100'>
                   <option>All Categories</option>
-                  <option value='shirt'>Shirt</option>
-                  <option value='electronics'>Electronics</option>
-                  <option value='furniture'>Furniture</option>
-                  <option value='shoes'>Shoes</option>
-                  <option value='watches'>Watches</option>
-                  <option value='bags'>Bags</option>
-                  <option value='jewelry'>Jewelry</option>
-                  <option value='toys'>Toys</option>
-                  <option value='kids'>Kids</option>
-                  <option value='home-appliances'>Home Appliances</option>
-                  <option value='sports'>Sports</option>
-                  <option value='outdoor'>Outdoor</option>
-                  <option value='automotive'>Automotive</option>
-                  <option value='health-beauty'>Health & Beauty</option>
-                  <option value='groceries'>Groceries</option>
-                  <option value='pets'>Pets</option>
-                  <option value='books'>Books</option>
-                  <option value='music'>Music</option>
-                  <option value='movies'>Movies</option>
-                  <option value='games'>Games</option>
-                  <option value='software'>Software</option>
-                  <option value='services'>Services</option>
-                  <option value='others'>Others</option>
+                  {/* ...other options... */}
                 </select>
                 <button
                   className='rounded-md px-6 bg-foreground dark:bg-yellow-500 text-background dark:text-gray-900 hover:bg-foreground/90 dark:hover:bg-yellow-400'
@@ -182,12 +199,29 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 {/* User dropdown menu */}
                 {username && showUserMenu && (
                   <div className='absolute top-full right-0 mt-2 w-40 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded shadow-lg z-50 flex flex-col'>
-                    <a
-                      href='/dashboard'
-                      className='px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 border-b dark:border-gray-700 text-sm text-black dark:text-yellow-100'
+                    <button
+                      className='px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 border-b dark:border-gray-700 text-sm text-black dark:text-yellow-100'
+                      onClick={() => {
+                        function getCookie(name: string) {
+                          const value = `; ${document.cookie}`;
+                          const parts = value.split(`; ${name}=`);
+                          if (parts.length === 2)
+                            return parts.pop()?.split(";").shift() || null;
+                          return null;
+                        }
+                        const userRole = getCookie("userRole");
+                        if (userRole === "admin") {
+                          window.location.href = "/dashboard";
+                        } else if (userRole === "user") {
+                          window.location.href = "/client-dashboard";
+                        } else {
+                          setShowLogin(true);
+                        }
+                        setShowUserMenu(false);
+                      }}
                     >
                       Dashboard
-                    </a>
+                    </button>
                     <button
                       className='px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-black dark:text-yellow-100'
                       onClick={async () => {
@@ -204,15 +238,14 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                           Notify.failure("Logout Failed");
                           console.error("Logout error:", err);
                         }
-                        // Remove cookies by setting expiry in the past
                         document.cookie =
                           "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                         document.cookie =
                           "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                        // Remove all user settings from localStorage/sessionStorage
+                        document.cookie =
+                          "userRole=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                         localStorage.removeItem("dashboardDarkMode");
                         localStorage.removeItem("email");
-                        // If you store other settings, remove them here as well
                         sessionStorage.clear();
                         setShowUserMenu(false);
                         window.location.reload();
@@ -234,6 +267,11 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   {wishlistCount > 0 && (
                     <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-primary dark:bg-yellow-500 text-primary-foreground dark:text-gray-900 text-xs'>
                       {wishlistCount}
+                    </span>
+                  )}
+                  {loadingWishlist && (
+                    <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-gray-300 dark:bg-gray-700 text-xs animate-pulse'>
+                      ...
                     </span>
                   )}
                 </button>
@@ -295,18 +333,12 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 >
                   SHOP
                 </Link>
-                <span className='font-medium hover:text-primary dark:hover:text-yellow-400 smooth-transition cursor-pointer text-xs md:text-base text-gray-900 dark:text-yellow-100'>
-                  PAGES
-                </span>
                 <Link
                   to='/blog'
                   className='font-medium hover:text-primary dark:hover:text-yellow-400 smooth-transition text-xs md:text-base text-gray-900 dark:text-yellow-100'
                 >
                   BLOG
                 </Link>
-                <span className='font-medium hover:text-primary dark:hover:text-yellow-400 smooth-transition cursor-pointer text-xs md:text-base text-gray-900 dark:text-yellow-100'>
-                  ELEMENTS
-                </span>
               </div>
               <Link to='/checkout'>
                 <button className='bg-primary text-primary-foreground dark:bg-yellow-500 dark:text-gray-900 hover:bg-primary/90 dark:hover:bg-yellow-400 px-4 lg:px-6 text-xs md:text-base inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium py-2'>
@@ -343,9 +375,6 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 >
                   SHOP
                 </Link>
-                <span className='font-medium hover:text-primary dark:hover:text-yellow-400 smooth-transition cursor-pointer text-xs text-gray-900 dark:text-yellow-100'>
-                  PAGES
-                </span>
                 <Link
                   to='/blog'
                   className='font-medium hover:text-primary dark:hover:text-yellow-400 smooth-transition text-xs text-gray-900 dark:text-yellow-100'
@@ -353,9 +382,6 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 >
                   BLOG
                 </Link>
-                <span className='font-medium hover:text-primary dark:hover:text-yellow-400 smooth-transition cursor-pointer text-xs text-gray-900 dark:text-yellow-100'>
-                  ELEMENTS
-                </span>
                 <button
                   className='bg-primary text-primary-foreground dark:bg-yellow-500 dark:text-gray-900 hover:bg-primary/90 dark:hover:bg-yellow-400 px-4 text-xs py-1'
                   type='button'

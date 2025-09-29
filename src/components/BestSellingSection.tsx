@@ -1,20 +1,110 @@
-import { Heart, Star } from "lucide-react";
-import { products } from "@/data/products";
+import { Heart } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Product } from "@/types/product";
+import { useNavigate } from "react-router-dom";
+import ProductModal from "./ProductModal"; // Import your modal
 
-interface BestSellingSectionProps {
-  onProductClick: (product: Product) => void;
-  wishlist?: string[];
-  toggleWishlist?: (productId: string) => void;
+interface BrandCategory {
+  _id: string;
+  name: string;
 }
 
-const BestSellingSection = ({
-  onProductClick,
-  wishlist = [],
-  toggleWishlist,
-}: BestSellingSectionProps) => {
-  // Show products 3-8 as best selling (different from hot deals)
+const BestSellingSection = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [brandCategories, setBrandCategories] = useState<BrandCategory[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [wishlistUpdatingId, setWishlistUpdatingId] = useState<string | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  // Modal state
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Helper to get category name by _id
+  const getCategoryName = (categoryId: string) => {
+    const cat = brandCategories.find((c) => c._id === categoryId);
+    return cat ? cat.name : "Unknown";
+  };
+
+  function getAccessTokenFromCookie() {
+    const match = document.cookie.match(/(?:^|; )accessToken=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  useEffect(() => {
+    setLoading(true);
+
+    const fetchAll = async () => {
+      try {
+        const [productsRes, categoriesRes] = await Promise.all([
+          axios.get("http://localhost:5000/api_v1/products"),
+          axios.get("http://localhost:5000/api_v1/brand-categories"),
+        ]);
+        setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
+        setBrandCategories(
+          Array.isArray(categoriesRes.data) ? categoriesRes.data : []
+        );
+      } catch {
+        setProducts([]);
+        setBrandCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAll();
+  }, []);
+
+  // Only use wishlist for toggling, not for display
+  const toggleWishlist = async (productId: string) => {
+    setWishlistUpdatingId(productId);
+    const token = getAccessTokenFromCookie();
+    try {
+      let updatedWishlist: string[];
+      if (wishlist.includes(productId)) {
+        await axios.delete(
+          `http://localhost:5000/api_v1/wishlist/${productId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          }
+        );
+        updatedWishlist = wishlist.filter((id) => id !== productId);
+      } else {
+        await axios.post(
+          "http://localhost:5000/api_v1/wishlist/add",
+          { productId },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          }
+        );
+        updatedWishlist = [...wishlist, productId];
+      }
+      setWishlist(updatedWishlist);
+      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
+    } catch {
+      // Silently fail, do not block UI
+    } finally {
+      setWishlistUpdatingId(null);
+    }
+  };
+
+  // Best selling: products 3-8
   const bestSellingProducts = products.slice(3, 9);
+
+  const openProductModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const closeProductModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
+  };
 
   const BestSellingCard = ({ product }: { product: Product }) => {
     const discountPercentage = product.originalPrice
@@ -24,11 +114,16 @@ const BestSellingSection = ({
         )
       : 0;
 
-    // Mock data for sold/available quantities
-    const soldQuantity = 50;
-    const availableQuantity = 75;
-    const totalQuantity = soldQuantity + availableQuantity;
-    const progressValue = (soldQuantity / totalQuantity) * 100;
+    const isWishlistUpdating = wishlistUpdatingId === product._id;
+
+    const handleToggleWishlist = async () => {
+      await toggleWishlist(product._id);
+    };
+
+    // Use modal instead of navigation
+    const handleViewProduct = () => {
+      openProductModal(product);
+    };
 
     return (
       <div className='bg-card dark:bg-gray-800 rounded-lg border-2 border-yellow-400 dark:border-yellow-600 hover:shadow-lg transition-all duration-300 group relative overflow-hidden h-full'>
@@ -44,28 +139,33 @@ const BestSellingSection = ({
           className='absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 dark:bg-gray-900/80 hover:bg-background dark:hover:bg-gray-800 rounded-full p-2'
           onClick={(e) => {
             e.stopPropagation();
-            if (toggleWishlist) toggleWishlist(product.id);
+            handleToggleWishlist();
           }}
           aria-label={
-            wishlist.includes(product.id)
+            wishlist.includes(product._id)
               ? "Remove from wishlist"
               : "Add to wishlist"
           }
           type='button'
+          disabled={isWishlistUpdating}
         >
-          <Heart
-            className={`h-4 w-4 ${
-              wishlist.includes(product.id)
-                ? "text-red-500 fill-red-500"
-                : "dark:text-yellow-100"
-            }`}
-          />
+          {isWishlistUpdating ? (
+            <span className='loader h-4 w-4' />
+          ) : (
+            <Heart
+              className={`h-4 w-4 ${
+                wishlist.includes(product._id)
+                  ? "text-red-500 fill-red-500"
+                  : "dark:text-yellow-100"
+              }`}
+            />
+          )}
         </button>
 
         {/* Product Image */}
         <div
           className='aspect-square overflow-hidden bg-muted dark:bg-gray-700 cursor-pointer'
-          onClick={() => onProductClick(product)}
+          onClick={handleViewProduct}
         >
           <img
             src={product.image}
@@ -78,13 +178,13 @@ const BestSellingSection = ({
         <div className='p-4 space-y-3'>
           {/* Category */}
           <div className='text-xs text-primary dark:text-yellow-400 font-medium uppercase tracking-wide'>
-            {product.category}
+            {getCategoryName(product.category)}
           </div>
 
           {/* Product Name */}
           <h3
             className='font-semibold text-lg leading-tight cursor-pointer hover:text-primary dark:hover:text-yellow-400 transition-colors text-gray-900 dark:text-yellow-100'
-            onClick={() => onProductClick(product)}
+            onClick={handleViewProduct}
           >
             {product.name}
           </h3>
@@ -92,7 +192,7 @@ const BestSellingSection = ({
           {/* Price */}
           <div className='flex items-center gap-2'>
             <span className='text-xl font-bold text-foreground dark:text-yellow-100'>
-              ${product.price}.00
+              ${product.price?.toFixed(2) ?? "0.00"}
             </span>
             {product.originalPrice &&
               product.originalPrice !== product.price && (
@@ -101,40 +201,41 @@ const BestSellingSection = ({
                     {" "}
                     –{" "}
                   </span>
-                  <span className='text-xl font-bold text-foreground dark:text-yellow-100'>
-                    ${product.originalPrice}.00
+                  <span className='text-xl font-bold text-foreground dark:text-yellow-100 line-through'>
+                    ${product.originalPrice?.toFixed(2) ?? "0.00"}
                   </span>
                 </>
               )}
           </div>
 
-          {/* Availability Progress */}
+          {/* Availability */}
           <div className='space-y-2'>
-            <div className='flex justify-between text-sm'>
-              <span className='text-muted-foreground dark:text-yellow-100'>
-                Already Sold:{" "}
-                <span className='font-semibold text-foreground dark:text-yellow-100'>
-                  {soldQuantity}
+            {product.inStock === false ? (
+              <div className='flex justify-between text-sm'>
+                <span className='text-muted-foreground dark:text-yellow-100'>
+                  Already Sold
                 </span>
-              </span>
-              <span className='text-muted-foreground dark:text-yellow-100'>
-                Available:{" "}
-                <span className='font-semibold text-foreground dark:text-yellow-100'>
-                  {availableQuantity}
+              </div>
+            ) : (
+              <div className='flex justify-between text-sm'>
+                <span className='text-muted-foreground dark:text-yellow-100'>
+                  In Stock
                 </span>
-              </span>
-            </div>
-            <div className='w-full bg-gray-200 dark:bg-gray-700 rounded h-2 overflow-hidden'>
-              <div
-                className='bg-yellow-400 dark:bg-yellow-600 h-2 rounded'
-                style={{ width: `${progressValue}%` }}
-              />
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     );
   };
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center min-h-[250px]'>
+        <span>Loading best selling products...</span>
+      </div>
+    );
+  }
 
   return (
     <section className='space-y-6'>
@@ -145,6 +246,9 @@ const BestSellingSection = ({
         <button
           className='border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-semibold transition-colors duration-150 text-gray-900 dark:text-yellow-100'
           type='button'
+          onClick={() => {
+            /* navigate("/shop") */
+          }}
         >
           View All
         </button>
@@ -152,9 +256,18 @@ const BestSellingSection = ({
 
       <div className='grid grid-cols-2 lg:grid-cols-3 gap-4'>
         {bestSellingProducts.map((product) => (
-          <BestSellingCard key={product.id} product={product} />
+          <BestSellingCard key={product._id} product={product} />
         ))}
       </div>
+
+      {/* Product Modal */}
+      <ProductModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={closeProductModal}
+        wishlist={wishlist}
+        toggleWishlist={toggleWishlist}
+      />
     </section>
   );
 };

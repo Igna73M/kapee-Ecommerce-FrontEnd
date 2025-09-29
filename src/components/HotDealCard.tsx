@@ -1,5 +1,12 @@
 import { Heart, Star, Shuffle, ShoppingCart, ZoomIn } from "lucide-react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Product } from "../types/product";
+
+interface BrandCategory {
+  _id: string;
+  name: string;
+}
 
 interface HotDealCardProps {
   product: Product;
@@ -9,6 +16,26 @@ interface HotDealCardProps {
   toggleWishlist?: (productId: string) => void;
 }
 
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()!.split(";").shift() || null;
+  return null;
+}
+
+function getLocalWishlist(): string[] {
+  try {
+    const raw = localStorage.getItem("wishlist");
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setLocalWishlist(wishlist: string[]) {
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+}
+
 const HotDealCard = ({
   product,
   onProductClick,
@@ -16,6 +43,82 @@ const HotDealCard = ({
   wishlist = [],
   toggleWishlist,
 }: HotDealCardProps) => {
+  const [brandCategories, setBrandCategories] = useState<BrandCategory[]>([]);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [wishlistUpdating, setWishlistUpdating] = useState(false);
+  const [localWishlist, setLocalWishlistState] = useState<string[]>(
+    getLocalWishlist()
+  );
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api_v1/brand-categories")
+      .then((res) => setBrandCategories(res.data))
+      .catch(() => setBrandCategories([]));
+  }, []);
+
+  // Get category name from _id
+  const getCategoryName = (categoryId: string) => {
+    const cat = brandCategories.find((c) => c._id === categoryId);
+    return cat ? cat.name : categoryId;
+  };
+
+  // Use addToCart from props (parent handles backend and state)
+  const handleAddToCart = async () => {
+    if (!addToCart) return;
+    setAddingToCart(true);
+    await addToCart(product, 1);
+    setAddingToCart(false);
+  };
+
+  // Wishlist handler (sync localStorage + backend)
+  const handleToggleWishlist = async () => {
+    setWishlistUpdating(true);
+    const accessToken = getCookie("accessToken");
+    let updatedWishlist: string[] = [...localWishlist];
+    const isCurrentlyWishlisted = updatedWishlist.includes(product._id);
+
+    // Optimistic UI update
+    if (isCurrentlyWishlisted) {
+      updatedWishlist = updatedWishlist.filter((id) => id !== product._id);
+    } else {
+      updatedWishlist = [...updatedWishlist, product._id];
+    }
+    setLocalWishlist(updatedWishlist);
+    setLocalWishlistState(updatedWishlist);
+
+    // Backend sync
+    try {
+      if (accessToken) {
+        if (!isCurrentlyWishlisted) {
+          await axios.post(
+            "http://localhost:5000/api_v1/wishlist/add",
+            { productId: product._id },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+        } else {
+          await axios.delete(
+            `http://localhost:5000/api_v1/wishlist/remove/${product._id}`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+        }
+        setLocalWishlist(updatedWishlist);
+        setLocalWishlistState(updatedWishlist);
+      }
+    } catch {
+      // On error, revert localStorage to previous state
+      const prevWishlist = getLocalWishlist();
+      setLocalWishlist(prevWishlist);
+      setLocalWishlistState(prevWishlist);
+    }
+    setWishlistUpdating(false);
+
+    // If parent provided toggleWishlist, call it for UI sync
+    if (toggleWishlist) {
+      await toggleWishlist(product._id);
+    }
+  };
+
   const discountPercentage = product.originalPrice
     ? Math.round(
         ((product.originalPrice - product.price) / product.originalPrice) * 100
@@ -43,23 +146,26 @@ const HotDealCard = ({
         className='absolute bg-white/80 dark:bg-gray-900/80 hover:bg-red-100 dark:hover:bg-yellow-600 rounded-full p-2 duration-150 shadow top-3 right-3 z-10 opacity-0 group-hover:opacity-100 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium focus-visible:outline-none focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0'
         onClick={(e) => {
           e.stopPropagation();
-          if (toggleWishlist) {
-            toggleWishlist(product.id);
-          }
+          handleToggleWishlist();
         }}
         aria-label={
-          wishlist?.includes(product.id)
+          localWishlist.includes(product._id)
             ? "Remove from wishlist"
             : "Add to wishlist"
         }
+        disabled={wishlistUpdating}
       >
-        <Heart
-          className={`h-4 w-4 ${
-            wishlist?.includes(product.id)
-              ? "text-red-500 fill-red-500"
-              : "text-gray-400 dark:text-yellow-100"
-          }`}
-        />
+        {wishlistUpdating ? (
+          <span className='loader h-4 w-4' />
+        ) : (
+          <Heart
+            className={`h-4 w-4 ${
+              localWishlist.includes(product._id)
+                ? "text-red-500 fill-red-500"
+                : "text-gray-400 dark:text-yellow-100"
+            }`}
+          />
+        )}
       </button>
 
       {/* Product Image */}
@@ -78,7 +184,7 @@ const HotDealCard = ({
       <div className='p-4 space-y-3'>
         {/* Category */}
         <div className='text-xs text-primary dark:text-yellow-400 font-medium uppercase tracking-wide'>
-          {product.category}
+          {getCategoryName(product.category)}
         </div>
 
         {/* Product Name */}
@@ -105,25 +211,6 @@ const HotDealCard = ({
                 ${product.originalPrice}.00
               </span>
             )}
-        </div>
-
-        {/* Action Buttons (show only on hover) */}
-        <div className='flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200'>
-          <button className='w-full py-2 px-4 rounded font-semibold transition-colors duration-150 disabled:opacity-50 mt-2 bg-yellow-400 dark:bg-yellow-600 border-yellow-400 dark:border-yellow-600 text-black dark:text-gray-900 hover:bg-yellow-500 dark:hover:bg-yellow-500 hover:border-yellow-500 dark:hover:border-yellow-500'>
-            <Shuffle className='h-4 w-4' />
-          </button>
-
-          <button
-            className='flex-1 bg-yellow-400 dark:bg-yellow-600 text-black dark:text-gray-900 hover:bg-yellow-500 dark:hover:bg-yellow-500 w-full py-2 px-4 rounded font-semibold transition-colors duration-150 disabled:opacity-50 mt-2'
-            onClick={() => addToCart && addToCart(product, 1)}
-            disabled={!addToCart}
-          >
-            <ShoppingCart className='h-4 w-4 mr-2' />
-          </button>
-
-          <button className='bg-yellow-400 dark:bg-yellow-600 border-yellow-400 dark:border-yellow-600 text-black dark:text-gray-900 hover:bg-yellow-500 dark:hover:bg-yellow-500 hover:border-yellow-500 dark:hover:border-yellow-500 w-full py-2 px-4 rounded font-semibold transition-colors duration-150 disabled:opacity-50 mt-2'>
-            <ZoomIn />
-          </button>
         </div>
       </div>
     </div>

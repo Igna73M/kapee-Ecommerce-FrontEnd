@@ -219,11 +219,11 @@ const Footer = () => {
               <h4 className='font-semibold text-foreground dark:text-yellow-100 mb-4'>
                 NEWSLETTER
               </h4>
-              <p className='text-sm text-muted-foreground dark:text-yellow-100 mb-4'>
+              <p className='text-sm text-muted-foreground dark:text-yellow-100 mb-4 '>
                 Subscribe to our mailing list to get the new updates!
               </p>
 
-              <div className='flex gap-2'>
+              <div className='flex gap-2 justify-center'>
                 <input
                   type='email'
                   placeholder='Your email address'
@@ -238,7 +238,7 @@ const Footer = () => {
               </div>
 
               {/* Social Media Icons */}
-              <div className='flex gap-2 mt-6'>
+              <div className='flex gap-2 mt-6 flex-wrap w-full align-center justify-center'>
                 <button
                   className='bg-blue-600 hover:bg-blue-700 p-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"'
                   type='button'

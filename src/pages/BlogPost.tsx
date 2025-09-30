@@ -70,7 +70,7 @@ const BlogPost = () => {
             />
           </div>
           <div className='text-lg text-muted-foreground dark:text-yellow-100 mb-4'>
-            {post.excerpt}
+            <span dangerouslySetInnerHTML={{ __html: post.excerpt }} />
           </div>
           <div
             className='prose dark:prose-invert max-w-none text-gray-900 dark:text-yellow-100'

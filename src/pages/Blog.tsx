@@ -78,7 +78,7 @@ const Blog = () => {
                     {post.title}
                   </h3>
                   <p className='text-muted-foreground dark:text-yellow-100'>
-                    {post.excerpt}
+                    <span dangerouslySetInnerHTML={{ __html: post.excerpt }} />
                   </p>
                 </div>
               </Link>

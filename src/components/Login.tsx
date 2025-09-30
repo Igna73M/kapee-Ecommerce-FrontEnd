@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Signup from "./Signup";
-
+import ForgotPass from "./ForgotPass";
+import VerifyOTP from "./VerifyOTP";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Notify } from "notiflix";
@@ -15,6 +16,9 @@ export default function Login({ open, onClose }: LoginProps) {
   const [show, setShow] = useState(open);
   const [animate, setAnimate] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [showVerifyOTP, setShowVerifyOTP] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const { register, handleSubmit, reset } = useForm<FormData>();
   const navigate = useNavigate();
@@ -22,10 +26,9 @@ export default function Login({ open, onClose }: LoginProps) {
   useEffect(() => {
     if (open) {
       setShow(true);
-      setTimeout(() => setAnimate(true), 10); // trigger animation
+      setTimeout(() => setAnimate(true), 10);
     } else if (show) {
       setAnimate(false);
-      // Wait for animation to finish before unmounting
       const timeout = setTimeout(() => setShow(false), 250);
       return () => clearTimeout(timeout);
     }
@@ -43,6 +46,34 @@ export default function Login({ open, onClose }: LoginProps) {
       />
     );
   }
+
+  if (showForgot) {
+    return (
+      <ForgotPass
+        open={showForgot}
+        onClose={() => setShowForgot(false)}
+        onOTPSent={(email) => {
+          setForgotEmail(email);
+          setShowForgot(false);
+          setShowVerifyOTP(true);
+        }}
+      />
+    );
+  }
+
+  if (showVerifyOTP) {
+    return (
+      <VerifyOTP
+        open={showVerifyOTP}
+        email={forgotEmail}
+        onClose={() => {
+          setShowVerifyOTP(false);
+          setShow(true);
+        }}
+      />
+    );
+  }
+
   if (!show) return null;
 
   interface FormData {
@@ -66,23 +97,34 @@ export default function Login({ open, onClose }: LoginProps) {
           },
         }
       );
-      // Store username and accessToken in cookies for session
       if (res.data && res.data.user) {
         document.cookie = `username=${res.data.user.username}; path=/`;
         document.cookie = `accessToken=${res.data.user.accessToken}; path=/`;
         document.cookie = `userRole=${res.data.user.userRole}; path=/`;
+
+        // Send login notification email
+        try {
+          await axios.post(
+            "http://localhost:5000/api_v1/user/send-login-email",
+            {
+              email: res.data.user.email,
+            }
+          );
+        } catch (err) {
+          // Optionally handle email send error, but don't block login
+          console.error("Failed to send login email:", err);
+        }
       }
       Notify.success("Login Successful");
       reset();
-      onClose(); // Close the login popup
+      onClose();
       setTimeout(() => {
-        // Redirect based on user role
         if (res.data && res.data.user && res.data.user.userRole === "admin") {
           window.location.href = "/dashboard";
         } else {
           window.location.href = "/client-dashboard";
         }
-      }, 200); // Small delay to allow popup to close
+      }, 200);
     } catch (error) {
       Notify.failure("Login failed");
       reset();
@@ -114,8 +156,6 @@ export default function Login({ open, onClose }: LoginProps) {
           >
             ×
           </button>
-
-          {/* Form section */}
           <form className='space-y-4' onSubmit={handleSubmit(onLogin)}>
             <div>
               <input
@@ -138,15 +178,12 @@ export default function Login({ open, onClose }: LoginProps) {
               />
             </div>
             <div className='flex items-center justify-between'>
-              <label className='flex items-center gap-2 text-sm text-primary font-bold'>
-                <input id='remember' type='checkbox' className='mr-2' />
-                Remember me
-              </label>
               <button
                 type='button'
                 className='text-xs text-primary hover:underline bg-transparent border-0 p-0 font-bold'
+                onClick={() => setShowForgot(true)}
               >
-                Lost your password?
+                Forgot your password?
               </button>
             </div>
             <button

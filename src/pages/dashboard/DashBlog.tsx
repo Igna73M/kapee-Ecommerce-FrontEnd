@@ -305,13 +305,13 @@ function DashBlog() {
                 value={newPost.excerpt}
                 onChange={handleQuillChange}
                 placeholder='Excerpt'
-                className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100'
+                className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100 overflow-auto max-h-40'
               />
               <ReactQuill
                 value={newPost.body}
                 onChange={handleBodyChange}
                 placeholder='Body'
-                className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100'
+                className='bg-white dark:bg-gray-800 rounded text-gray-900 dark:text-yellow-100 overflow-auto max-h-80'
               />
               {/* Drag & drop image only */}
               <div
@@ -331,6 +331,7 @@ function DashBlog() {
               </div>
               <input
                 name='date'
+                type='date'
                 value={newPost.date}
                 onChange={handleNewChange}
                 placeholder='Date'

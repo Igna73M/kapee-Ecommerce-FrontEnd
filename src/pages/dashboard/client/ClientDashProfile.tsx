@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import ResetPass from "../../../components/ResetPass";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -8,10 +9,10 @@ function getCookie(name) {
 }
 
 function ClientProfile() {
+  const [showReset, setShowReset] = useState(false);
   const username = getCookie("username") || "user";
   const email = getCookie("email") || "client@kapee.com";
 
-  // Ensure dark mode is applied on mount if enabled
   useEffect(() => {
     const darkMode = localStorage.getItem("dashboardDarkMode") === "true";
     if (darkMode) {
@@ -60,6 +61,26 @@ function ClientProfile() {
           <span className='text-gray-900 dark:text-yellow-100'>2024-01-01</span>
         </div>
       </div>
+      <button
+        className='mt-8 px-4 py-2 bg-yellow-500 text-white font-semibold rounded hover:bg-yellow-600 transition-colors'
+        onClick={() => setShowReset(true)}
+      >
+        Change Password
+      </button>
+      {showReset && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-gray-900/80'>
+          <div className='relative'>
+            <button
+              className='absolute top-2 right-2 text-xl font-bold text-gray-900 dark:text-yellow-100 bg-transparent border-0'
+              onClick={() => setShowReset(false)}
+              aria-label='Close'
+            >
+              ×
+            </button>
+            <ResetPass />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -70,14 +70,14 @@ function ProtectedRoute({
     if (type === "admin") {
       if (!isLoggedIn || userRole !== "admin") {
         setShowLogin(true);
-        window.location.replace("http://localhost:8080/");
+        window.location.replace("/");
       }
     }
     // For client dashboard
     if (type === "user") {
       if (!isLoggedIn || userRole !== "user") {
         setShowLogin(true);
-        window.location.replace("http://localhost:8080/");
+        window.location.replace("/");
       }
     }
   }, [location.pathname, type]);

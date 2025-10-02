@@ -8,6 +8,7 @@ import ProductModal from "@/components/ProductModal";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Product } from "@/types/product";
+import { Notify } from "notiflix";
 
 interface ShopProps {
   addToCart: (product: Product, quantity?: number) => void;
@@ -20,6 +21,7 @@ interface ShopProps {
 }
 
 const LOCAL_CART_KEY = "localCart";
+const LOCAL_WISHLIST_KEY = "wishlist";
 
 function getLocalCart(): { product: Product; quantity: number }[] {
   try {
@@ -34,13 +36,20 @@ function setLocalCart(cart: { product: Product; quantity: number }[]) {
   localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cart));
 }
 
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
+}
+
 const Shop = ({
   addToCart,
   cart,
   removeFromCart,
   updateCartQuantity,
-  wishlist,
-  toggleWishlist,
+  wishlist: wishlistProp,
+  toggleWishlist: toggleWishlistProp,
   openCart,
 }: ShopProps) => {
   useEffect(() => {
@@ -56,13 +65,55 @@ const Shop = ({
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [wishlist, setWishlist] = useState<string[]>(wishlistProp || []);
 
+  // Fetch products
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api_v1/products")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`)
       .then((res) => setProducts(res.data))
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
+  }, []);
+
+  // Fetch wishlist from backend or localStorage on mount
+  useEffect(() => {
+    const accessToken = getCookie("accessToken");
+    if (accessToken) {
+      axios
+        .get(
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/me`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          if (Array.isArray(res.data?.wishlist)) {
+            setWishlist(res.data.wishlist);
+            localStorage.setItem(
+              LOCAL_WISHLIST_KEY,
+              JSON.stringify(res.data.wishlist)
+            );
+          } else {
+            setWishlist([]);
+            localStorage.setItem(LOCAL_WISHLIST_KEY, "[]");
+          }
+        })
+        .catch(() => {
+          setWishlist([]);
+        });
+    } else {
+      // Not logged in: use localStorage
+      try {
+        const localWishlist = JSON.parse(
+          localStorage.getItem(LOCAL_WISHLIST_KEY) || "[]"
+        );
+        setWishlist(Array.isArray(localWishlist) ? localWishlist : []);
+      } catch {
+        setWishlist([]);
+      }
+    }
   }, []);
 
   const handleProductClick = (product: Product) => {
@@ -77,7 +128,6 @@ const Shop = ({
 
   // Add to cart handler (localStorage + backend)
   const handleAddToCart = async (product: Product, quantity: number = 1) => {
-    // Local cart update
     const localCart = getLocalCart();
     const idx = localCart.findIndex((item) => item.product._id === product._id);
     if (idx > -1) {
@@ -87,23 +137,71 @@ const Shop = ({
     }
     setLocalCart(localCart);
 
-    // Backend cart update if logged in
-    const token = localStorage.getItem("token");
+    const token = getCookie("accessToken");
     if (token) {
       try {
         await axios.post(
-          "http://localhost:5000/api_v1/carts/add",
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
           { productId: product._id, quantity },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } catch (err) {
         // Optionally show error feedback
+        console.error("Failed to sync cart with server:", err);
+        Notify.failure("Failed to sync cart with server");
       }
     }
 
-    // Call parent handler for UI update
     if (addToCart) addToCart(product, quantity);
     openCart();
+  };
+
+  // Wishlist handler (syncs with backend and localStorage)
+  const handleToggleWishlist = async (productId: string) => {
+    const accessToken = getCookie("accessToken");
+    let updatedWishlist: string[] = [];
+    if (wishlist.includes(productId)) {
+      // Remove from wishlist
+      if (accessToken) {
+        try {
+          await axios.delete(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/remove/${productId}`,
+            {
+              headers: { Authorization: `Bearer ${accessToken}` },
+              withCredentials: true,
+            }
+          );
+          Notify.success("Removed from wishlist");
+        } catch (err) {
+          console.error("Failed to remove from wishlist:", err);
+          Notify.failure("Failed to remove from wishlist");
+        }
+      }
+      updatedWishlist = wishlist.filter((id) => id !== productId);
+    } else {
+      // Add to wishlist
+      if (accessToken) {
+        try {
+          await axios.post(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/add`,
+            { productId },
+            {
+              headers: { Authorization: `Bearer ${accessToken}` },
+              withCredentials: true,
+            }
+          );
+          Notify.success("Added to wishlist");
+        } catch (err) {
+          console.error("Failed to add to wishlist:", err);
+          Notify.failure("Failed to add to wishlist");
+        }
+      }
+      updatedWishlist = [...wishlist, productId];
+    }
+    setWishlist(updatedWishlist);
+    localStorage.setItem(LOCAL_WISHLIST_KEY, JSON.stringify(updatedWishlist));
+    // Optionally call parent handler
+    if (toggleWishlistProp) toggleWishlistProp(productId);
   };
 
   return (
@@ -154,7 +252,7 @@ const Shop = ({
                     onProductClick={handleProductClick}
                     addToCart={handleAddToCart}
                     wishlist={wishlist}
-                    toggleWishlist={toggleWishlist}
+                    toggleWishlist={handleToggleWishlist}
                   />
                 ))
               )}

@@ -41,7 +41,7 @@ function DashBlog() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api_v1/blog-posts")
+      .get("https://kapee-ecommerce-backend.onrender.com/api_v1/blog-posts")
       .then((res) => {
         setPosts(res.data);
         setLoading(false);
@@ -119,7 +119,7 @@ function DashBlog() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api_v1/blog-posts",
+        "https://kapee-ecommerce-backend.onrender.com/api_v1/blog-posts",
         formData,
         {
           headers: {
@@ -206,7 +206,7 @@ function DashBlog() {
     }
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api_v1/blog-posts/${editId}`,
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/blog-posts/${editId}`,
         formData,
         {
           headers: {
@@ -244,11 +244,14 @@ function DashBlog() {
       return;
     }
     axios
-      .delete(`http://localhost:5000/api_v1/blog-posts/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/blog-posts/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then(() => {
         setPosts((prev) => prev.filter((p) => p._id !== id));
         setError("");
@@ -408,7 +411,7 @@ function DashBlog() {
                     value={editPost.excerpt}
                     onChange={handleEditExcerptChange}
                     placeholder='Header'
-                    className='h-full'
+                    className='h-full dark:text-yellow-100 dark:bg-gray-800 text-gray-900 max-h-40'
                   />
                 </div>
               </div>
@@ -417,12 +420,12 @@ function DashBlog() {
                 <label className='block mb-2 font-semibold text-gray-700 dark:text-yellow-100'>
                   Body
                 </label>
-                <div className='border rounded bg-white dark:bg-gray-800 h-40 sm:h-60 mb-2'>
+                <div className='border rounded bg-white dark:bg-gray-800 dark:text-yellow-100 h-40 sm:h-60 mb-2'>
                   <ReactQuill
                     value={editPost.body}
                     onChange={handleEditBodyChange}
                     placeholder='Body'
-                    className='h-full'
+                    className='h-full dark:bg-gray-800 dark:text-yellow-100 text-gray-900 max-h-80'
                   />
                 </div>
               </div>
@@ -513,9 +516,14 @@ function DashBlog() {
             <tbody>
               {posts.map((post) => (
                 <tr key={post._id}>
-                  <td className='px-6 py-4'>{post.title}</td>
-                  <td className='px-6 py-4'>
-                    <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+                  <td className='px-6 py-4 dark:text-yellow-100'>
+                    {post.title}
+                  </td>
+                  <td className='px-6 py-4 dark:text-yellow-100'>
+                    <div
+                      dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                      className='dark:text-yellow-100'
+                    />
                   </td>
                   <td className='px-6 py-4'>
                     {post.image ? (
@@ -529,19 +537,59 @@ function DashBlog() {
                     )}
                   </td>
                   <td className='px-6 py-4'>{post.date}</td>
-                  <td className='px-6 py-4 flex gap-2'>
-                    <button
-                      className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
-                      onClick={() => handleEdit(post)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className='font-medium text-red-600 dark:text-red-400 hover:underline'
-                      onClick={() => handleDelete(post._id)}
-                    >
-                      Delete
-                    </button>
+                  <td>
+                    <div className='px-6 py-4 w-full h-full flex gap-2 items-center'>
+                      <button
+                        className='flex items-center gap-1 font-medium text-blue-600 dark:text-blue-400 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                        onClick={() => handleEdit(post)}
+                        title='Edit blog post'
+                      >
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-4 w-4'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M11 5h2m-1 0v14m-7-7h14'
+                          />
+                        </svg>
+                        Edit
+                      </button>
+                      <button
+                        className='flex items-center gap-1 font-medium text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to delete this blog post? This action cannot be undone."
+                            )
+                          ) {
+                            handleDelete(post._id);
+                          }
+                        }}
+                        title='Delete blog post'
+                      >
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-4 w-4'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                          stroke='currentColor'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M6 18L18 6M6 6l12 12'
+                          />
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

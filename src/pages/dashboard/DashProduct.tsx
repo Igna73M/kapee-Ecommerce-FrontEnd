@@ -35,8 +35,10 @@ function DashProduct() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get("http://localhost:5000/api_v1/products"),
-      axios.get("http://localhost:5000/api_v1/brand-categories"),
+      axios.get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`),
+      axios.get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+      ),
     ])
       .then(([productsRes, categoriesRes]) => {
         setProducts(productsRes.data);
@@ -127,12 +129,16 @@ function DashProduct() {
       formData.append("image", editImageFile);
     }
     axios
-      .patch(`http://localhost:5000/api_v1/products/${editId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .patch(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/products/${editId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         setProducts((prev) =>
           prev.map((p) => (p._id === editId ? res.data : p))
@@ -171,11 +177,14 @@ function DashProduct() {
       return;
     }
     axios
-      .delete(`http://localhost:5000/api_v1/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then(() => {
         setProducts((prev) => prev.filter((p) => p._id !== id));
         setError("");
@@ -256,12 +265,16 @@ function DashProduct() {
     }
 
     axios
-      .post("http://localhost:5000/api_v1/products", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .post(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/products`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         setProducts((prev) => [...prev, res.data]);
         setNewProduct({
@@ -650,19 +663,59 @@ function DashProduct() {
                     <td className='px-4 py-2'>
                       {product.inStock ? "Yes" : "No"}
                     </td>
-                    <td className='px-4 py-2 flex gap-2'>
-                      <button
-                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
-                        onClick={() => handleEdit(product)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
-                        onClick={() => handleDelete(product._id)}
-                      >
-                        Delete
-                      </button>
+                    <td>
+                      <div className='px-6 py-4 w-full h-full flex gap-2 items-center'>
+                        <button
+                          className='flex items-center gap-1 font-medium text-blue-600 dark:text-blue-400 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => handleEdit(product)}
+                          title='Edit product'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M11 5h2m-1 0v14m-7-7h14'
+                            />
+                          </svg>
+                          Edit
+                        </button>
+                        <button
+                          className='flex items-center gap-1 font-medium text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this product? This action cannot be undone."
+                              )
+                            ) {
+                              handleDelete(product._id);
+                            }
+                          }}
+                          title='Delete product'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M6 18L18 6M6 6l12 12'
+                            />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )

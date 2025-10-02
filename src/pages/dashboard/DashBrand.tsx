@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Cart from "@/components/Cart";
 
 export default function DashBrand() {
   const [categories, setCategories] = useState([]);
@@ -33,7 +34,9 @@ export default function DashBrand() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api_v1/brand-categories")
+      .get(
+        "https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories"
+      )
       .then((res) => {
         setCategories(res.data);
         setLoading(false);
@@ -61,11 +64,15 @@ export default function DashBrand() {
   const handleNewSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:5000/api_v1/brand-categories", newCategory, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+      .post(
+        "https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories",
+        newCategory,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then((res) => {
         setCategories((prev) => [...prev, res.data]);
         setNewCategory({ name: "", tagline: "", initial: "", bgColor: "" });
@@ -100,7 +107,7 @@ export default function DashBrand() {
     }
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api_v1/brand-categories/${editId}`,
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories/${editId}`,
         editCategory,
         {
           headers: {
@@ -126,11 +133,14 @@ export default function DashBrand() {
   // Delete brand category
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:5000/api_v1/brand-categories/${id}`, {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      })
+      .delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
       .then(() => {
         setCategories((prev) => prev.filter((c) => c._id !== id));
       })
@@ -199,9 +209,9 @@ export default function DashBrand() {
               </tr>
             </thead>
             <tbody>
-              {categories.map((cat) =>
-                editId === cat._id ? (
-                  <tr key={cat._id}>
+              {categories.map((cart) =>
+                editId === cart._id ? (
+                  <tr key={cart._id}>
                     <td colSpan={5} className='px-6 py-4'>
                       <form
                         className='flex gap-2 items-center'
@@ -249,24 +259,64 @@ export default function DashBrand() {
                     </td>
                   </tr>
                 ) : (
-                  <tr key={cat._id}>
-                    <td className='px-6 py-4'>{cat.name}</td>
-                    <td className='px-6 py-4'>{cat.tagline}</td>
-                    <td className='px-6 py-4'>{cat.initial}</td>
-                    <td className='px-6 py-4'>{cat.bgColor}</td>
-                    <td className='px-6 py-4 flex gap-2'>
-                      <button
-                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
-                        onClick={() => handleEdit(cat)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
-                        onClick={() => handleDelete(cat._id)}
-                      >
-                        Delete
-                      </button>
+                  <tr key={cart._id}>
+                    <td className='px-6 py-4'>{cart.name}</td>
+                    <td className='px-6 py-4'>{cart.tagline}</td>
+                    <td className='px-6 py-4'>{cart.initial}</td>
+                    <td className='px-6 py-4'>{cart.bgColor}</td>
+                    <td>
+                      <div className='px-6 py-4 flex gap-2 items-center'>
+                        <button
+                          className='flex items-center gap-1 font-medium text-blue-600 dark:text-blue-400 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => handleEdit(cart)}
+                          title='Edit cart'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M11 5h2m-1 0v14m-7-7h14'
+                            />
+                          </svg>
+                          Edit
+                        </button>
+                        <button
+                          className='flex items-center gap-1 font-medium text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this cart? This action cannot be undone."
+                              )
+                            ) {
+                              handleDelete(cart._id);
+                            }
+                          }}
+                          title='Delete blog post'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M6 18L18 6M6 6l12 12'
+                            />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )

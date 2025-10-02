@@ -49,9 +49,12 @@ const CartPage: React.FC = () => {
     setLoading(true);
     const token = getAccessTokenFromCookies();
     try {
-      const res = await axios.get("http://localhost:5000/api_v1/carts/", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await axios.get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
       if (Array.isArray(res.data.items) && res.data.items.length > 0) {
         const items: CartItem[] = res.data.items.map(
           (item: { product: Product; quantity: number }) => ({
@@ -79,13 +82,17 @@ const CartPage: React.FC = () => {
   const removeFromCart = async (productId: string) => {
     const token = getAccessTokenFromCookies();
     try {
-      await axios.delete("http://localhost:5000/api_v1/carts/remove", {
-        data: { productId },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      await axios.delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/remove`,
+        {
+          data: { productId },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
       await fetchCart();
     } catch (err) {
       // Optionally show error/toast
+      console.log(err);
     }
   };
 
@@ -94,13 +101,14 @@ const CartPage: React.FC = () => {
     const token = getAccessTokenFromCookies();
     try {
       await axios.patch(
-        "http://localhost:5000/api_v1/carts/update",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/update`,
         { productId, quantity },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
       await fetchCart();
     } catch (err) {
       // Optionally show error/toast
+      console.log(err);
     }
   };
 

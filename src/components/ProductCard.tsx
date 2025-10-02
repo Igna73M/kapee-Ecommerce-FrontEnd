@@ -58,7 +58,9 @@ const ProductCard = ({
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api_v1/brand-categories")
+      .get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+      )
       .then((res) => setBrandCategories(res.data))
       .catch(() => setBrandCategories([]));
     // Fetch cartId if logged in
@@ -66,9 +68,12 @@ const ProductCard = ({
       const token = getAccessTokenFromCookies();
       if (token) {
         try {
-          const res = await axios.get("http://localhost:5000/api_v1/carts/", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await axios.get(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (res.data && res.data._id) setCartId(res.data._id);
         } catch {
           setCartId(null);
@@ -112,7 +117,7 @@ const ProductCard = ({
       try {
         if (cartId) {
           await axios.patch(
-            "http://localhost:5000/api_v1/carts/update",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/update`,
             {
               cartId,
               productId: product._id,
@@ -123,7 +128,7 @@ const ProductCard = ({
           );
         } else {
           await axios.post(
-            "http://localhost:5000/api_v1/carts/add",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
             { productId: product._id, quantity: 1 },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -172,7 +177,7 @@ const ProductCard = ({
           handleToggleWishlist();
         }}
         aria-label={
-          wishlist?.includes(product._id)
+          wishlist && Array.isArray(wishlist) && wishlist.includes(product._id)
             ? "Remove from wishlist"
             : "Add to wishlist"
         }
@@ -183,7 +188,9 @@ const ProductCard = ({
         ) : (
           <Heart
             className={`h-5 w-5 ${
-              wishlist?.includes(product._id)
+              wishlist &&
+              Array.isArray(wishlist) &&
+              wishlist.includes(product._id)
                 ? "text-red-500 fill-red-500"
                 : "text-gray-400 dark:text-yellow-100"
             }`}

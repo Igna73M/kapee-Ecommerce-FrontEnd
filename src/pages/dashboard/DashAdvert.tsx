@@ -39,7 +39,7 @@ function DashAdvert() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api_v1/hero-slides")
+      .get("https://kapee-ecommerce-backend.onrender.com/api_v1/hero-slides")
       .then((res) => {
         setSlides(res.data);
         setLoading(false);
@@ -89,12 +89,16 @@ function DashAdvert() {
     formData.append("image", imageFile);
 
     axios
-      .post("http://localhost:5000/api_v1/hero-slides", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .post(
+        "https://kapee-ecommerce-backend.onrender.com/api_v1/hero-slides",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         setSlides((prev) => [...prev, res.data]);
         setNewSlide({
@@ -158,12 +162,16 @@ function DashAdvert() {
       formData.append("image", editImageFile);
     }
     axios
-      .patch(`http://localhost:5000/api_v1/hero-slides/${editId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .patch(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/hero-slides/${editId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         setSlides((prev) => prev.map((s) => (s._id === editId ? res.data : s)));
         setEditId(null);
@@ -196,11 +204,14 @@ function DashAdvert() {
       return;
     }
     axios
-      .delete(`http://localhost:5000/api_v1/hero-slides/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/hero-slides/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then(() => {
         setSlides((prev) => prev.filter((s) => s._id !== id));
         setError("");
@@ -411,19 +422,59 @@ function DashAdvert() {
                     </td>
                     <td className='px-6 py-4'>{slide.discount}</td>
                     <td className='px-6 py-4'>{slide.buttonText}</td>
-                    <td className='px-6 py-4 flex gap-2'>
-                      <button
-                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
-                        onClick={() => handleEdit(slide)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
-                        onClick={() => handleDelete(slide._id)}
-                      >
-                        Delete
-                      </button>
+                    <td>
+                      <div className='px-6 py-4 flex gap-2'>
+                        <button
+                          className='flex items-center gap-1 font-medium text-blue-600 dark:text-blue-400 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => handleEdit(slide)}
+                          title='Edit slide'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M11 5h2m-1 0v14m-7-7h14'
+                            />
+                          </svg>
+                          Edit
+                        </button>
+                        <button
+                          className='flex items-center gap-1 font-medium text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this slide? This action cannot be undone."
+                              )
+                            ) {
+                              handleDelete(slide._id);
+                            }
+                          }}
+                          title='Delete slide'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M6 18L18 6M6 6l12 12'
+                            />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )

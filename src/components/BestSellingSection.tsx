@@ -2,8 +2,8 @@ import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Product } from "@/types/product";
+import ProductModal from "./ProductModal";
 import { useNavigate } from "react-router-dom";
-import ProductModal from "./ProductModal"; // Import your modal
 
 interface BrandCategory {
   _id: string;
@@ -18,6 +18,7 @@ const BestSellingSection = () => {
     null
   );
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Modal state
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -40,8 +41,12 @@ const BestSellingSection = () => {
     const fetchAll = async () => {
       try {
         const [productsRes, categoriesRes] = await Promise.all([
-          axios.get("http://localhost:5000/api_v1/products"),
-          axios.get("http://localhost:5000/api_v1/brand-categories"),
+          axios.get(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/products`
+          ),
+          axios.get(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+          ),
         ]);
         setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
         setBrandCategories(
@@ -66,7 +71,7 @@ const BestSellingSection = () => {
       let updatedWishlist: string[];
       if (wishlist.includes(productId)) {
         await axios.delete(
-          `http://localhost:5000/api_v1/wishlist/${productId}`,
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/remove/${productId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
@@ -75,7 +80,7 @@ const BestSellingSection = () => {
         updatedWishlist = wishlist.filter((id) => id !== productId);
       } else {
         await axios.post(
-          "http://localhost:5000/api_v1/wishlist/add",
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/add`,
           { productId },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -247,7 +252,7 @@ const BestSellingSection = () => {
           className='border border-gray-300 dark:border-gray-700 rounded px-4 py-2 bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-semibold transition-colors duration-150 text-gray-900 dark:text-yellow-100'
           type='button'
           onClick={() => {
-            /* navigate("/shop") */
+            navigate("/shop");
           }}
         >
           View All

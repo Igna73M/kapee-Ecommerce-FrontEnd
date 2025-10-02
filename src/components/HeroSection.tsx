@@ -26,11 +26,11 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api_v1/hero-slides")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/hero-slides`)
       .then((res) => setHeroSlides(res.data))
       .catch(() => setHeroSlides([]));
     axios
-      .get("http://localhost:5000/api_v1/products")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`)
       .then((res) => setProducts(res.data))
       .catch(() => setProducts([]));
   }, []);
@@ -44,13 +44,13 @@ const HeroSection = ({ addToCart, openCart }: HeroSectionProps) => {
   const [animating, setAnimating] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setAnimating(true);
     setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
       setAnimating(false);
     }, 350);
-  };
+  }, [heroSlides.length]);
 
   const prevSlide = () => {
     setAnimating(true);

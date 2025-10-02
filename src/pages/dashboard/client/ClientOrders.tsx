@@ -44,9 +44,12 @@ function ClientOrders({ products = [] }: { products?: Product[] }) {
           setLoading(false);
           return;
         }
-        const res = await axios.get("http://localhost:5000/api_v1/orders/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          "https://kapee-ecommerce-backend.onrender.com/api_v1/orders/me",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         setOrders([]);

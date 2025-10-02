@@ -23,7 +23,7 @@ const Blog = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api_v1/blog-posts")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/blog-posts`)
       .then((res) => {
         setPosts(res.data);
         setLoading(false);
@@ -61,7 +61,7 @@ const Blog = () => {
               <Link
                 key={post._id}
                 to={`/blog/${post._id}`}
-                className='card-shadow group cursor-pointer bg-white dark:bg-gray-800 rounded-lg overflow-hidden border dark:border-gray-700 block'
+                className='card-shadow group cursor-pointer bg-white dark:bg-gray-600 dark:text-yellow-100 rounded-lg overflow-hidden border dark:border-gray-700 block'
               >
                 <div className='aspect-video overflow-hidden'>
                   <img

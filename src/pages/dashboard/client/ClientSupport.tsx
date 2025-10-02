@@ -36,7 +36,7 @@ function ClientSupport() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api_v1/support/contact",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/support/contact`,
         { email, message },
         { withCredentials: true }
       );

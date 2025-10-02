@@ -80,7 +80,7 @@ const Index = ({
       if (localCart.length > 0 && token) {
         try {
           await axios.post(
-            "http://localhost:5000/api_v1/carts/add",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
             {
               items: localCart.map((item) => ({
                 product: item.product._id,
@@ -99,7 +99,7 @@ const Index = ({
     syncLocalCartWithBackend();
 
     axios
-      .get("http://localhost:5000/api_v1/products")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`)
       .then((res) => setProducts(res.data))
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));

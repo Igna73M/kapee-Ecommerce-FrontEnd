@@ -24,7 +24,9 @@ const BlogPost = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:5000/api_v1/blog-posts/${id}`)
+      .get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/blog-posts/${id}`
+      )
       .then((res) => {
         setPost(res.data);
         setLoading(false);
@@ -54,7 +56,7 @@ const BlogPost = () => {
   return (
     <div className='min-h-screen bg-background dark:bg-gray-900'>
       <TopBanner />
-      <main className='max-w-3xl mx-auto py-8 px-4'>
+      <main className='max-w-3xl mx-auto py-8 px-4 dark:text-yellow-100 dark:bg-gray-600'>
         <div className='mb-8'>
           <h1 className='text-4xl font-bold mb-4 text-gray-900 dark:text-yellow-100'>
             {post.title}

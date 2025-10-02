@@ -67,8 +67,10 @@ const ProductTabs = ({
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:5000/api_v1/products"),
-      axios.get("http://localhost:5000/api_v1/brand-categories"),
+      axios.get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`),
+      axios.get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+      ),
     ])
       .then(([prodRes, catRes]) => {
         setProducts(prodRes.data);
@@ -116,7 +118,7 @@ const ProductTabs = ({
     if (accessToken) {
       try {
         await axios.post(
-          "http://localhost:5000/api_v1/carts/add",
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
           { productId: product._id, quantity: 1 },
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );

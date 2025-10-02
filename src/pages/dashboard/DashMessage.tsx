@@ -32,7 +32,7 @@ const DashMessage = () => {
     }
     try {
       const res = await axios.get(
-        "http://localhost:5000/api_v1/support/messages",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/support/messages`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

@@ -103,7 +103,7 @@ const App = () => {
   // Fetch products from backend
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api_v1/products")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`)
       .then((res) => setProducts(res.data))
       .catch(() => setProducts([]))
       .finally(() => setLoadingProducts(false));
@@ -114,7 +114,7 @@ const App = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
     axios
-      .get("http://localhost:5000/api_v1/carts", {
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/carts`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCart(res.data.items || []))
@@ -144,13 +144,14 @@ const App = () => {
     if (!token) return;
     try {
       await axios.post(
-        "http://localhost:5000/api_v1/carts/add",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
         { productId: product._id, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       refreshCart();
     } catch (err) {
       // Optionally show error feedback
+      console.error(err);
     }
   };
 
@@ -159,13 +160,17 @@ const App = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      await axios.delete("http://localhost:5000/api_v1/carts/remove", {
-        data: { productId },
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/remove`,
+        {
+          data: { productId },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       refreshCart();
     } catch (err) {
       // Optionally show error feedback
+      console.error(err);
     }
   };
 
@@ -175,13 +180,14 @@ const App = () => {
     if (!token) return;
     try {
       await axios.patch(
-        "http://localhost:5000/api_v1/carts/update",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/update`,
         { productId, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       refreshCart();
     } catch (err) {
       // Optionally show error feedback
+      console.error(err);
     }
   };
 
@@ -270,12 +276,7 @@ const App = () => {
             <Route
               path='wishlist'
               element={
-                <WishlistPage
-                  wishlist={products.filter((p) => wishlist.includes(p._id))}
-                  onProductClick={() => {}}
-                  addToCart={addToCart}
-                  toggleWishlist={toggleWishlist}
-                />
+                <WishlistPage onProductClick={() => {}} addToCart={addToCart} />
               }
             />
           </Route>

@@ -54,7 +54,7 @@ export default function Signup({
       formData.append("userRole", data.userRole);
 
       const response = await axios.post(
-        "http://localhost:5000/api_v1/user/register",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/user/register`,
         formData,
         {
           headers: {

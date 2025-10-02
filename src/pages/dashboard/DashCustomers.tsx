@@ -31,7 +31,7 @@ function DashCustomers() {
       return;
     }
     axios
-      .get("http://localhost:5000/api_v1/user/users", {
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/user/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

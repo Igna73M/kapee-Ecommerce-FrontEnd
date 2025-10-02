@@ -89,7 +89,7 @@ export default function Login({ open, onClose }: LoginProps) {
       formData.append("password", password);
 
       const res = await axios.post(
-        "http://localhost:5000/api_v1/user/login",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/user/login`,
         formData,
         {
           headers: {
@@ -105,7 +105,7 @@ export default function Login({ open, onClose }: LoginProps) {
         // Send login notification email
         try {
           await axios.post(
-            "http://localhost:5000/api_v1/user/send-login-email",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/user/send-login-email`,
             {
               email: res.data.user.email,
             }
@@ -126,8 +126,12 @@ export default function Login({ open, onClose }: LoginProps) {
         }
       }, 200);
     } catch (error) {
-      Notify.failure("Login failed");
-      reset();
+      const backendMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Login failed";
+      Notify.failure(backendMessage);
     }
   };
 

@@ -21,7 +21,7 @@ function ForgotPass({ open, onClose, onOTPSent }: ForgotPassProps) {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api_v1/user/forgot-password",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/user/forgot-password`,
         { email }
       );
       if (res.data?.message) {

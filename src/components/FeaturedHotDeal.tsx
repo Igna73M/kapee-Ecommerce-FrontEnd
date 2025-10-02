@@ -50,8 +50,10 @@ const FeaturedHotDeal = ({
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:5000/api_v1/products"),
-      axios.get("http://localhost:5000/api_v1/brand-categories"),
+      axios.get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`),
+      axios.get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+      ),
     ])
       .then(([prodRes, catRes]) => {
         setProducts(prodRes.data);
@@ -96,13 +98,13 @@ const FeaturedHotDeal = ({
       if (accessToken) {
         if (!isCurrentlyWishlisted) {
           await axios.post(
-            "http://localhost:5000/api_v1/wishlist/add",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/add`,
             { productId: product._id },
             { headers: { Authorization: `Bearer ${accessToken}` } }
           );
         } else {
           await axios.delete(
-            `http://localhost:5000/api_v1/wishlist/remove/${product._id}`,
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/remove/${product._id}`,
             { headers: { Authorization: `Bearer ${accessToken}` } }
           );
         }
@@ -162,7 +164,7 @@ const FeaturedHotDeal = ({
     // 3. Update backend with Authorization header
     try {
       await axios.post(
-        "http://localhost:5000/api_v1/carts/add",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
         {
           productId,
           quantity: 1,

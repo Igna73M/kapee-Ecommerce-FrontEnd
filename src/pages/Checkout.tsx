@@ -44,9 +44,12 @@ export default function Checkout() {
       setLoading(true);
       const token = getAccessTokenFromCookies();
       try {
-        const res = await axios.get("http://localhost:5000/api_v1/carts/", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await axios.get(
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
         if (
           res.data &&
           Array.isArray(res.data.items) &&
@@ -85,14 +88,20 @@ export default function Checkout() {
     const token = getAccessTokenFromCookies();
     if (cartId) {
       try {
-        await axios.delete("http://localhost:5000/api_v1/carts/remove", {
-          data: { cartId, productId: id },
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        await axios.delete(
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/remove`,
+          {
+            data: { cartId, productId: id },
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
         // Refresh cart
-        const res = await axios.get("http://localhost:5000/api_v1/carts/", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await axios.get(
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
         if (res.data && Array.isArray(res.data.items)) {
           setCart(
             res.data.items.map(
@@ -123,14 +132,17 @@ export default function Checkout() {
     if (cartId) {
       try {
         await axios.patch(
-          "http://localhost:5000/api_v1/carts/update",
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/update`,
           { cartId, productId: id, quantity: qty },
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         // Refresh cart
-        const res = await axios.get("http://localhost:5000/api_v1/carts/", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await axios.get(
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
         if (res.data && Array.isArray(res.data.items)) {
           setCart(
             res.data.items.map(
@@ -226,19 +238,27 @@ export default function Checkout() {
 
     try {
       const token = getAccessTokenFromCookies();
-      await axios.post("http://localhost:5000/api_v1/orders/", orderPayload, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      await axios.post(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/orders/`,
+        orderPayload,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
 
       // Delete cart from backend if cartId exists
       if (cartId && token) {
         try {
-          await axios.delete("http://localhost:5000/api_v1/carts/", {
-            headers: { Authorization: `Bearer ${token}` },
-            data: { cartId },
-          });
-        } catch {
+          await axios.delete(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+              data: { cartId },
+            }
+          );
+        } catch (err) {
           // Ignore backend cart delete errors
+          console.log(err);
         }
       }
 

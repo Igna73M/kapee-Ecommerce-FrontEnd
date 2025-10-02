@@ -76,13 +76,17 @@ const Cart = ({
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        await axios.delete("http://localhost:5000/api_v1/carts/remove", {
-          data: { productId },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await axios.delete(
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/remove`,
+          {
+            data: { productId },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (removeFromCart) removeFromCart(productId);
       } catch (err) {
         // Optionally show error feedback
+        console.error(err);
       }
     }
     setUpdatingId(null);
@@ -103,13 +107,14 @@ const Cart = ({
     if (token) {
       try {
         await axios.patch(
-          "http://localhost:5000/api_v1/carts/update",
+          `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/update`,
           { productId, quantity },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (updateCartQuantity) updateCartQuantity(productId, quantity);
       } catch (err) {
         // Optionally show error feedback
+        console.error(err);
       }
     }
     setUpdatingId(null);

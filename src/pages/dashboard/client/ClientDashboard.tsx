@@ -54,11 +54,11 @@ function ClientDashboard() {
         const headers = { Authorization: `Bearer ${token}` };
         // Fetch orders and wishlist separately for better error handling
         const ordersPromise = axios.get(
-          "http://localhost:5000/api_v1/orders/me",
+          "https://kapee-ecommerce-backend.onrender.com/api_v1/orders/me",
           { headers }
         );
         const wishlistPromise = axios.get(
-          "http://localhost:5000/api_v1/wishlist/me",
+          "https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/me",
           { headers }
         );
         const [ordersRes, wishlistRes] = await Promise.allSettled([

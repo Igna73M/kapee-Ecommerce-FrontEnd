@@ -73,9 +73,12 @@ const ProductModal = ({
       const token = getAccessTokenFromCookies();
       if (token) {
         try {
-          const res = await axios.get("http://localhost:5000/api_v1/carts/", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await axios.get(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
           if (res.data && res.data._id) setCartId(res.data._id);
         } catch {
           setCartId(null);
@@ -116,7 +119,7 @@ const ProductModal = ({
         let productInCart = false;
         if (cartId) {
           const cartRes = await axios.get(
-            "http://localhost:5000/api_v1/carts/",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -139,7 +142,7 @@ const ProductModal = ({
 
         if (cartId && productInCart) {
           await axios.patch(
-            "http://localhost:5000/api_v1/carts/update",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/update`,
             {
               cartId,
               productId: product._id,
@@ -150,7 +153,7 @@ const ProductModal = ({
           );
         } else {
           await axios.post(
-            "http://localhost:5000/api_v1/carts/add",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/carts/add`,
             { productId: product._id, quantity },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -189,13 +192,13 @@ const ProductModal = ({
       if (token) {
         if (updatedWishlist.includes(product._id)) {
           await axios.post(
-            "http://localhost:5000/api_v1/wishlist/add",
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/add`,
             { productId: product._id },
             { headers: { Authorization: `Bearer ${token}` } }
           );
         } else {
           await axios.delete(
-            `http://localhost:5000/api_v1/wishlist/remove/${product._id}`,
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/remove/${product._id}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
         }

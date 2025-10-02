@@ -28,8 +28,8 @@ const BannerSection = ({ addToCart, openCart }: BannerSectionProps) => {
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:5000/api_v1/banners"),
-      axios.get("http://localhost:5000/api_v1/products"),
+      axios.get(`https://kapee-ecommerce-backend.onrender.com/api_v1/banners`),
+      axios.get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`),
     ])
       .then(([bannersRes, productsRes]) => {
         setBanners(bannersRes.data);

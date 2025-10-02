@@ -30,7 +30,7 @@ function DashServices() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:5000/api_v1/services")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/services`)
       .then((res) => {
         setServices(res.data);
         setLoading(false);
@@ -63,11 +63,15 @@ function DashServices() {
       return;
     }
     axios
-      .post("http://localhost:5000/api_v1/services", newService, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .post(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/services`,
+        newService,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         setServices((prev) => [...prev, res.data]);
         setNewService({ icon: "", title: "", description: "" });
@@ -103,11 +107,15 @@ function DashServices() {
       return;
     }
     axios
-      .patch(`http://localhost:5000/api_v1/services/${editId}`, editService, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .patch(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/services/${editId}`,
+        editService,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         setServices((prev) =>
           prev.map((s) => (s._id === editId ? res.data : s))
@@ -133,11 +141,14 @@ function DashServices() {
       return;
     }
     axios
-      .delete(`http://localhost:5000/api_v1/services/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .delete(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/services/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then(() => {
         setServices((prev) => prev.filter((s) => s._id !== id));
         setError("");
@@ -278,19 +289,59 @@ function DashServices() {
                     <td className='px-6 py-4'>{renderIcon(service.icon)}</td>
                     <td className='px-6 py-4'>{service.title}</td>
                     <td className='px-6 py-4'>{service.description}</td>
-                    <td className='px-6 py-4 flex gap-2'>
-                      <button
-                        className='font-medium text-blue-600 dark:text-blue-400 hover:underline'
-                        onClick={() => handleEdit(service)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className='font-medium text-red-600 dark:text-red-400 hover:underline'
-                        onClick={() => handleDelete(service._id)}
-                      >
-                        Delete
-                      </button>
+                    <td>
+                      <div className='px-6 py-4 flex gap-2'>
+                        <button
+                          className='flex items-center gap-1 font-medium text-blue-600 dark:text-blue-400 hover:text-white hover:bg-blue-600 dark:hover:bg-blue-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => handleEdit(service)}
+                          title='Edit service'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M11 5h2m-1 0v14m-7-7h14'
+                            />
+                          </svg>
+                          Edit
+                        </button>
+                        <button
+                          className='flex items-center gap-1 font-medium text-red-600 dark:text-red-400 hover:text-white hover:bg-red-600 dark:hover:bg-red-500 hover:shadow px-3 py-1 rounded transition-all duration-150'
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this service? This action cannot be undone."
+                              )
+                            ) {
+                              handleDelete(service._id);
+                            }
+                          }}
+                          title='Delete service'
+                        >
+                          <svg
+                            xmlns='http://www.w3.org/2000/svg'
+                            className='h-4 w-4'
+                            fill='none'
+                            viewBox='0 0 24 24'
+                            stroke='currentColor'
+                          >
+                            <path
+                              strokeLinecap='round'
+                              strokeLinejoin='round'
+                              strokeWidth={2}
+                              d='M6 18L18 6M6 6l12 12'
+                            />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )

@@ -36,15 +36,24 @@ function Dashboard() {
         const token = getToken();
         const [productsRes, usersRes, brandsRes, servicesRes] =
           await Promise.all([
-            axios.get("http://localhost:5000/api_v1/products"),
+            axios.get(
+              `https://kapee-ecommerce-backend.onrender.com/api_v1/products`
+            ),
             // Customers route is protected: requireSignin, isAdmin
             token
-              ? axios.get("http://localhost:5000/api_v1/user/users", {
-                  headers: { Authorization: `Bearer ${token}` },
-                })
+              ? axios.get(
+                  `https://kapee-ecommerce-backend.onrender.com/api_v1/user/users`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                )
               : Promise.resolve({ data: [] }),
-            axios.get("http://localhost:5000/api_v1/brand-categories"),
-            axios.get("http://localhost:5000/api_v1/services"),
+            axios.get(
+              `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+            ),
+            axios.get(
+              `https://kapee-ecommerce-backend.onrender.com/api_v1/services`
+            ),
           ]);
         setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
         // If response is { users: [...] }, extract users array

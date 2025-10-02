@@ -33,7 +33,7 @@ function ResetPass() {
     try {
       const accessToken = getCookie("accessToken");
       const res = await axios.post(
-        "http://localhost:5000/api_v1/user/change-password",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/user/change-password`,
         {
           currentPassword,
           newPassword,

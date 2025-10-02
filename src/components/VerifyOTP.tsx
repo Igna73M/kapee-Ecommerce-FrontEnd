@@ -26,7 +26,7 @@ function VerifyOTP({ open, email, onClose }: VerifyOTPProps) {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api_v1/user/forgot-password/reset",
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/user/forgot-password/reset`,
         {
           email,
           otp,

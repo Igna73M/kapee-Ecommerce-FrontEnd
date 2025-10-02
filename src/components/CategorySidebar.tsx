@@ -28,8 +28,10 @@ const CategorySidebar = ({ open, onClose }: CategorySidebarProps) => {
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:5000/api_v1/brand-categories"),
-      axios.get("http://localhost:5000/api_v1/products"),
+      axios.get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+      ),
+      axios.get(`https://kapee-ecommerce-backend.onrender.com/api_v1/products`),
     ])
       .then(([catRes, prodRes]) => {
         setCategories(catRes.data);

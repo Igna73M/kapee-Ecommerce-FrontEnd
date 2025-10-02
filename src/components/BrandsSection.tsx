@@ -16,7 +16,9 @@ const BrandsSection = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api_v1/brand-categories")
+      .get(
+        `https://kapee-ecommerce-backend.onrender.com/api_v1/brand-categories`
+      )
       .then((res) => setBrandCategories(res.data))
       .catch(() => setBrandCategories([]))
       .finally(() => setLoading(false));

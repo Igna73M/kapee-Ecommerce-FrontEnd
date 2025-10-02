@@ -15,7 +15,7 @@ const ServicesSection = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api_v1/services")
+      .get(`https://kapee-ecommerce-backend.onrender.com/api_v1/services`)
       .then((res) => setServices(res.data))
       .catch(() => setServices([]))
       .finally(() => setLoading(false));

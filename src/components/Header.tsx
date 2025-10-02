@@ -43,9 +43,15 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
       const accessToken = getCookie("accessToken");
       if (accessToken) {
         try {
-          const res = await axios.get("http://localhost:5000/api_v1/wishlist", {
-            withCredentials: true,
-          });
+          const res = await axios.get(
+            `https://kapee-ecommerce-backend.onrender.com/api_v1/wishlist/me`,
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
           if (Array.isArray(res.data?.wishlist)) {
             setWishlistState(res.data.wishlist);
             localStorage.setItem("wishlist", JSON.stringify(res.data.wishlist));
@@ -229,7 +235,7 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                           const email = localStorage.getItem("email");
                           if (email) {
                             await axios.post(
-                              "http://localhost:5000/api_v1/user/logout",
+                              `https://kapee-ecommerce-backend.onrender.com/api_v1/user/logout`,
                               { email }
                             );
                           }
@@ -340,11 +346,6 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                   BLOG
                 </Link>
               </div>
-              <Link to='/checkout'>
-                <button className='bg-primary text-primary-foreground dark:bg-yellow-500 dark:text-gray-900 hover:bg-primary/90 dark:hover:bg-yellow-400 px-4 lg:px-6 text-xs md:text-base inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium py-2'>
-                  BUY NOW
-                </button>
-              </Link>
             </div>
             {/* Mobile nav */}
             {showMobileNav && (
@@ -382,12 +383,6 @@ const Header = ({ cart = [], wishlist = [], onCartClick }: HeaderProps) => {
                 >
                   BLOG
                 </Link>
-                <button
-                  className='bg-primary text-primary-foreground dark:bg-yellow-500 dark:text-gray-900 hover:bg-primary/90 dark:hover:bg-yellow-400 px-4 text-xs py-1'
-                  type='button'
-                >
-                  BUY NOW
-                </button>
               </div>
             )}
           </nav>
